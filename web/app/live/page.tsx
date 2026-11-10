@@ -67,8 +67,10 @@ export default function LivePage() {
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [results, setResults] = useState<RunResult[]>([]);
+  const [origin, setOrigin] = useState("http://localhost:4310");
 
   useEffect(() => {
+    setOrigin(window.location.origin);
     const u = readStoredUrl();
     setApiUrl(u);
     setDraftUrl(u);
@@ -259,7 +261,7 @@ export default function LivePage() {
         <Section title="Run it locally" description="The API runs on any machine with gpulab installed, on the best local device (CUDA, Apple MPS, or CPU).">
           <CodeBlock>{`git clone https://github.com/Gnanasudharsan/gpu-inference-performance-lab
 cd gpu-inference-performance-lab && make install
-GPULAB_CORS_ORIGINS=http://localhost:3000 .venv/bin/gpulab serve --port 8000`}</CodeBlock>
+GPULAB_CORS_ORIGINS=${origin} .venv/bin/gpulab serve --port 8000`}</CodeBlock>
           <p className="mt-3 text-sm text-ink-2">
             Recorded results from the development machine are in the{" "}
             <Link className="text-accent hover:underline" href="/benchmarks/">

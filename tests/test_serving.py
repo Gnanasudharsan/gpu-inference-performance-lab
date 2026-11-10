@@ -210,7 +210,8 @@ def test_bounded_queue_sheds_load_and_counts_misses():
     # progress at arrival (measured service times, not an assumed sleep duration)
     worst_service = max(o.service_us for o in done)
     assert max(o.queue_us for o in done) <= (4 + 1) * worst_service + 1_000
-    assert m["deadline_miss_rate"] >= m["counts"]["rejected"] / len(trace)
+    # rejected requests are misses; equality is exact in math but not in floating point
+    assert m["deadline_miss_rate"] >= m["counts"]["rejected"] / len(trace) - 1e-12
 
 
 def test_expired_requests_are_dropped():

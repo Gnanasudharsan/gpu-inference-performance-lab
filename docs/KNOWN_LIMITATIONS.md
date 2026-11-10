@@ -30,3 +30,7 @@
   and no multi-GPU.
 - **Root cause of the 3–10 ms MPS round-trip stalls is undetermined.** The display-frame hypothesis
   was tested and rejected.
+- **No public GPU backend.** The deployed dashboard's Live page needs a user-run local API, or a GPU
+  service that has not been deployed (credentials and spend not authorized).
+- **Docker image not built locally.** The Docker daemon was unavailable and disk was limited, so
+  `deploy/Dockerfile` is unverified until built on a CUDA host.

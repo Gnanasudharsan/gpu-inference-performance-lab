@@ -4,6 +4,7 @@ A reproducible lab for optimizing small-batch, latency-sensitive ML inference on
 PyTorch baseline to measured, fused GPU execution, and reporting the tradeoffs between latency, throughput,
 goodput, correctness and cost.
 
+> **Live dashboard:** https://gpu-inference-performance-lab.vercel.app (recorded Apple M4 measurements).
 > **Status:** under active construction. See [docs/PHASE_STATUS.md](docs/PHASE_STATUS.md).
 > No result appears in this repository unless it was measured on the hardware recorded next to it.
 
@@ -23,7 +24,7 @@ make check      # lint + typecheck + tests
 - [Kernel optimization and results](docs/KERNELS.md)
 - [Latency-aware serving](docs/SERVING.md)
 - [Engineering report](docs/ENGINEERING_REPORT.md) and [generated analysis](results/ANALYSIS.md)
-- [Dashboard](docs/DASHBOARD.md)
+- [Dashboard](docs/DASHBOARD.md) and [deployment](docs/DEPLOYMENT.md)
 - [Decisions](docs/DECISIONS.md)
 - [Benchmark methodology](docs/BENCHMARK_METHODOLOGY.md) and [profiling](docs/PROFILING.md)
 - [Reproducibility](docs/REPRODUCIBILITY.md)

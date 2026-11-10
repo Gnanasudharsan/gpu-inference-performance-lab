@@ -9,7 +9,7 @@
 | 4 | Scheduling and end-to-end systems | **complete** | `758dbd6`, phase commit |
 | 5 | Experimental analysis | **complete** | `10828f8`, phase commit |
 | 6 | Web dashboard | **complete** | phase commit |
-| 7 | Deployment and live execution | pending | |
+| 7 | Deployment and live execution | **complete for the dashboard**; GPU API prepared, not deployed (needs authorization) | phase commit |
 | 8 | Final hardening and showcase | pending | |
 
 ## Phase 0 report
@@ -107,3 +107,15 @@
   `docs/screenshots/`.
 - Gate: production build succeeds (CI job added); no fabricated live state; recorded and live data
   are kept separate.
+
+## Phase 7 report
+
+- Dashboard deployed to https://gpu-inference-performance-lab.vercel.app (static, security headers,
+  verified with HTTP checks; the Live page reports *offline* without a backend).
+- GPU execution API: hardened (auth, rate limit, one job at a time, bounded inputs, CORS including
+  Private Network Access, hashed client ids, JSON logs). Packaged as `deploy/Dockerfile` (base image
+  tag verified) and `deploy/modal_app.py` (`max_containers=1`, timeout, scale-to-zero, secret
+  store). **Not deployed: no GPU-cloud credentials and no authorized spend.**
+- A cross-origin live run from the production origin to a local M4 API was verified at the HTTP
+  level (preflight plus run).
+- See [DEPLOYMENT.md](DEPLOYMENT.md) for the hosting evaluation, cost caps and the exact checklist.

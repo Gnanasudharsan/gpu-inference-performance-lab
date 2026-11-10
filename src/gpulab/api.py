@@ -112,6 +112,8 @@ def create_app() -> FastAPI:
             allow_methods=["GET", "POST"],
             allow_headers=["Content-Type", "X-API-Key"],
             max_age=600,
+            # Chrome Private Network Access: lets a listed public HTTPS origin call a local API
+            allow_private_network=True,
         )
 
     def client_id(request: Request) -> str:

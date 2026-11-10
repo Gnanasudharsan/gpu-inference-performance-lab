@@ -107,3 +107,21 @@ def test_cors_allowlist(monkeypatch):
         "/api/run", headers={"Origin": "https://evil.test", "Access-Control-Request-Method": "POST"}
     )
     assert bad.headers.get("access-control-allow-origin") is None
+
+
+def test_private_network_access_preflight(monkeypatch):
+    c, _ = _client(monkeypatch, GPULAB_CORS_ORIGINS="https://example.test")
+    h = {
+        "Origin": "https://example.test",
+        "Access-Control-Request-Method": "POST",
+        "Access-Control-Request-Headers": "content-type",
+        "Access-Control-Request-Private-Network": "true",
+    }
+    ok = c.options("/api/run", headers=h)
+    assert ok.status_code == 200
+    assert ok.headers.get("access-control-allow-private-network") == "true"
+    assert ok.headers.get("access-control-allow-origin") == "https://example.test"
+    h["Origin"] = "https://evil.test"
+    bad = c.options("/api/run", headers=h)
+    assert bad.status_code == 400  # browsers refuse the request: no allow-origin header
+    assert bad.headers.get("access-control-allow-origin") is None

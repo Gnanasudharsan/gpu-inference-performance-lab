@@ -27,6 +27,7 @@ jobs:
           uv pip install --python .venv/bin/python -e ".[dev]"
       - run: .venv/bin/python -m gpulab.cli env
       - run: make lint
+      - run: python3 -m py_compile deploy/modal_app.py
       - run: make typecheck
       - run: .venv/bin/python -m pytest --cov=gpulab --cov-report=term-missing
       - name: experiment pipeline smoke test (runner + analysis)
