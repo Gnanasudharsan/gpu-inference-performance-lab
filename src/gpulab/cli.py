@@ -208,6 +208,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     bench.add_argument("--iters", type=int, default=300)
     bench.add_argument("--trials", type=int, default=3)
+    bench.add_argument("--burst", type=int, default=50, help="requests per pipelined burst")
     bench.add_argument("--warmup-s", type=float, default=1.0)
     bench.add_argument("--idle-gap-us", type=float, default=0.0)
     bench.add_argument("--device-iters", type=int, default=100)

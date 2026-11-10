@@ -424,8 +424,13 @@ def run_interleaved(
     dtype: torch.dtype,
     cfg: BenchConfig,
     input_seed: int = 1234,
+    mode: str = "latency",
 ) -> list[ExperimentRecord]:
-    """Latency-mode comparison with implementations interleaved trial by trial.
+    """Comparison with implementations interleaved trial by trial.
+
+    ``mode="latency"``: each trial is ``iters / trials`` synchronous requests.
+    ``mode="throughput"``: each trial is one pipelined burst of ``cfg.burst`` requests
+    (one sample per trial), which is far less sensitive to power-state noise.
 
     Each trial measures every implementation once, rotating the order, so slow drift in
     clocks, thermals or background load affects all implementations equally. Per-trial
@@ -433,6 +438,8 @@ def run_interleaved(
     """
     if len(set(impl_names)) != len(impl_names) or not impl_names:
         raise ValueError("impl_names must be non-empty and unique")
+    if mode not in ("latency", "throughput"):
+        raise ValueError("interleaved mode must be 'latency' or 'throughput'")
     weights = make_weights(model, device, dtype)
     x = make_inputs(rows, model.d_model, input_seed, device, dtype)
     synchronize(device)
@@ -443,7 +450,7 @@ def run_interleaved(
     for p in preps.values():
         _warmup(functools.partial(p.runner, x), device, cfg)
     state_before = system_state()
-    results = {n: ModeResult("latency") for n in impl_names}
+    results = {n: ModeResult(mode) for n in impl_names}
     short = BenchConfig(**{**cfg.to_dict(), "warmup_iters": 5, "warmup_s": 0.0})
     for t, n_iter in enumerate(_split(cfg.iters, cfg.trials)):
         k = t % len(impl_names)
@@ -451,6 +458,17 @@ def run_interleaved(
         for name in order:
             runner = preps[name].runner
             _warmup(functools.partial(runner, x), device, short)
+            if mode == "throughput":
+                with _quiet_gc():
+                    synchronize(device)
+                    t0 = time.perf_counter_ns()
+                    for _ in range(cfg.burst):
+                        runner(x)
+                    synchronize(device)
+                    per_req = (time.perf_counter_ns() - t0) / 1e3 / cfg.burst
+                results[name].host_us.append(per_req)
+                results[name].trial_medians_us.append(per_req)
+                continue
             host = np.empty(n_iter)
             with _quiet_gc():
                 for i in range(n_iter):
@@ -461,7 +479,7 @@ def run_interleaved(
                     host[i] = (time.perf_counter_ns() - t0) / 1e3
             results[name].host_us.extend(host.tolist())
             results[name].trial_medians_us.append(float(np.median(host)))
-    if device.type != "cpu" and cfg.device_iters:
+    if device.type != "cpu" and cfg.device_iters and mode == "latency":
         for name in impl_names:
             evs = _events(device, cfg.device_iters)
             runner = preps[name].runner
@@ -486,7 +504,7 @@ def run_interleaved(
             input_seed,
             mem_before,
             state_before,
-            {"interleaved": {"group": group, "peers": impl_names, "order": "rotate"}},
+            {"interleaved": {"group": group, "peers": impl_names, "order": "rotate", "mode": mode}},
         )
         for n in impl_names
     ]

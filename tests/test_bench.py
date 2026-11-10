@@ -104,6 +104,13 @@ def test_interleaved_pairs_trials(extra_impls):
     assert len(base.metrics["trial_medians_us"]) == len(slow.metrics["trial_medians_us"]) == 3
     s = paired_speedup(base.metrics["trial_medians_us"], slow.metrics["trial_medians_us"])
     assert s["max"] < 1.0  # the sleepy impl is slower in every trial
+    thr = run_interleaved(
+        ["eager", "sleepy"], TINY, 2, torch.device("cpu"), torch.float32, FAST, mode="throughput"
+    )
+    assert len(thr[0].metrics["trial_medians_us"]) == FAST.trials
+    assert thr[1].metrics["host_us"]["min"] > 2000  # 2 ms sleep per request
+    with pytest.raises(ValueError, match="interleaved mode"):
+        run_interleaved(["eager"], TINY, 2, torch.device("cpu"), torch.float32, FAST, mode="e2e")
     table = benchmark_table(recs)
     assert "sleepy" in table
     assert "×" in table
