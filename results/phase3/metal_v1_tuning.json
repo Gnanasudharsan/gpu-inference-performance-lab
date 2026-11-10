@@ -1,0 +1,57 @@
+{
+  "dtype": "float16",
+  "model": {
+    "d_model": 1024,
+    "d_hidden": 2816,
+    "depth": 4,
+    "eps": 1e-06,
+    "seed": 0
+  },
+  "results": {
+    "1": {
+      "metal_n1_c1": 806.545,
+      "metal_n1_c2": 793.98,
+      "metal_n1_c4": 779.49916,
+      "metal_n2_c1": 788.86834,
+      "metal_n2_c2": 783.58,
+      "metal_n2_c4": 785.59834,
+      "metal_n4_c1": 769.85916,
+      "metal_n4_c2": 774.975,
+      "metal_n4_c4": 771.78666,
+      "metal_n8_c1": 804.29834,
+      "metal_n8_c2": 756.9575,
+      "metal_n8_c4": 777.45166
+    },
+    "4": {
+      "metal_n1_c1": 1220.3275,
+      "metal_n1_c2": 1123.31084,
+      "metal_n1_c4": 1103.7641800000001,
+      "metal_n2_c1": 1081.9675,
+      "metal_n2_c2": 1073.1025,
+      "metal_n2_c4": 1164.86584,
+      "metal_n4_c1": 1063.04168,
+      "metal_n4_c2": 1049.3375,
+      "metal_n4_c4": 1093.97,
+      "metal_n8_c1": 1042.1825,
+      "metal_n8_c2": 1083.56,
+      "metal_n8_c4": 1020.36
+    },
+    "8": {
+      "metal_n1_c1": 2235.2725,
+      "metal_n1_c2": 1935.27334,
+      "metal_n1_c4": 2112.68166,
+      "metal_n2_c1": 1923.96582,
+      "metal_n2_c2": 1786.48,
+      "metal_n2_c4": 1895.7475,
+      "metal_n4_c1": 1794.5225,
+      "metal_n4_c2": 1697.26082,
+      "metal_n4_c4": 1850.57166,
+      "metal_n8_c1": 1741.435,
+      "metal_n8_c2": 1686.695,
+      "metal_n8_c4": 1769.09584
+    }
+  },
+  "device_name": "Apple M4 GPU (Metal/MPS)",
+  "git_commit": "cb577af67843df336f3d8dd076585aac54d20f65",
+  "git_dirty": false
+}

@@ -1,0 +1,24 @@
+{
+  "impl": "compile",
+  "device": "mps",
+  "dtype": "float16",
+  "rows": 8,
+  "iters": 20,
+  "dispatches_per_forward": 8.0,
+  "custom_kernel_launches_per_forward": 0.0,
+  "custom_kernels": {},
+  "launches_per_forward": 8.0,
+  "launch_count_complete": false,
+  "top_ops": [
+    {
+      "name": "aten::mm",
+      "calls_per_forward": 4.0,
+      "self_cpu_us_per_forward": 205.24060000000128
+    },
+    {
+      "name": "aten::addmm",
+      "calls_per_forward": 4.0,
+      "self_cpu_us_per_forward": 178.14390000000103
+    }
+  ]
+}

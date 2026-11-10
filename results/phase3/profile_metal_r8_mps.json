@@ -1,0 +1,16 @@
+{
+  "impl": "metal",
+  "device": "mps",
+  "dtype": "float16",
+  "rows": 8,
+  "iters": 20,
+  "dispatches_per_forward": 0.0,
+  "custom_kernel_launches_per_forward": 8.0,
+  "custom_kernels": {
+    "gpulab.kernels.metal.norm_gate_up_silu": 4.0,
+    "gpulab.kernels.metal.down_residual": 4.0
+  },
+  "launches_per_forward": 8.0,
+  "launch_count_complete": true,
+  "top_ops": []
+}

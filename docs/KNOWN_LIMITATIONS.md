@@ -15,3 +15,8 @@
   from this machine are indicative. Paired, interleaved speedups are the robust quantity.
 - **No device-side MPS timeline.** The PyTorch profiler has no MPS device activity, and Instruments
   is not installed. Device time comes from MPS events, and launch counts from leaf dispatches.
+- **Triton and CUDA graphs are unmeasured.** These paths are correctness-tested only (fp32/fp16 under
+  the interpreter). bf16 under the interpreter is blocked by a Triton interpreter bug
+  (`tests/test_triton_bf16_diagnostic.py`).
+- **Launch counts for `torch.compile` are incomplete.** Inductor-generated Metal kernels are invisible
+  to the ATen-level profiler proxy.

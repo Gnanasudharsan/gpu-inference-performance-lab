@@ -5,7 +5,7 @@
 | 0 | Research, repository and environment | **complete** | `2c42aa6`, `275775a` |
 | 1 | Workload and correctness baseline | **complete** | see git log |
 | 2 | Benchmarking and profiling | **complete** | `d82a86a`, `18e7cbf`, `fa7ac5f`, data commit |
-| 3 | GPU kernel optimization | pending | |
+| 3 | GPU kernel optimization | **complete** (Apple GPU measured; NVIDIA paths correctness-only) | `cb577af`→`8cff002`→`605be56`, phase commit |
 | 4 | Scheduling and end-to-end systems | pending | |
 | 5 | Experimental analysis | pending | |
 | 6 | Web dashboard | pending | |
@@ -48,3 +48,22 @@
   timing is far more stable (trial CV ≈ 0.08).
 - Gate: 94 tests pass (stats, harness timing against a known 2 ms delay, correctness gate,
   interleaving, profiler scaling, CLI round trip). Repeatability is measured and documented.
+
+## Phase 3 report
+
+- Bottleneck first: eager issues 64 launches per forward, of which 12 are GEMMs, and streams weights
+  at 55–66% of nominal bandwidth at 1–8 rows.
+- Implementations: `fused_weights`, `compile`, `metal` (fused GEMV kernels, v1→v2 with an interleaved
+  A/B, tuned launch configs), `triton` (fused tiled GEMMs), and the CUDA-graph variants.
+- Correctness: every implementation is checked against the float64 reference on all supported
+  devices and dtypes (210 tests locally). Triton fp32/fp16 pass in the CI interpreter; bf16 is blocked
+  by an interpreter bug that a minimal diagnostic reproduces.
+- Measured (pipelined, fp16, 1024×2816×4): metal is 1.16–1.26× faster than eager at 1–8 rows, with
+  launches cut 64→8 and bandwidth 55%→68% of nominal. At 16 rows there is no significant
+  difference. At d=512 it is 1.66×.
+- Regressions documented: CPU `torch.compile` (0.63–0.78×), CPU `fused_weights` at 8 rows (0.79×),
+  and one MPS fp32 latency-mode case that the pipelined mode contradicts.
+- Not measured: anything CUDA-specific (no NVIDIA GPU).
+- Gate: correctness passes; speedups and regressions are backed by paired CIs; profiler launch counts
+  explain the gains. Process bugs found and fixed on the way: the interleaved CLI silently skipped
+  throughput mode, the profiler missed custom kernels, and lint failures were masked by pipes.

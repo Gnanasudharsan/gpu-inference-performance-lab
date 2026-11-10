@@ -81,3 +81,29 @@ of per-trial ratios, reported with its min and max across trials.
 Synchronous per-request latency on this laptop is dominated by power-state effects (clustered
 tails). Pipelined time per request is much more stable and isolates the cost of the work itself.
 Both are reported, and neither is substituted for the other.
+
+## D11. Custom kernels target only the regime where they win (≤ 8 rows)
+
+The fused Metal GEMV kernels beat eager at 1–8 rows. At 16+ rows MPS's GEMM (simdgroup-matrix
+hardware) is the better tool for the products, so `metal` switches to it and keeps only fused
+elementwise kernels. The crossover was measured (16 rows: no significant difference), not assumed.
+**Rejected:** writing a general Metal GEMM. Competing with Apple's GEMM at large M is a large
+project with little payoff for a latency-oriented workload.
+
+## D12. Kernel iterations are compared head-to-head from Git history
+
+v1 and v2 of the Metal kernels were A/B tested in one interleaved run. v1 was loaded from its commit
+with `git show`, so the comparison stays reproducible without keeping dead code in the package.
+
+## D13. CUDA C++ / PTX not written
+
+For this workload, Triton expresses the needed fusion (norm folded into the K-loop, two accumulators,
+nonlinear epilogues) at the tile level. No NVIDIA hardware was available to justify or validate
+hand-written CUDA or PTX. **Revisit** if Nsight Compute on a real GPU shows Triton failing to reach
+DRAM bandwidth at small M (for example, if split-K is needed).
+
+## D14. Launch-config tuning and comparisons use pipelined mode
+
+Synchronous single-request latency on this laptop is dominated by clustered power-state noise
+(Phase 2). Pipelined bursts isolate the cost of the work, and their CIs are 3–5× tighter. Synchronous
+latency is still measured and reported for every comparison.

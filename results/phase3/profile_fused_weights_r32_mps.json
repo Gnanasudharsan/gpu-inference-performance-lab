@@ -1,0 +1,39 @@
+{
+  "impl": "fused_weights",
+  "device": "mps",
+  "dtype": "float16",
+  "rows": 32,
+  "iters": 20,
+  "dispatches_per_forward": 20.0,
+  "custom_kernel_launches_per_forward": 0.0,
+  "custom_kernels": {},
+  "launches_per_forward": 20.0,
+  "launch_count_complete": true,
+  "top_ops": [
+    {
+      "name": "aten::addmm",
+      "calls_per_forward": 4.0,
+      "self_cpu_us_per_forward": 151.88665000000032
+    },
+    {
+      "name": "aten::linear",
+      "calls_per_forward": 4.0,
+      "self_cpu_us_per_forward": 53.88230000000203
+    },
+    {
+      "name": "aten::_fused_rms_norm",
+      "calls_per_forward": 4.0,
+      "self_cpu_us_per_forward": 20.64410000000027
+    },
+    {
+      "name": "aten::silu",
+      "calls_per_forward": 4.0,
+      "self_cpu_us_per_forward": 12.621550000002406
+    },
+    {
+      "name": "aten::mul",
+      "calls_per_forward": 4.0,
+      "self_cpu_us_per_forward": 10.82364999999778
+    }
+  ]
+}
