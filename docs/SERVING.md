@@ -128,13 +128,18 @@ and it means sparse real-time traffic pays a latency premium on this GPU.
 
 ## Lessons for the operating point
 
-1. **Size the queue from the deadline, not from memory.** With `max_queue = 256` and ~2 ms service, a
-   request can wait ~0.5 s. Some p99 values above 100 ms in the sweep are this backlog during stalls.
-   A bound of roughly `deadline ÷ service ≈ 5` would shed load earlier and protect p99.
+1. **Expired-request dropping bounds queueing; it cannot bound service stalls.** Queue delay never
+   exceeded 10.0 ms (the deadline) in any run. The p99 latencies above 100 ms (eager/dynamic at 300
+   and 400 rps, metal/dynamic at 600 rps) come from *single batches whose service took 114–392 ms*.
+   These are rare GPU stalls, and they hit every request in the affected batch. Queue sizing cannot
+   fix that. A production design would need a per-batch watchdog plus hedging or failover to
+   another device. (An earlier version of this page attributed these outliers to queue backlog;
+   the queue/service breakdown in the records shows that was wrong.)
 2. **Keep the GPU warm or batch.** Given the measured idle-gap penalty, sparse traffic benefits from
    batching windows or keep-alive work; the tradeoff is power.
 3. **Fix the round trip before the kernel.** On this platform, pipelining H2D/compute/D2H across
    requests (or keeping inputs device-resident) would beat any further kernel tuning.
 
-Repeated runs per sweep point and a deadline-derived queue bound are listed as follow-ups in
+Repeated runs per sweep point, a deadline-derived queue bound, and stall watchdogs are listed as
+follow-ups in
 [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md).

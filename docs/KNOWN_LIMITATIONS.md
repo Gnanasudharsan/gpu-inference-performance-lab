@@ -22,8 +22,10 @@
   to the ATen-level profiler proxy.
 - **Serving sweep points are single 3-second runs.** Point-to-point noise is visible. Repeated runs
   with CIs per point are a follow-up.
-- **Queue bound not tuned.** The serving runs used `max_queue = 256`, too deep for a 10 ms deadline.
-  A deadline-derived bound is a documented follow-up.
+- **Queue bound not tuned.** The serving runs used `max_queue = 256`. Expired-request dropping kept
+  queueing at ≤ 10 ms anyway, but a deadline-derived bound would shed earlier and waste less work.
+- **No stall watchdog.** Rare single-batch GPU stalls of 114–392 ms were observed; nothing detects
+  or hedges them.
 - **Single-device, single-worker serving.** There is no multi-stream pipelining of H2D/compute/D2H,
   and no multi-GPU.
 - **Root cause of the 3–10 ms MPS round-trip stalls is undetermined.** The display-frame hypothesis
