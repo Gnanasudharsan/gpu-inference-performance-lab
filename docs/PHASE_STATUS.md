@@ -7,7 +7,7 @@
 | 2 | Benchmarking and profiling | **complete** | `d82a86a`, `18e7cbf`, `fa7ac5f`, data commit |
 | 3 | GPU kernel optimization | **complete** (Apple GPU measured; NVIDIA paths correctness-only) | `cb577af`→`8cff002`→`605be56`, phase commit |
 | 4 | Scheduling and end-to-end systems | **complete** | `758dbd6`, phase commit |
-| 5 | Experimental analysis | pending | |
+| 5 | Experimental analysis | **complete** | `10828f8`, phase commit |
 | 6 | Web dashboard | pending | |
 | 7 | Deployment and live execution | pending | |
 | 8 | Final hardening and showcase | pending | |
@@ -82,3 +82,16 @@
   paired CIs.
 - Gate: reproducible replay (seeded traces), load sweep with p99, documented envelope. Caveat:
   each sweep point is one run.
+
+## Phase 5 report
+
+- Runner: `gpulab experiment <config.toml>`, with configs `smoke` (CI), `apple_m4` (full local
+  matrix), `repro_check`, and `nvidia` (prepared, not executed). Skipped work is recorded with a
+  reason.
+- Analysis: `gpulab analyze` produces `results/summary.json` (the evidence-labeled dataset for the
+  dashboard) and `results/ANALYSIS.md` (114 paired comparisons with CIs, 5 regressions, roofline,
+  serving, envelope, idle gap, launch counts, correctness).
+- Reproduction check: an independent re-run through the runner replicated the Phase 3 headline
+  speedups within overlapping CIs (`results/phase5/repro_comparison.json`).
+- Narrative: [ENGINEERING_REPORT.md](ENGINEERING_REPORT.md), covering bottlenecks, wins, failures,
+  constraints, evidence categories and next steps.

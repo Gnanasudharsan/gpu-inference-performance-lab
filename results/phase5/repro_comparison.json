@@ -1,0 +1,33 @@
+{
+  "note": "metal vs eager, pipelined fp16 1024x2816x4; paired geomean [95% CI]",
+  "phase3_commit": "758dbd6",
+  "repro_commit": "10828f88ae1737c2485f094a754a3dd20eaa5d76",
+  "rows": {
+    "1": {
+      "phase3": [
+        1.162,
+        1.108,
+        1.234
+      ],
+      "repro": [
+        1.153,
+        1.098,
+        1.216
+      ],
+      "overlap": true
+    },
+    "8": {
+      "phase3": [
+        1.205,
+        1.135,
+        1.269
+      ],
+      "repro": [
+        1.21,
+        1.153,
+        1.271
+      ],
+      "overlap": true
+    }
+  }
+}

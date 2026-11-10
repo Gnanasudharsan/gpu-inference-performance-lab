@@ -44,5 +44,15 @@ python scripts/idle_gap_interleaved.py      # -> results/phase4/idle_gap_interle
 
 Traces are seeded by rate (`seed = int(rate)`), so every replay is regenerated identically.
 
+## Phase 5: experiments and analysis
+
+```bash
+gpulab experiment experiments/smoke.toml           # seconds, CPU (also runs in CI)
+gpulab experiment experiments/apple_m4.toml        # ~25 min on an M-series Mac
+gpulab experiment experiments/repro_check.toml --out results/phase5/repro_check
+gpulab experiment experiments/nvidia.toml          # on a CUDA host (not yet executed)
+gpulab analyze                                     # -> results/summary.json, results/ANALYSIS.md
+```
+
 Further sections (workload generation, benchmarks, experiments, dashboard) are added as each phase
 lands.

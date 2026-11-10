@@ -1,0 +1,55 @@
+{
+  "name": "repro_check",
+  "description": "eager vs metal, pipelined, fp16, rows 1 and 8 (compare with results/phase3).",
+  "started_utc": "2026-11-10T18:30:22Z",
+  "provenance": {
+    "timestamp_utc": "2026-11-10T18:30:22+00:00",
+    "hostname_hash": "b66b439f5780",
+    "os": "Darwin",
+    "os_release": "27.2",
+    "machine": "arm64",
+    "cpu": "Apple M4",
+    "cpu_count": 10,
+    "memory_bytes": 17179869184,
+    "python": "3.12.16",
+    "torch": "2.15.0",
+    "torch_cuda": null,
+    "triton": null,
+    "numpy": "2.5.4",
+    "accelerators": [
+      {
+        "backend": "mps",
+        "name": "Apple M4 GPU (Metal/MPS)",
+        "count": 1,
+        "memory_bytes": null,
+        "compute_capability": null,
+        "driver": null
+      },
+      {
+        "backend": "cpu",
+        "name": "Apple M4",
+        "count": 10,
+        "memory_bytes": null,
+        "compute_capability": null,
+        "driver": null
+      }
+    ],
+    "git_commit": "10828f88ae1737c2485f094a754a3dd20eaa5d76",
+    "git_dirty": false,
+    "git_dirty_files": [],
+    "tools": {
+      "nvidia-smi": false,
+      "nvcc": false,
+      "nsys": false,
+      "ncu": false
+    },
+    "env_flags": {}
+  },
+  "skipped": [],
+  "counts": {
+    "bench": 4,
+    "serving": 0
+  },
+  "elapsed_s": 17.6,
+  "finished_utc": "2026-11-10T18:30:40Z"
+}

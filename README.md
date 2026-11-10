@@ -22,6 +22,7 @@ make check      # lint + typecheck + tests
 - [Workload](docs/WORKLOAD.md) and [correctness methodology](docs/CORRECTNESS.md)
 - [Kernel optimization and results](docs/KERNELS.md)
 - [Latency-aware serving](docs/SERVING.md)
+- [Engineering report](docs/ENGINEERING_REPORT.md) and [generated analysis](results/ANALYSIS.md)
 - [Decisions](docs/DECISIONS.md)
 - [Benchmark methodology](docs/BENCHMARK_METHODOLOGY.md) and [profiling](docs/PROFILING.md)
 - [Reproducibility](docs/REPRODUCIBILITY.md)
