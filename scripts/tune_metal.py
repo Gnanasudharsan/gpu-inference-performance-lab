@@ -40,13 +40,21 @@ def main() -> None:
         impl.name = f"metal_n{nsg}_c{cols}"
         impls.register(impl)
         names.append(impl.name)
-    cfg = BenchConfig(iters=a.trials, trials=a.trials, burst=a.burst, warmup_s=1.0,
-                      keep_samples=False)
+    cfg = BenchConfig(
+        iters=a.trials, trials=a.trials, burst=a.burst, warmup_s=1.0, keep_samples=False
+    )
     out: dict[str, object] = {"dtype": a.dtype, "model": ModelConfig().to_dict(), "results": {}}
     results: dict[str, dict[str, float]] = {}
     for rows in a.rows:
-        recs = run_interleaved(names, ModelConfig(), rows, torch.device("mps"),
-                               parse_dtype(a.dtype), cfg, mode="throughput")
+        recs = run_interleaved(
+            names,
+            ModelConfig(),
+            rows,
+            torch.device("mps"),
+            parse_dtype(a.dtype),
+            cfg,
+            mode="throughput",
+        )
         per = {r.impl: r.metrics["host_us"]["p50"] for r in recs}
         results[str(rows)] = per
         best = min(per, key=per.__getitem__)
