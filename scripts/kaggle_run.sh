@@ -3,8 +3,9 @@
 #
 # Prerequisites (one-time, done by the account owner):
 #   1. Kaggle account with phone verification (needed for internet + GPU in kernels).
-#   2. API token: kaggle.com -> Settings -> API -> "Create New Token", saved as
-#      ~/.kaggle/kaggle.json (chmod 600), or KAGGLE_USERNAME + KAGGLE_KEY in the environment.
+#   2. API credentials from kaggle.com -> Settings -> API, either:
+#      - new API token  -> save to ~/.kaggle/access_token (chmod 600) and export KAGGLE_USERNAME
+#      - legacy API key -> save the downloaded kaggle.json to ~/.kaggle/kaggle.json (chmod 600)
 #   3. The commit to measure is pushed to GitHub (the kernel clones it by SHA).
 #
 # Usage: scripts/kaggle_run.sh            # push, run (<= 3 h), wait, download, analyze
@@ -14,13 +15,22 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)
 cd "$ROOT"
 k() { uvx --quiet --with six --from kaggle==2.2.5 kaggle "$@"; }
 
+# Credentials: either the classic legacy key (~/.kaggle/kaggle.json, or KAGGLE_USERNAME +
+# KAGGLE_KEY), or the newer API token (~/.kaggle/access_token, or KAGGLE_API_TOKEN) plus
+# KAGGLE_USERNAME (the username is not secret; it names the kernel).
 if [ -n "${KAGGLE_USERNAME:-}" ]; then
   KUSER=$KAGGLE_USERNAME
 elif [ -f "$HOME/.kaggle/kaggle.json" ]; then
   KUSER=$(python3 -c 'import json,os;print(json.load(open(os.path.expanduser("~/.kaggle/kaggle.json")))["username"])')
 else
-  echo "no Kaggle credentials: see the header of this script" >&2; exit 2
+  echo "no Kaggle username: save ~/.kaggle/kaggle.json, or export KAGGLE_USERNAME=<your username>" >&2
+  exit 2
 fi
+if [ ! -f "$HOME/.kaggle/kaggle.json" ] && [ ! -f "$HOME/.kaggle/access_token" ] \
+   && [ -z "${KAGGLE_KEY:-}" ] && [ -z "${KAGGLE_API_TOKEN:-}" ]; then
+  echo "no Kaggle token: see the header of this script" >&2; exit 2
+fi
+k config view > /dev/null 2>&1 || { echo "Kaggle CLI could not authenticate" >&2; exit 2; }
 SLUG="$KUSER/gpulab-nvidia-t4"
 
 if [ "${1:-}" != "--fetch" ]; then
