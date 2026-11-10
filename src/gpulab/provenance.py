@@ -133,7 +133,11 @@ def git_state(root: Path = REPO_ROOT) -> tuple[str | None, bool | None, list[str
     if commit is None:
         return None, None, []
     status = _run(["git", "status", "--porcelain", "--untracked-files=no"], cwd=root) or ""
-    files = sorted(line[3:] for line in status.splitlines() if line.strip())
+    # porcelain lines are "XY path" (or "XY old -> new"); _run strips the first line's
+    # leading space, so split on whitespace instead of slicing fixed columns.
+    files = sorted(
+        line.split(None, 1)[1].split(" -> ")[-1] for line in status.splitlines() if line.strip()
+    )
     return commit, bool(files), files
 
 
