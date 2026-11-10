@@ -43,3 +43,22 @@ The Triton interpreter (`TRITON_INTERPRET=1`) runs `@triton.jit` kernels on CPU 
 semantics. It checks indexing, masking and numerics, but not performance, and it does not catch every
 GPU-only failure (for example, shared-memory limits or register pressure). Those are covered by the GPU
 validation plan.
+
+## D5. Golden reference is float64 on CPU, not the eager implementation
+
+Comparing optimized kernels only against eager in the same dtype would hide errors that both share,
+and it would make the reference depend on the device. A float64 CPU reference is independent of all
+implementations under test. The reference itself is cross-checked against a separate NumPy
+implementation.
+
+## D6. Scale-normalized error metrics with calibrated per-dtype tolerances
+
+`torch.allclose`-style `atol` and `rtol` values are sensitive to activation magnitude and to elements
+near zero. Normalizing by ‖ref‖ and max|ref| gives thresholds that hold across shapes and depths.
+Tolerances were set at 3–10× the measured baseline error ([CORRECTNESS.md](CORRECTNESS.md)).
+
+## D7. Experiment records are JSON Lines with an `evidence` field
+
+Every record carries `evidence ∈ {measured, derived, theoretical}` and a full provenance block
+(hardware, versions, Git commit and dirty flag, hashed hostname). JSONL is append-only and
+diff-friendly. Parquet is produced from it for analysis.

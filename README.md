@@ -19,6 +19,7 @@ make check      # lint + typecheck + tests
 
 - [Research alignment](docs/research-alignment.md)
 - [Environment report](docs/ENVIRONMENT.md)
+- [Workload](docs/WORKLOAD.md) and [correctness methodology](docs/CORRECTNESS.md)
 - [Decisions](docs/DECISIONS.md)
 - [Benchmark methodology](docs/BENCHMARK_METHODOLOGY.md)
 - [Reproducibility](docs/REPRODUCIBILITY.md)
