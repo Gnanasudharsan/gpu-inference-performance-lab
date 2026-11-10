@@ -138,7 +138,13 @@ export default function LivePage() {
       setSupport(c.support);
       setConn({ state: "online", url, health });
       // default to the custom kernel that this backend's device supports
-      setForm((f) => ({ ...f, impl: health.device === "cuda" ? "triton" : health.device === "mps" ? "metal" : "fused_weights" }));
+      // default to the custom kernel this backend supports; on a CPU backend use the small model
+      // so a run takes seconds, not tens of seconds
+      setForm((f) => ({
+        ...f,
+        impl: health.device === "cuda" ? "triton" : health.device === "mps" ? "metal" : "fused_weights",
+        model: health.device === "cpu" ? "small" : f.model,
+      }));
     } catch (e) {
       setConn({ state: "offline", url, ...diagnose(url, e, window.location.origin, timeoutS) });
     } finally {
@@ -241,7 +247,7 @@ export default function LivePage() {
                 <p className="leading-relaxed">
                   {HOSTED_API
                     ? "Connect to the hosted backend, or to one you run yourself."
-                    : "This deployment has no hosted GPU backend. Connect to one you run yourself (one command, below); recorded measurements are on the other pages."}
+                    : "This deployment has no hosted backend. Connect to one you run yourself (one command, below); recorded measurements are on the other pages."}
                 </p>
               </div>
             )}

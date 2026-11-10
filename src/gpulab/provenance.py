@@ -43,10 +43,13 @@ def _cpu_brand() -> str:
         try:
             for line in Path("/proc/cpuinfo").read_text().splitlines():
                 if line.lower().startswith("model name"):
-                    return line.split(":", 1)[1].strip()
+                    name = line.split(":", 1)[1].strip()
+                    if name and name.lower() != "unknown":
+                        return name
         except OSError:
             pass
-    return platform.processor() or platform.machine()
+    # sandboxes (e.g. gVisor on Modal) may report the model name as "unknown"
+    return platform.processor() or f"{platform.machine()} CPU"
 
 
 def _total_memory_bytes() -> int | None:

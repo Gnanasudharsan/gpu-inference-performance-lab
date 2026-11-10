@@ -153,3 +153,9 @@ def test_daily_cap_rolls_over():
     d.day = date(2000, 1, 1)  # simulate yesterday
     assert d.take()
     assert DailyCap(None).remaining() is None
+
+
+def test_host_label_is_reported_as_device(monkeypatch):
+    c, _ = _client(monkeypatch, GPULAB_HOST_LABEL="Modal cloud CPU (2 vCPU)")
+    assert c.get("/api/health").json()["device_name"].startswith("Modal cloud CPU (2 vCPU) · ")
+    assert c.post("/api/run", json=TINY).json()["device_name"].startswith("Modal cloud CPU")

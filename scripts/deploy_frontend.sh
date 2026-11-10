@@ -6,6 +6,9 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)
 STAGE=$(mktemp -d)/gpu-inference-performance-lab
 "$ROOT/.venv/bin/gpulab" analyze --results "$ROOT/results" --summary "$ROOT/results/summary.json" \
   --report "$ROOT/results/ANALYSIS.md" > /dev/null
+# hosted live backend baked into the build (override with GPULAB_PUBLIC_API_URL; "" for none)
+export NEXT_PUBLIC_API_URL="${GPULAB_PUBLIC_API_URL-https://gnanasudharsan--gpulab-api-api.us-east.modal.run}"
+echo "building with NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-<none>}"
 (cd "$ROOT/web" && npm run build > /dev/null)
 mkdir -p "$STAGE"
 cp -R "$ROOT/web/out/." "$STAGE/"

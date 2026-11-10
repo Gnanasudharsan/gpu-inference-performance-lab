@@ -14,6 +14,7 @@ Configuration (environment variables):
   GPULAB_TRUST_PROXY    "1" to take the client address from X-Forwarded-For (behind a proxy)
   GPULAB_MAX_RUN_S      soft per-request runtime cap reported in /api/health (default 30)
   GPULAB_DAILY_RUN_CAP  global measurements per UTC day (unset: unlimited); bounds demo spend
+  GPULAB_HOST_LABEL     human-readable host description shown as the device (e.g. a cloud CPU)
 
 Run: ``uvicorn gpulab.api:app --host 0.0.0.0 --port 8000``
 """
@@ -129,6 +130,11 @@ def create_app() -> FastAPI:
     daily = DailyCap(int(cap_env) if cap_env else None)
     gpu_lock = threading.Lock()  # one measurement at a time: concurrent runs would contaminate
     prov = collect_provenance()
+    host_label = os.environ.get("GPULAB_HOST_LABEL") or None
+
+    def device_label() -> str:
+        name = device_name(device)
+        return f"{host_label} · {name}" if host_label else name
 
     app = FastAPI(
         title="GPU Inference Performance Lab",
@@ -186,7 +192,7 @@ def create_app() -> FastAPI:
             "status": "ok",
             "version": __version__,
             "device": device.type,
-            "device_name": device_name(device),
+            "device_name": device_label(),
             "torch": torch.__version__,
             "git_commit": prov.git_commit,
             "busy": gpu_lock.locked(),
@@ -302,7 +308,7 @@ def create_app() -> FastAPI:
             "elapsed_s": round(elapsed, 3),
             "over_soft_cap": elapsed > max_run_s,
             "device": device.type,
-            "device_name": device_name(device),
+            "device_name": device_label(),
             "torch": torch.__version__,
             "git_commit": prov.git_commit,
             "request": req.model_dump(),
