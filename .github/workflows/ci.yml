@@ -1,0 +1,49 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python:
+    name: lint, types, tests (CPU)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: install (CPU-only torch)
+        run: |
+          uv venv --python 3.12 .venv
+          uv pip install --python .venv/bin/python --index-url https://download.pytorch.org/whl/cpu torch
+          uv pip install --python .venv/bin/python -e ".[dev]"
+      - run: .venv/bin/python -m gpulab.cli env
+      - run: make lint
+      - run: make typecheck
+      - run: .venv/bin/python -m pytest --cov=gpulab --cov-report=term-missing
+
+  triton-interpreter:
+    name: Triton kernels via TRITON_INTERPRET=1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: install (CPU torch + triton)
+        run: |
+          uv venv --python 3.12 .venv
+          uv pip install --python .venv/bin/python --index-url https://download.pytorch.org/whl/cpu torch
+          uv pip install --python .venv/bin/python -e ".[dev,triton]"
+      - run: .venv/bin/python -m gpulab.cli env
+      - name: interpreter correctness tests
+        env:
+          TRITON_INTERPRET: "1"
+        run: .venv/bin/python -m pytest -m triton -v

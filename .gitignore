@@ -1,0 +1,24 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+.DS_Store
+# raw profiler traces are large; summaries are committed instead
+*.nsys-rep
+*.ncu-rep
+*.qdrep
+results/scratch/
+web/node_modules/
+web/.next/
+web/out/
+.vercel
+.env
+.env.*
+!.env.example
