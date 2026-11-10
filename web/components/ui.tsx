@@ -163,3 +163,21 @@ export function Table({ head, rows, caption }: { head: ReactNode[]; rows: ReactN
     </div>
   );
 }
+
+export function DeviceToggle({ devices, value, onChange }: { devices: string[]; value: string; onChange: (d: string) => void }) {
+  const gpus = devices.filter((d) => d !== "cpu");
+  if (gpus.length < 2) return null;
+  const label: Record<string, string> = { mps: "Apple M4 GPU", cuda: "NVIDIA GPU" };
+  return (
+    <div className="mb-4 flex items-center gap-3 text-sm">
+      <span className="text-ink-2">Device</span>
+      <div className="flex rounded-md border border-line p-0.5" role="group" aria-label="Device">
+        {gpus.map((d) => (
+          <button key={d} type="button" aria-pressed={value === d} onClick={() => onChange(d)} className={`rounded px-2.5 py-1 text-xs transition-colors duration-150 ${value === d ? "bg-elevated text-ink" : "text-ink-2 hover:text-ink"}`}>
+            {label[d] ?? d}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}

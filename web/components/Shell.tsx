@@ -62,7 +62,7 @@ export function Shell({ children }: { children: ReactNode }) {
           <a className="block hover:text-ink" href={REPO}>
             Source on GitHub ↗
           </a>
-          <p>Measured on Apple M4 (Metal/MPS). NVIDIA results pending.</p>
+          <p>Every number links to the device and commit that produced it.</p>
         </div>
       </aside>
       <div className="sticky top-0 z-30 flex items-center justify-between border-b border-line bg-bg/95 px-4 py-3 backdrop-blur lg:hidden">

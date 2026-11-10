@@ -109,3 +109,40 @@ def test_cli_analyze(tmp_path, capsys):
     assert rc == 0
     s = json.loads((tmp_path / "s.json").read_text())
     assert "phase3 benchmarks" in s["unavailable"]
+
+
+def test_summary_ingests_gpu_sessions(tmp_path):
+    """results/gpu/<run>/gpulab_results/* is merged; the NVIDIA-unavailable note depends on it."""
+    from gpulab.records import append_jsonl, read_jsonl
+
+    cfg = tmp_path / "t.toml"
+    cfg.write_text(CONFIG)
+    run_experiment(load_experiment(cfg), tmp_path / "out", log=lambda *_: None)
+    results = tmp_path / "results"
+    (results / "phase3").mkdir(parents=True)
+    run_dir = results / "gpu" / "kaggle-t4-test" / "gpulab_results"
+    (run_dir / "experiment").mkdir(parents=True)
+    # TEST FIXTURE: a CPU record relabeled as cuda, only to exercise the ingestion logic.
+    recs = read_jsonl(tmp_path / "out" / "bench.jsonl")
+    for r in recs:
+        r.device = "cuda"
+    append_jsonl(run_dir / "experiment" / "bench.jsonl", recs)
+    (run_dir / "session.json").write_text(
+        json.dumps(
+            {
+                "steps": [
+                    {"step": "correctness gate", "status": "ok", "seconds": 1.0},
+                    {"step": "nsight systems", "status": "skipped", "reason": "nsys not installed"},
+                ]
+            }
+        )
+    )
+    (run_dir / "env.json").write_text(
+        json.dumps({"git_commit": "abc", "accelerators": [{"backend": "cuda", "name": "Tesla T4"}]})
+    )
+    s = build_summary(results)
+    assert s["devices"] == ["cuda"]
+    assert s["gpu_sessions"][0]["gpu"] == "Tesla T4"
+    assert s["gpu_sessions"][0]["steps"][1]["status"] == "skipped"
+    assert not any("NVIDIA GPU results" in u for u in s["unavailable"])
+    assert any("Nsight" in u for u in s["unavailable"])  # nsys was skipped

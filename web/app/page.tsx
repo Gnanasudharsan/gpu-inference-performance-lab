@@ -29,6 +29,13 @@ function Overview({ s }: { s: Summary }) {
     points: bySeries.get(k)!.map((b) => ({ x: b.rows, y: b.host_us.p50 })),
   }));
   const gpu = s.environment.accelerators.find((a) => a.backend === "mps" || a.backend === "cuda");
+  const cuda = ["triton", "cuda_graph_triton"].flatMap((cand) =>
+    [1, 8].flatMap((rows) => {
+      const c = findComparison(s, { device: "cuda", dtype: "float16", mode: "throughput", candidate: cand, rows, d_model: 1024 });
+      return c ? [c] : [];
+    }),
+  );
+  const cudaGpu = s.benchmarks.find((b) => b.device === "cuda")?.device_name ?? "NVIDIA";
 
   return (
     <>
@@ -132,12 +139,30 @@ function Overview({ s }: { s: Summary }) {
                 <li key={u}>{u}</li>
               ))}
             </ul>
-            <p className="mt-2">
-              Triton kernels and CUDA graphs are implemented and correctness-tested; their performance is pending NVIDIA hardware.
-            </p>
+            {!(s.devices ?? []).includes("cuda") && (
+              <p className="mt-2">
+                Triton kernels and CUDA graphs are implemented and correctness-tested; their performance is pending NVIDIA hardware.
+              </p>
+            )}
           </div>
         </Card>
       </div>
+
+      {cuda.length > 0 && (
+        <Section title={`NVIDIA results · ${cudaGpu}`} description="Same workload, harness and paired method on an NVIDIA GPU. Pipelined fp16 time per forward, 1024×2816×4.">
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {cuda.map((c) => (
+              <StatTile
+                key={`${c.candidate}-${c.rows}`}
+                label={`${IMPL_LABEL[c.candidate] ?? c.candidate} vs eager · ${c.rows} rows`}
+                value={`${c.speedup_geomean.toFixed(2)}×`}
+                evidence="derived"
+                detail={<>[{c.ci_low.toFixed(2)}, {c.ci_high.toFixed(2)}] · {c.verdict} · {fmtUs(c.baseline_p50_us)} → {fmtUs(c.candidate_p50_us)}</>}
+              />
+            ))}
+          </div>
+        </Section>
+      )}
 
       <Section title="What the data says" description="The short version. Each claim links to the evidence.">
         <div className="grid gap-4 md:grid-cols-3">

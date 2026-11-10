@@ -103,8 +103,14 @@ def _load_json(path: Path) -> Any:
 
 def build_summary(results: Path) -> dict[str, Any]:
     p3, p4, p1, p2 = (results / d for d in ("phase3", "phase4", "phase1", "phase2"))
-    bench = _read_all(sorted(p3.glob("bench_*.jsonl")))
-    serving = _read_all([p4 / "serving_sweep.jsonl", p4 / "serving_bursty.jsonl"])
+    gpu_runs = sorted((results / "gpu").glob("*/gpulab_results"))
+    bench = _read_all(
+        sorted(p3.glob("bench_*.jsonl")) + [g / "experiment/bench.jsonl" for g in gpu_runs]
+    )
+    serving = _read_all(
+        [p4 / "serving_sweep.jsonl", p4 / "serving_bursty.jsonl"]
+        + [g / "experiment/serving.jsonl" for g in gpu_runs]
+    )
     correctness = _read_all([p1 / "correctness.jsonl"])
     unavailable = []
     if not bench:
@@ -112,6 +118,31 @@ def build_summary(results: Path) -> dict[str, Any]:
     if not serving:
         unavailable.append("phase4 serving")
     profiles = {}
+    cuda_profiles: dict[str, Any] = {}
+    for g in gpu_runs:
+        for f in sorted(g.glob("profile_*_cuda.json")):
+            d = json.loads(f.read_text())
+            cuda_profiles[f"{d['impl']}/r{d['rows']}"] = {
+                "aten": d["dispatches_per_forward"],
+                "cuda_kernels": d.get("cuda_kernels_per_forward"),
+                "cuda_kernel_us": d.get("cuda_kernel_us_per_forward"),
+            }
+    sessions: list[dict[str, Any]] = []
+    for g in gpu_runs:
+        sess = _load_json(g / "session.json") or {"steps": []}
+        envj = _load_json(g / "env.json") or {}
+        cuda_acc = [a for a in envj.get("accelerators", []) if a.get("backend") == "cuda"]
+        sessions.append(
+            {
+                "run": g.parent.name,
+                "gpu": cuda_acc[0]["name"] if cuda_acc else None,
+                "git_commit": envj.get("git_commit"),
+                "steps": [
+                    {k: st.get(k) for k in ("step", "status", "reason", "seconds")}
+                    for st in sess["steps"]
+                ],
+            }
+        )
     for f in sorted(p3.glob("profile_*_mps.json")):
         d = json.loads(f.read_text())
         profiles[f"{d['impl']}/r{d['rows']}"] = {
@@ -124,6 +155,9 @@ def build_summary(results: Path) -> dict[str, Any]:
         (bench or serving or correctness)[0].provenance if (bench or serving or correctness) else {}
     )
     comps = [c.to_dict() for c in comparisons(bench)]
+    has_cuda = any(b.device == "cuda" for b in bench)
+    if not has_cuda:
+        unavailable.append("NVIDIA GPU results (no NVIDIA hardware available or authorized)")
     return {
         "schema": 1,
         "generated_utc": datetime.now(UTC).isoformat(timespec="seconds"),
@@ -151,6 +185,7 @@ def build_summary(results: Path) -> dict[str, Any]:
         "idle_gap": _load_json(p4 / "idle_gap_interleaved.json"),
         "kernels": {
             "launches_per_forward": profiles,
+            "cuda_profiles": cuda_profiles,
             "metal_tuning": _load_json(p3 / "metal_tuning.json"),
             "metal_v1_vs_v2": _load_json(p3 / "metal_v1_vs_v2.json"),
         },
@@ -167,10 +202,19 @@ def build_summary(results: Path) -> dict[str, Any]:
             }
             for r in correctness
         ],
+        "gpu_sessions": sessions,
+        "devices": sorted({b.device for b in bench}),
         "unavailable": [
             *unavailable,
-            "NVIDIA GPU results (no NVIDIA hardware available or authorized)",
-            "Nsight Systems / Nsight Compute traces (not available on macOS)",
+            *(
+                []
+                if any(
+                    st["step"] == "nsight systems" and st["status"] == "ok"
+                    for se in sessions
+                    for st in se["steps"]
+                )
+                else ["Nsight Systems / Nsight Compute traces"]
+            ),
         ],
     }
 

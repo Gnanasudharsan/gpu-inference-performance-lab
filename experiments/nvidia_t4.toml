@@ -1,0 +1,44 @@
+# NVIDIA T4 suite (Kaggle free tier, sm_75, 16 GB). Run via deploy/kaggle or scripts/gpu_session.py.
+# bf16 is excluded: the T4 has no bf16 tensor-core MMA (the Triton impl reports it unsupported).
+name = "nvidia_t4"
+description = "CUDA paths on a T4: Triton fused kernels, CUDA graphs, torch.compile reduce-overhead."
+
+[[bench]]
+device = "cuda"
+dtype = "float16"
+impls = ["eager", "fused_weights", "compile", "compile_cudagraphs", "triton",
+         "cuda_graph_eager", "cuda_graph_triton"]
+rows = [1, 2, 4, 8, 16, 32, 64]
+deadline_us = 1000
+
+[[bench]]
+device = "cuda"
+dtype = "float32"
+impls = ["eager", "fused_weights", "triton", "cuda_graph_triton"]
+rows = [1, 8, 32]
+
+[[bench]]
+device = "cuda"
+dtype = "float16"
+impls = ["eager", "triton", "cuda_graph_eager", "cuda_graph_triton", "compile_cudagraphs"]
+rows = [1, 8]
+d_model = 512
+d_hidden = 1408
+
+[[bench]]
+device = "cuda"
+dtype = "float16"
+impls = ["eager", "triton", "cuda_graph_eager", "cuda_graph_triton", "compile_cudagraphs"]
+rows = [1, 8]
+d_model = 2048
+d_hidden = 5632
+iters = 200
+
+[[serving]]
+device = "cuda"
+dtype = "float16"
+impls = ["eager", "triton", "cuda_graph_triton"]
+policies = ["direct", "static8", "dynamic"]
+rates = [250, 500, 1000, 2000, 4000, 8000]
+duration_s = 3.0
+deadline_us = 2000

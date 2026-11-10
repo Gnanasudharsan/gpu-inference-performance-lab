@@ -133,3 +133,17 @@ Hardening checks and their results are in [final-audit.md](final-audit.md):
 
 The README was rewritten with verified results only. The interview walkthrough and final audit,
 including resume bullets limited to measured outcomes, are in `docs/`.
+
+## Post-release: NVIDIA validation path (Kaggle T4)
+
+- Chosen platform: the Kaggle free tier (T4), which needs no sponsor and is scriptable end to end.
+  Explorer is the upgrade path.
+- Added `scripts/gpu_session.py`, a portable session driver with provenance, a capability gate, a
+  correctness gate that blocks benchmarks on failure, the experiment, CUDA kernel profiles, optional
+  Nsight and an archive. Verified locally in dry-run mode, including the gate-failure abort.
+- Added `experiments/nvidia_t4.toml`, `deploy/kaggle/` and `scripts/kaggle_run.sh` (push, run with a
+  3 h cap, download, ingest).
+- The Triton bf16 path is reported unsupported below compute capability 8.0.
+- Ingestion: `gpulab analyze` merges `results/gpu/*`. The dashboard gains CUDA views only when real
+  CUDA records exist; the layout was checked once with a scratch-only fixture, which was deleted.
+- **Pending:** the run itself, which needs the owner's Kaggle API token.

@@ -42,12 +42,28 @@ export function useSummary(): State & { retry: () => void } {
 
 export const IMPL_ORDER = ["eager", "fused_weights", "compile", "metal"] as const;
 
+/** Series shown in line charts per device: at most four, in the validated palette order. */
+export const DEVICE_SERIES: Record<string, readonly string[]> = {
+  mps: IMPL_ORDER,
+  cpu: ["eager", "fused_weights", "compile"],
+  cuda: ["eager", "cuda_graph_triton", "compile_cudagraphs", "triton"],
+};
+
+export function seriesFor(device: string): readonly string[] {
+  return DEVICE_SERIES[device] ?? IMPL_ORDER;
+}
+
+export const DEVICE_LABEL: Record<string, string> = { mps: "Apple M4 GPU", cuda: "NVIDIA GPU", cpu: "CPU" };
+
 export const IMPL_LABEL: Record<string, string> = {
   eager: "eager (baseline)",
   fused_weights: "fused weights",
   compile: "torch.compile",
   metal: "Metal fused kernels",
   triton: "Triton fused kernels",
+  cuda_graph_triton: "Triton + CUDA graph",
+  cuda_graph_eager: "eager + CUDA graph",
+  compile_cudagraphs: "compile (reduce-overhead)",
 };
 
 export const IMPL_COLOR: Record<string, string> = {
@@ -55,6 +71,12 @@ export const IMPL_COLOR: Record<string, string> = {
   fused_weights: "var(--color-s-fused)",
   compile: "var(--color-s-compile)",
   metal: "var(--color-s-metal)",
+  // colors encode role, so they stay consistent across devices: custom fused kernel = teal,
+  // compiler = violet, CUDA-graph replay of the custom kernel = magenta (never charted with
+  // fused_weights, which only appears on CPU/MPS views)
+  triton: "var(--color-s-metal)",
+  compile_cudagraphs: "var(--color-s-compile)",
+  cuda_graph_triton: "var(--color-s-fused)",
 };
 
 export const DEFAULT_MODEL = { d_model: 1024, d_hidden: 2816, depth: 4 };

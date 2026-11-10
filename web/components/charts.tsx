@@ -495,7 +495,7 @@ export function HBarChart({
   ariaLabel: string;
 }) {
   const [ref, width] = useWidth<HTMLDivElement>();
-  const labelW = Math.min(190, Math.max(110, width * 0.34));
+  const labelW = Math.min(200, Math.max(140, width * 0.34));
   const rowH = 30;
   const max = Math.max(...bars.map((b) => b.value), 1);
   const iw = Math.max(10, width - labelW - 70);

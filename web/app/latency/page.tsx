@@ -2,15 +2,17 @@
 
 import { useState } from "react";
 import { ChartFrame, ForestPlot, LineChart, type Series } from "@/components/charts";
-import { Card, ErrorState, EvidenceTag, LoadingPage, PageHeader, Section, Table } from "@/components/ui";
-import { benchSeries, fmtUs, IMPL_COLOR, IMPL_LABEL, IMPL_ORDER, useSummary } from "@/lib/data";
+import { Card, DeviceToggle, ErrorState, EvidenceTag, LoadingPage, PageHeader, Section, Table } from "@/components/ui";
+import { benchSeries, DEVICE_LABEL, fmtUs, IMPL_COLOR, IMPL_LABEL, seriesFor, useSummary } from "@/lib/data";
 import type { Summary } from "@/lib/types";
 
 function Latency({ s }: { s: Summary }) {
   const [dtype, setDtype] = useState("float16");
-  const by = benchSeries(s, { device: "mps", dtype, mode: "latency" });
+  const [device, setDevice] = useState("mps");
+  const dtypes = ["float16", "bfloat16", "float32"].filter((d) => s.benchmarks.some((b) => b.device === device && b.dtype === d));
+  const by = benchSeries(s, { device, dtype, mode: "latency" });
   const mk = (q: "p50" | "p95" | "p99"): Series[] =>
-    IMPL_ORDER.filter((k) => by.has(k)).map((k) => ({
+    seriesFor(device).filter((k) => by.has(k)).map((k) => ({
       key: k,
       label: IMPL_LABEL[k] ?? k,
       color: IMPL_COLOR[k] ?? "var(--color-ink-2)",
@@ -18,9 +20,9 @@ function Latency({ s }: { s: Summary }) {
       points: by.get(k)!.map((b) => ({ x: b.rows, y: b.host_us[q] })),
     }));
   const comps = s.comparisons
-    .filter((c) => c.device === "mps" && c.dtype === dtype && c.mode === "latency" && c.d_model === 1024)
+    .filter((c) => c.device === device && c.dtype === dtype && c.mode === "latency" && c.d_model === 1024)
     .sort((a, b) => a.candidate.localeCompare(b.candidate) || a.rows - b.rows);
-  const autocorr = s.benchmarks.filter((b) => b.mode === "latency" && b.device === "mps" && b.lag1_autocorr != null);
+  const autocorr = s.benchmarks.filter((b) => b.mode === "latency" && b.device === device && b.lag1_autocorr != null);
   const highAc = autocorr.filter((b) => (b.lag1_autocorr ?? 0) >= 0.2).length;
   const rep = s.baseline_phase2.repeatability;
   const ig = s.idle_gap;
@@ -33,10 +35,11 @@ function Latency({ s }: { s: Summary }) {
         trial by trial, so slow drift in the machine affects every implementation equally.
       </PageHeader>
 
+      <DeviceToggle devices={s.devices ?? ["mps"]} value={device} onChange={(d) => { setDevice(d); setDtype("float16"); }} />
       <div className="mb-4 flex items-center gap-3 text-sm">
         <span className="text-ink-2">Precision</span>
         <div className="flex rounded-md border border-line p-0.5" role="group" aria-label="Precision">
-          {["float16", "bfloat16", "float32"].map((d) => (
+          {dtypes.map((d) => (
             <button key={d} type="button" aria-pressed={dtype === d} onClick={() => setDtype(d)} className={`rounded px-2.5 py-1 text-xs transition-colors duration-150 ${dtype === d ? "bg-elevated text-ink" : "text-ink-2 hover:text-ink"}`}>
               {d}
             </button>
@@ -51,7 +54,7 @@ function Latency({ s }: { s: Summary }) {
             <ChartFrame
               key={q}
               title={`${q} latency vs rows`}
-              subtitle={`Apple M4 GPU · ${dtype} · 1024×2816×4 · ${by.get("eager")?.[0]?.host_us.n ?? 0} requests per point`}
+              subtitle={`${by.get("eager")?.[0]?.device_name ?? DEVICE_LABEL[device]} · ${dtype} · 1024×2816×4 · ${by.get("eager")?.[0]?.host_us.n ?? 0} requests per point`}
               legend={q === "p50" ? ser : undefined}
               table={<Table head={["rows", ...ser.map((x) => x.label)]} rows={(ser[0]?.points ?? []).map((p, i) => [p.x, ...ser.map((x) => fmtUs(x.points[i]?.y))])} />}
             >

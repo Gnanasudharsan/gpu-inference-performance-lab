@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ChartFrame, LineChart, type Series } from "@/components/charts";
-import { Card, ErrorState, EvidenceTag, LoadingPage, PageHeader, Section, Table } from "@/components/ui";
+import { Card, DeviceToggle, ErrorState, EvidenceTag, LoadingPage, PageHeader, Section, Table } from "@/components/ui";
 import { fmtNum, fmtUs, IMPL_COLOR, IMPL_LABEL, useSummary } from "@/lib/data";
 import type { Serving, Summary } from "@/lib/types";
 
@@ -10,9 +10,12 @@ const POLICY_LABEL: Record<string, string> = { direct: "direct (no batching)", s
 const POLICY_COLOR: Record<string, string> = { direct: "var(--color-s-eager)", static8: "var(--color-s-fused)", dynamic: "var(--color-s-metal)" };
 
 function ServingPage({ s }: { s: Summary }) {
-  const [impl, setImpl] = useState("metal");
-  const impls = [...new Set(s.serving.map((x) => x.impl))];
-  const sweep = s.serving.filter((x) => x.arrival === "poisson" && x.impl === impl);
+  const [device, setDevice] = useState("mps");
+  const onDevice = s.serving.filter((x) => x.device === device);
+  const impls = [...new Set(onDevice.map((x) => x.impl))];
+  const [implSel, setImpl] = useState("metal");
+  const impl = impls.includes(implSel) ? implSel : (impls[impls.length - 1] ?? "eager");
+  const sweep = onDevice.filter((x) => x.arrival === "poisson" && x.impl === impl);
   const policies = ["direct", "static8", "dynamic"].filter((p) => sweep.some((x) => x.policy === p));
   const mk = (f: (x: Serving) => number | null | undefined): Series[] =>
     policies.map((p) => ({
@@ -29,7 +32,7 @@ function ServingPage({ s }: { s: Summary }) {
   const goodput = mk((x) => x.goodput_rows_per_s);
   const miss = mk((x) => x.deadline_miss_rate * 100);
   const p99 = mk((x) => (x.counts.ok > 0 ? (x.latency_us.p99 ?? null) : null)).map((ser) => ({ ...ser, points: ser.points.filter((p) => p.y > 0) }));
-  const bursty = s.serving.filter((x) => x.arrival === "bursty");
+  const bursty = onDevice.filter((x) => x.arrival === "bursty");
   const env = s.envelope;
   const deadline = sweep[0]?.deadline_us ?? 10_000;
   const tableFor = (ser: Series[], f: (v: number) => string) => (
@@ -44,6 +47,7 @@ function ServingPage({ s }: { s: Summary }) {
         that were shed or expired.
       </PageHeader>
 
+      <DeviceToggle devices={[...new Set(s.serving.map((x) => x.device))]} value={device} onChange={setDevice} />
       <div className="mb-4 flex flex-wrap items-center gap-3 text-sm">
         <span className="text-ink-2">Implementation</span>
         <div className="flex rounded-md border border-line p-0.5" role="group" aria-label="Implementation">

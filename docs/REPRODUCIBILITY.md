@@ -54,5 +54,10 @@ gpulab experiment experiments/nvidia.toml          # on a CUDA host (not yet exe
 gpulab analyze                                     # -> results/summary.json, results/ANALYSIS.md
 ```
 
+## NVIDIA validation (Kaggle T4 or a cluster node)
+
+See [GPU_VALIDATION_PLAN.md](GPU_VALIDATION_PLAN.md): `scripts/kaggle_run.sh`, or
+`scripts/gpu_session.py` directly on any CUDA machine.
+
 Further sections (workload generation, benchmarks, experiments, dashboard) are added as each phase
 lands.

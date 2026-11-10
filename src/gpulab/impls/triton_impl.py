@@ -27,6 +27,12 @@ class TritonImpl(Implementation):
         if not triton_available():
             return "triton is not installed (Linux only)"
         if device.type == "cuda":
+            major, _ = torch.cuda.get_device_capability(device)
+            if dtype == torch.bfloat16 and major < 8:
+                # Pre-Ampere GPUs (e.g. T4, sm_75) have no bf16 tensor-core MMA; Triton's bf16
+                # tl.dot is unsupported there, and an emulated path would not be the kernel we
+                # mean to measure.
+                return "bf16 tl.dot needs compute capability >= 8.0 (Ampere or newer)"
             return None
         if device.type == "cpu" and os.environ.get("TRITON_INTERPRET") == "1":
             if dtype == torch.bfloat16:

@@ -22,6 +22,7 @@ from gpulab.records import ExperimentRecord
 #: Vendor-nominal peak DRAM bandwidth (GB/s), used only for *theoretical* floors.
 NOMINAL_BANDWIDTH_GBPS: dict[str, float] = {
     "Apple M4": 120.0,  # Apple M4 (base) unified memory, vendor-stated
+    "Tesla T4": 320.0,  # NVIDIA T4 datasheet (GDDR6)
 }
 
 

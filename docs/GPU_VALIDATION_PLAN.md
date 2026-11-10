@@ -1,29 +1,70 @@
 # GPU validation plan (NVIDIA)
 
-**Status: not executed.** No NVIDIA GPU is available on the development machine, and no GPU-cloud
-spend has been authorized. Nothing in this file is a result.
+**Status: ready to run; not executed yet.** It needs the repository owner's Kaggle API token. Nothing
+in this file is a result.
 
-## Goal
+## Chosen platform: Kaggle Notebooks, free tier (T4)
 
-Run the same experiment matrix on one NVIDIA data-center GPU (target: L4, A10G, or H100 if available) to
-measure the CUDA-only paths: Triton kernels, CUDA graphs, and `torch.compile(mode="reduce-overhead")`.
-Also collect Nsight Systems and Nsight Compute evidence.
+| Option | Why it was or was not chosen |
+|---|---|
+| **Kaggle, T4 (chosen)** | Free (community-reported ~30 GPU-h/week). Available today with no sponsor. Fully scriptable with the Kaggle CLI: push a script kernel, run on a T4 (`--accelerator NvidiaTeslaT4`, a "T4 x2" session), download outputs |
+| Northeastern Explorer (H100/H200/A100) | Better hardware, but students cannot request partition access themselves (a sponsor is required). **The upgrade path**: `scripts/gpu_session.py` runs unchanged on a cluster node |
+| Google Colab free | Same T4 class, but less predictable (no guaranteed GPU, unpublished limits) and not scriptable |
+| Modal / Runpod | Credits or paid; better suited to the live API than to a benchmark run |
 
-## Procedure (single script, bounded spend)
+### T4 caveats (stated up front)
 
-1. Provision one GPU container (Modal or Runpod, CUDA 12.x image, PyTorch from the official wheel index).
-2. `pip install -e ".[dev,triton]"`, then `gpulab env --json > results/gpu/env.json`.
-3. `pytest -m "cuda or triton"`. The gate is that every correctness test passes before any benchmark runs.
-4. `scripts/run_experiments.py --suite gpu` (the same matrix as the local suite plus CUDA-only modes).
-5. `nsys profile -t cuda,nvtx,osrt -o results/gpu/nsys/<mode> python -m gpulab.cli bench ...` for eager,
-   triton and cuda_graph at batch 1 and batch 32. Commit the summaries (`nsys stats`), not the raw traces.
-6. `ncu --set full -k regex:gated|rmsnorm -c 20` on the Triton kernels. Record achieved memory bandwidth
-   as a fraction of peak, SM occupancy, and register and shared-memory use.
-7. Copy the JSON/Parquet results back and regenerate reports. Tag every record with the GPU name and
-   driver from `nvidia-smi`.
+- **Architecture:** Turing (sm_75), with 320 GB/s nominal bandwidth (NVIDIA datasheet; theoretical).
+  Results will not transfer to A100/H100 numerically, only methodologically.
+- **No bf16 tensor-core MMA.** The Triton implementation reports bf16 as unsupported on compute
+  capability < 8.0 (`experiments/nvidia_t4.toml` excludes it). bf16 Triton stays unverified until an
+  Ampere-or-newer run.
+- **Shared, virtualized GPU.** Clocks and temperature are recorded per record (`nvidia-smi`), and
+  comparisons are interleaved and paired, as on the M4.
+- **Nsight Compute will likely fail in a container** (no performance-counter access). Nsight Systems
+  runs only if `nsys` exists. Kernel counts and kernel time come from the PyTorch profiler's CUDA
+  activity either way.
+- **Only one GPU is used** of the two in a T4 x2 session (`cuda:0`).
 
-## Budget guardrails
+## What one run does (`scripts/gpu_session.py`)
 
-- Hard cap agreed with the repository owner before provisioning (proposed: USD 10).
-- One GPU, maximum wall-clock 45 minutes, auto-shutdown on completion or failure.
-- No persistent endpoints are left running.
+1. **Provenance:** `gpulab env --json`, `nvidia-smi -q`.
+2. **Capability gate:** compute capability must be ≥ 7.5.
+3. **Correctness gate:** the full test suite on the GPU, including the CUDA-only tests (no hidden host
+   syncs, CUDA-graph shape rejection) and the Triton kernels on real hardware. **If it fails, no
+   benchmarks run.**
+4. **Experiment:** `experiments/nvidia_t4.toml`.
+   - *fp16 at 1–64 rows:* eager, fused_weights, compile, compile_cudagraphs, triton, cuda_graph_eager,
+     cuda_graph_triton
+   - *fp32 at 1, 8 and 32 rows*
+   - *two more model widths*
+   - *a serving sweep* with a 2 ms deadline
+5. **Kernel profiles:** CUDA kernels and kernel time per forward, per implementation.
+6. **Nsight Systems:** eager vs `cuda_graph_triton`, if `nsys` is available.
+7. **Archive:** `gpulab_results.tar.gz`, containing `session.json` (each step: ok, failed or skipped,
+   with a reason).
+
+## How to run
+
+```bash
+# one-time (account owner): phone-verify the Kaggle account; create an API token
+# (kaggle.com → Settings → API → Create New Token) and save it as ~/.kaggle/kaggle.json (chmod 600)
+scripts/kaggle_run.sh          # pushes the current pushed commit, runs (≤ 3 h cap), downloads,
+                               # unpacks into results/gpu/kaggle-t4-<date>/, runs gpulab analyze
+scripts/kaggle_run.sh --fetch  # re-download the latest run's outputs only
+```
+
+`gpulab analyze` merges `results/gpu/*/gpulab_results/` into `results/summary.json`. The dashboard
+then shows an NVIDIA device toggle on the Latency, Serving and Kernel pages, and an NVIDIA results
+section on the Overview. With no GPU session ingested, none of that appears.
+
+## On a cluster node (Explorer or similar)
+
+```bash
+srun -p gpu --gres=gpu:1 --time=02:00:00 --pty bash        # or an sbatch wrapper
+make install && .venv/bin/python scripts/gpu_session.py --config experiments/nvidia.toml \
+    --out results/gpu/explorer-$(date +%Y%m%d)/gpulab_results
+```
+
+Explorer's `gpu` partition allows 4–8 h jobs, and `gpu-short` (1–2 h) schedules faster. The full
+`nvidia.toml` includes bf16 for Ampere or newer.
