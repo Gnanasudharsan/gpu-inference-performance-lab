@@ -50,6 +50,10 @@ VIEW_OPS = frozenset(
         "result_type",
         "unbind",
         "split_with_sizes",
+        # conversions that launch nothing when they have no child copy (no-op casts)
+        "to",
+        "contiguous",
+        "type_as",
     )
 )
 

@@ -21,5 +21,10 @@ Python 3.12 and PyTorch 2.4 or newer are required. The development machine used 
 .venv/bin/python -m pytest tests/test_correctness.py -v
 ```
 
+## Phase 2: benchmarks and profiles
+
+See [BENCHMARK_METHODOLOGY.md](BENCHMARK_METHODOLOGY.md#reproduce) for the exact commands that
+produced `results/phase2/`, and [PROFILING.md](PROFILING.md) for profiler usage.
+
 Further sections (workload generation, benchmarks, experiments, dashboard) are added as each phase
 lands.

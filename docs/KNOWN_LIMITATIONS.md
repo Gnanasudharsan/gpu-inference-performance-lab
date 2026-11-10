@@ -10,3 +10,8 @@
 - **Unified memory.** On Apple silicon the CPU and GPU share memory, so "host-to-device transfer" is a
   copy within unified memory and is cheaper than PCIe. Transfer costs measured here do not transfer to
   discrete GPUs.
+- **Noisy development GPU.** The M4 laptop GPU also drives the display, and its power management
+  produces clustered latency tails and run-to-run p50 variation of up to 2.2×. Absolute latencies
+  from this machine are indicative. Paired, interleaved speedups are the robust quantity.
+- **No device-side MPS timeline.** The PyTorch profiler has no MPS device activity, and Instruments
+  is not installed. Device time comes from MPS events, and launch counts from leaf dispatches.

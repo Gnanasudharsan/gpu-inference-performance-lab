@@ -95,6 +95,8 @@ class Provenance:
     accelerators: list[AcceleratorInfo] = field(default_factory=list)
     git_commit: str | None = None
     git_dirty: bool | None = None
+    #: tracked files that differ from HEAD (e.g. docs only vs. source changes)
+    git_dirty_files: list[str] = field(default_factory=list)
     tools: dict[str, bool] = field(default_factory=dict)
     env_flags: dict[str, str] = field(default_factory=dict)
 
@@ -125,12 +127,14 @@ def accelerators() -> list[AcceleratorInfo]:
     return accs
 
 
-def git_state(root: Path = REPO_ROOT) -> tuple[str | None, bool | None]:
+def git_state(root: Path = REPO_ROOT) -> tuple[str | None, bool | None, list[str]]:
+    """HEAD commit, whether tracked files differ from it, and which ones."""
     commit = _run(["git", "rev-parse", "HEAD"], cwd=root)
     if commit is None:
-        return None, None
-    status = _run(["git", "status", "--porcelain", "--untracked-files=no"], cwd=root)
-    return commit, bool(status)
+        return None, None, []
+    status = _run(["git", "status", "--porcelain", "--untracked-files=no"], cwd=root) or ""
+    files = sorted(line[3:] for line in status.splitlines() if line.strip())
+    return commit, bool(files), files
 
 
 @lru_cache(maxsize=1)
@@ -158,7 +162,7 @@ def _static_provenance() -> dict[str, Any]:
 
 def collect_provenance() -> Provenance:
     """Collect a provenance snapshot. Hostnames are hashed, never stored raw."""
-    commit, dirty = git_state()
+    commit, dirty, dirty_files = git_state()
     flags = {
         k: v
         for k, v in os.environ.items()
@@ -176,6 +180,7 @@ def collect_provenance() -> Provenance:
         accelerators=accelerators(),
         git_commit=commit,
         git_dirty=dirty,
+        git_dirty_files=dirty_files,
         env_flags=flags,
         **_static_provenance(),
     )

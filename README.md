@@ -21,7 +21,7 @@ make check      # lint + typecheck + tests
 - [Environment report](docs/ENVIRONMENT.md)
 - [Workload](docs/WORKLOAD.md) and [correctness methodology](docs/CORRECTNESS.md)
 - [Decisions](docs/DECISIONS.md)
-- [Benchmark methodology](docs/BENCHMARK_METHODOLOGY.md)
+- [Benchmark methodology](docs/BENCHMARK_METHODOLOGY.md) and [profiling](docs/PROFILING.md)
 - [Reproducibility](docs/REPRODUCIBILITY.md)
 - [Known limitations](docs/KNOWN_LIMITATIONS.md)
 

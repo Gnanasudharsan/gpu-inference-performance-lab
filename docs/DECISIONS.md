@@ -62,3 +62,22 @@ Tolerances were set at 3–10× the measured baseline error ([CORRECTNESS.md](CO
 Every record carries `evidence ∈ {measured, derived, theoretical}` and a full provenance block
 (hardware, versions, Git commit and dirty flag, hashed hostname). JSONL is append-only and
 diff-friendly. Parquet is produced from it for analysis.
+
+## D8. Host latency and device time are measured in separate passes
+
+Measured on MPS: recording a pair of events around every request raised host p50 and variance.
+Host latency is the user-facing number, so it is measured without instrumentation. Device time
+comes from a second pass and is never subtracted sample-by-sample from host time.
+
+## D9. Comparisons are interleaved and paired
+
+Cross-process p50 on the M4 varied by up to 2.2× (`results/phase2/repeatability_mps.json`), which
+is larger than many optimizations. Comparing separately run numbers would be meaningless here.
+`run_interleaved` rotates the implementation order every trial, and speedup is the geometric mean
+of per-trial ratios, reported with its min and max across trials.
+
+## D10. Pipelined (throughput-mode) time is reported alongside synchronous latency
+
+Synchronous per-request latency on this laptop is dominated by power-state effects (clustered
+tails). Pipelined time per request is much more stable and isolates the cost of the work itself.
+Both are reported, and neither is substituted for the other.
