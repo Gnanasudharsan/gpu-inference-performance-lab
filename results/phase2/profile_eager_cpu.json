@@ -1,0 +1,55 @@
+{
+  "impl": "eager",
+  "device": "cpu",
+  "dtype": "float32",
+  "rows": 8,
+  "iters": 20,
+  "dispatches_per_forward": 60.0,
+  "top_ops": [
+    {
+      "name": "aten::mm",
+      "calls_per_forward": 12.0,
+      "self_cpu_us_per_forward": 3981.3427500000057
+    },
+    {
+      "name": "aten::silu",
+      "calls_per_forward": 4.0,
+      "self_cpu_us_per_forward": 74.49924999999722
+    },
+    {
+      "name": "aten::mul",
+      "calls_per_forward": 12.0,
+      "self_cpu_us_per_forward": 25.017899999999987
+    },
+    {
+      "name": "aten::add",
+      "calls_per_forward": 8.0,
+      "self_cpu_us_per_forward": 12.169399999997578
+    },
+    {
+      "name": "aten::pow",
+      "calls_per_forward": 4.0,
+      "self_cpu_us_per_forward": 11.912699999999681
+    },
+    {
+      "name": "aten::div_",
+      "calls_per_forward": 4.0,
+      "self_cpu_us_per_forward": 8.291349999997758
+    },
+    {
+      "name": "aten::copy_",
+      "calls_per_forward": 8.0,
+      "self_cpu_us_per_forward": 4.411550000000955
+    },
+    {
+      "name": "aten::rsqrt",
+      "calls_per_forward": 4.0,
+      "self_cpu_us_per_forward": 2.696099999999993
+    },
+    {
+      "name": "aten::fill_",
+      "calls_per_forward": 4.0,
+      "self_cpu_us_per_forward": 1.662499999999109
+    }
+  ]
+}

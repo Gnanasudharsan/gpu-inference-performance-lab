@@ -53,9 +53,11 @@ These were observed on 2026-11-10 and drove the controls above.
    about 1.22 ms and about 3.48 ms. The GPU moves between fast and slow states over hundreds of
    milliseconds. This laptop's GPU also composites a 3024×1964 display for other applications, so p99
    on this machine reflects the environment, not only the kernels.
-2. **Idle gaps before a request raise its latency** (GPU power-state behavior). See
-   `results/phase2/idle_gap_mps.jsonl`. Sparse-arrival latency is therefore measured explicitly with
-   `--idle-gap-us`, not inferred from back-to-back runs.
+2. **Idle-gap sensitivity: suspected, not established.** An exploratory script showed p50 rising
+   from 1.35 ms (back to back) to 2.98 ms with a 2 ms idle gap before each request. The sequential
+   harness sweep in `results/phase2/idle_gap_mps.jsonl` did **not** reproduce a monotonic trend
+   (p50 2.66 / 3.32 / 2.95 / 2.46 ms for 0 / 0.5 / 2 / 10 ms gaps), because run-to-run noise is
+   larger than the effect. Phase 4 measures this with gap values interleaved inside one run.
 3. **Within-run trials agree better than separate runs.** One run gave a trial-median CV below 1%,
    while separate processes differed by about 25% in p50. Cross-process spread is measured in
    `results/phase2/repeatability_mps.json`.

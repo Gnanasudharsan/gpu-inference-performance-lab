@@ -4,7 +4,7 @@
 |---|---|---|---|
 | 0 | Research, repository and environment | **complete** | `2c42aa6`, `275775a` |
 | 1 | Workload and correctness baseline | **complete** | see git log |
-| 2 | Benchmarking and profiling | **complete** | `d82a86a` + docs/data commits |
+| 2 | Benchmarking and profiling | **complete** | `d82a86a`, `18e7cbf`, `fa7ac5f`, data commit |
 | 3 | GPU kernel optimization | pending | |
 | 4 | Scheduling and end-to-end systems | pending | |
 | 5 | Experimental analysis | pending | |
