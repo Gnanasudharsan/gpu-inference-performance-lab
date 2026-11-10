@@ -9,11 +9,12 @@ Cost and abuse controls encoded here:
                                        itself still runs ONE measurement at a time (429 if busy)
   * timeout=120                     -> hard per-request wall-clock limit
   * scaledown_window=60             -> scale to zero one minute after the last request
-  * GPULAB_DAILY_RUN_CAP=30         -> global measurements per UTC day (the spend bound)
+  * GPULAB_DAILY_RUN_CAP=20         -> global measurements per UTC day (the spend bound)
   * GPULAB_RATE_PER_MIN=3           -> per-client rate limit
-Worst case with these settings: 30 runs/day, each waking the GPU for <= ~3 min (cold start +
-run + scale-down) -> <= 1.5 GPU-h/day. Set a workspace spending limit in the Modal dashboard as
-the outer cap.
+Worst case with these settings: 20 runs/day, each waking the GPU for ~2.5 min (cold start +
+run + 60 s scale-down) -> ~50 GPU-min/day -> ~25 GPU-h/month, about $20/month at the reported
+~$0.80/h L4 rate: inside the Starter plan's $30/month credit. Also set a workspace spending
+limit in the Modal dashboard as the outer cap.
 
 Deploy (from the repository root):
     modal secret create gpulab-api GPULAB_CORS_ORIGINS=https://gpu-inference-performance-lab.vercel.app
@@ -25,7 +26,7 @@ import modal
 image = (
     modal.Image.from_registry("pytorch/pytorch:2.8.0-cuda12.8-cudnn9-runtime")
     .pip_install("fastapi>=0.110", "uvicorn>=0.29", "pydantic>=2.6", "triton>=3.1", "numpy>=1.26")
-    .env({"GPULAB_DEVICE": "cuda", "GPULAB_TRUST_PROXY": "1", "GPULAB_DAILY_RUN_CAP": "30",
+    .env({"GPULAB_DEVICE": "cuda", "GPULAB_TRUST_PROXY": "1", "GPULAB_DAILY_RUN_CAP": "20",
           "GPULAB_RATE_PER_MIN": "3"})
     .add_local_python_source("gpulab")  # resolved from src/ via PYTHONPATH=src at deploy time
 )

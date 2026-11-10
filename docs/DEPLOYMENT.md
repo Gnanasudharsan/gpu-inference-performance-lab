@@ -85,7 +85,7 @@ Sources consulted: [Modal pricing explained (Beam)](https://www.beam.cloud/blog/
 | Authentication | Optional `GPULAB_API_KEY`, required for `/api/run` when set; constant-time comparison |
 | Rate limiting | Sliding window per client (default 6 runs/min); `Retry-After` on 429 |
 | Concurrency | One measurement at a time (a lock); concurrent runs would also contaminate timing. Busy → 429 |
-| Spend bound | `GPULAB_DAILY_RUN_CAP`: a global cap on measurements per UTC day (30 in `modal_app.py`). Only runs that actually start count; once reached → 429 until 00:00 UTC. `/api/health` reports runs remaining |
+| Spend bound | `GPULAB_DAILY_RUN_CAP`: a global cap on measurements per UTC day (20 in `modal_app.py`, about $20/month worst case at the reported L4 rate, inside the free $30 credit). Only runs that actually start count; once reached → 429 until 00:00 UTC. `/api/health` reports runs remaining |
 | Bounded runtime | Inputs cap the work (≤ 20 trials × small bursts); `timeout=120` in Modal; reported `over_soft_cap` |
 | CORS | Explicit allowlist (`GPULAB_CORS_ORIGINS`), including Chrome Private Network Access preflights (`allow_private_network`) for listed origins only |
 | Logging | Structured JSON, one line per request. Client addresses are SHA-256 hashed and never logged raw |
