@@ -209,3 +209,44 @@ def format_report(p: Provenance) -> str:
     for tool, ok in p.tools.items():
         lines.append(f"  - {tool:<10} {'found' if ok else 'not found'}")
     return "\n".join(lines)
+
+
+def system_state() -> dict[str, Any]:
+    """Per-run conditions that change performance: power source, thermal/clock state.
+
+    macOS: ``pmset`` power source and thermal/performance warning levels (no root needed).
+    NVIDIA: SM/memory clocks, temperature and power draw from ``nvidia-smi``.
+    """
+    state: dict[str, Any] = {}
+    if sys.platform == "darwin":
+        batt = _run(["pmset", "-g", "batt"]) or ""
+        state["power_source"] = (
+            "AC" if "AC Power" in batt else "battery" if "Battery Power" in batt else None
+        )
+        therm = _run(["pmset", "-g", "therm"]) or ""
+        state["thermal_warning"] = "No thermal warning level has been recorded" not in therm
+        state["performance_warning"] = "No performance warning level has been recorded" not in therm
+        low_power = _run(["pmset", "-g"]) or ""
+        for line in low_power.splitlines():
+            if line.strip().startswith("lowpowermode"):
+                state["low_power_mode"] = line.split()[-1] == "1"
+    if shutil.which("nvidia-smi"):
+        q = _run(
+            [
+                "nvidia-smi",
+                "--query-gpu=clocks.sm,clocks.mem,temperature.gpu,power.draw,pstate",
+                "--format=csv,noheader,nounits",
+            ]
+        )
+        if q:
+            sm, mem, temp, power, pstate = (v.strip() for v in q.splitlines()[0].split(","))
+            state.update(
+                {
+                    "sm_clock_mhz": sm,
+                    "mem_clock_mhz": mem,
+                    "gpu_temp_c": temp,
+                    "power_w": power,
+                    "pstate": pstate,
+                }
+            )
+    return state
