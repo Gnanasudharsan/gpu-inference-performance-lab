@@ -4,7 +4,7 @@
 > labeled by evidence type: **measured** (read from records), **derived** (computed from
 > measured values), or **theoretical** (from specifications). Do not edit by hand.
 
-- Generated: 2026-11-10T19:20:33+00:00
+- Generated: 2026-11-10T20:14:29+00:00
 - Hardware: Apple M4, 16.0 GiB; accelerators: mps: Apple M4 GPU (Metal/MPS), cpu: Apple M4
 - Software: Darwin 27.2, Python 3.12.16, PyTorch 2.15.0
 - Records from commit: `758dbd6`
