@@ -20,6 +20,8 @@ k() { uvx --quiet --with six --from kaggle==2.2.5 kaggle "$@"; }
 # KAGGLE_USERNAME (the username is not secret; it names the kernel).
 if [ -n "${KAGGLE_USERNAME:-}" ]; then
   KUSER=$KAGGLE_USERNAME
+elif [ -s "$HOME/.kaggle/username" ]; then
+  KUSER=$(head -n1 "$HOME/.kaggle/username")
 elif [ -f "$HOME/.kaggle/kaggle.json" ]; then
   KUSER=$(python3 -c 'import json,os;print(json.load(open(os.path.expanduser("~/.kaggle/kaggle.json")))["username"])')
 else
