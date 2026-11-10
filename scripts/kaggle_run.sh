@@ -57,10 +57,17 @@ if [ "${1:-}" != "--fetch" ]; then
   k kernels push -p "$STAGE" --accelerator NvidiaTeslaT4 -t "$TIMEOUT"
   # poll the remote run (an external queue the harness cannot watch); give up after 4 h
   for _ in $(seq 240); do
-    st=$(k kernels status "$SLUG" 2>&1 | tr '[:upper:]' '[:lower:]')
-    echo "$(date +%H:%M) $st"
+    # a failed status call must not kill the script (set -e): classify it instead
+    st=$(k kernels status "$SLUG" 2>&1 | tr '[:upper:]' '[:lower:]') || true
+    echo "$(date +%H:%M) ${st%%$'\n'*}"
     case "$st" in
       *complete*) break ;;
+      *"authentication required"*|*"permission"*"denied"*)
+        # OAuth sessions from `kaggle auth login` expire (observed after ~3 h); the run continues
+        # on Kaggle and its output stays there, so re-authenticate and fetch it
+        echo "Kaggle login expired while polling; the kernel keeps running remotely." >&2
+        echo "Run: uvx --with six --from kaggle==2.2.5 kaggle auth login   then: scripts/kaggle_run.sh --fetch" >&2
+        exit 3 ;;
       *error*|*cancel*) echo "kernel run failed; fetching logs anyway"; break ;;
     esac
     sleep 60
