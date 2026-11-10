@@ -35,33 +35,36 @@ MAX_ROWS = 8
 
 _MSL_TYPES = {torch.float32: "float", torch.float16: "half", torch.bfloat16: "bfloat"}
 
-_SOURCE = r"""
+_HEADER = r"""
 #include <metal_stdlib>
 using namespace metal;
 
 #define T {T}
 #define T4 {T}4
-constant constexpr uint MAX_R = {MAX_R};
 constant constexpr uint NSG = {NSG};     // simdgroups per threadgroup
 constant constexpr uint COLS = {COLS};   // output columns per simdgroup
+"""
 
-kernel void norm_gate_up_silu(
+# v2: one specialization per row count R (compile-time constant, so accumulators are
+# statically indexed and live in registers), and the column loop is *inside* the K-loop so
+# each x load is reused across COLS columns.
+_GEMV = r"""
+kernel void norm_gate_up_silu_r{R}(
     device const T* x      [[buffer(0)]],   // (R, D)
     device const T* g      [[buffer(1)]],   // (D)
     device const T* wgu    [[buffer(2)]],   // (2H, D): rows [0,H) gate, [H,2H) up
     device T* out          [[buffer(3)]],   // (R, H)
-    constant uint& R       [[buffer(4)]],
-    constant uint& D       [[buffer(5)]],
-    constant uint& H       [[buffer(6)]],
-    constant float& eps    [[buffer(7)]],
+    constant uint& D       [[buffer(4)]],
+    constant uint& H       [[buffer(5)]],
+    constant float& eps    [[buffer(6)]],
     uint tgid  [[threadgroup_position_in_grid]],
     uint sg    [[simdgroup_index_in_threadgroup]],
     uint lane  [[thread_index_in_simdgroup]],
     uint tid   [[thread_index_in_threadgroup]])
 {{
-    threadgroup float partial[MAX_R][NSG];
-    threadgroup float inv_rms[MAX_R];
-    // 1) per-row inverse RMS, recomputed per threadgroup (x is tiny and cache-resident)
+    constexpr uint R = {R};
+    threadgroup float partial[R][NSG];
+    threadgroup float inv_rms[R];
     for (uint r = 0; r < R; ++r) {{
         float ss = 0.0f;
         for (uint k = tid; k < D; k += NSG * 32) {{ float v = float(x[r * D + k]); ss += v * v; }}
@@ -76,67 +79,84 @@ kernel void norm_gate_up_silu(
     }}
     threadgroup_barrier(mem_flags::mem_threadgroup);
 
-    // 2) GEMV over packed gate/up rows with fused SiLU*mul epilogue
+    const uint j0 = (tgid * NSG + sg) * COLS;
+    if (j0 >= H) return;
     const uint D4 = D / 4;
     device const T4* x4 = (device const T4*)x;
     device const T4* g4 = (device const T4*)g;
+    device const T4* wg[COLS];
+    device const T4* wu[COLS];
     for (uint c = 0; c < COLS; ++c) {{
-        const uint j = (tgid * NSG + sg) * COLS + c;
-        if (j >= H) return;
-        device const T4* wg = (device const T4*)(wgu + (ulong)j * D);
-        device const T4* wu = (device const T4*)(wgu + (ulong)(H + j) * D);
-        float accg[MAX_R];
-        float accu[MAX_R];
-        for (uint r = 0; r < MAX_R; ++r) {{ accg[r] = 0.0f; accu[r] = 0.0f; }}
-        for (uint k = lane; k < D4; k += 32) {{
-            const float4 a = float4(wg[k]);
-            const float4 b = float4(wu[k]);
-            const float4 gk = float4(g4[k]);
-            for (uint r = 0; r < R; ++r) {{
-                const float4 xv = float4(x4[r * D4 + k]) * gk;
-                accg[r] += dot(xv, a);
-                accu[r] += dot(xv, b);
+        const uint j = min(j0 + c, H - 1);  // clamp: tail columns compute but never store
+        wg[c] = (device const T4*)(wgu + (ulong)j * D);
+        wu[c] = (device const T4*)(wgu + (ulong)(H + j) * D);
+    }}
+    float accg[R][COLS];
+    float accu[R][COLS];
+    for (uint r = 0; r < R; ++r)
+        for (uint c = 0; c < COLS; ++c) {{ accg[r][c] = 0.0f; accu[r][c] = 0.0f; }}
+    for (uint k = lane; k < D4; k += 32) {{
+        const float4 gk = float4(g4[k]);
+        float4 a[COLS];
+        float4 b[COLS];
+        for (uint c = 0; c < COLS; ++c) {{ a[c] = float4(wg[c][k]); b[c] = float4(wu[c][k]); }}
+        for (uint r = 0; r < R; ++r) {{
+            const float4 xv = float4(x4[r * D4 + k]) * gk;
+            for (uint c = 0; c < COLS; ++c) {{
+                accg[r][c] += dot(xv, a[c]);
+                accu[r][c] += dot(xv, b[c]);
             }}
         }}
-        for (uint r = 0; r < R; ++r) {{
-            const float gs = simd_sum(accg[r]) * inv_rms[r];
-            const float us = simd_sum(accu[r]) * inv_rms[r];
-            if (lane == 0) out[r * H + j] = T(gs / (1.0f + exp(-gs)) * us);
+    }}
+    for (uint r = 0; r < R; ++r) {{
+        for (uint c = 0; c < COLS; ++c) {{
+            const float gs = simd_sum(accg[r][c]) * inv_rms[r];
+            const float us = simd_sum(accu[r][c]) * inv_rms[r];
+            if (lane == 0 && j0 + c < H) out[r * H + j0 + c] = T(gs / (1.0f + exp(-gs)) * us);
         }}
     }}
 }}
 
-kernel void down_residual(
+kernel void down_residual_r{R}(
     device const T* act    [[buffer(0)]],   // (R, H)
     device const T* wd     [[buffer(1)]],   // (D, H)
     device const T* res    [[buffer(2)]],   // (R, D)
     device T* out          [[buffer(3)]],   // (R, D)
-    constant uint& R       [[buffer(4)]],
-    constant uint& D       [[buffer(5)]],
-    constant uint& H       [[buffer(6)]],
+    constant uint& D       [[buffer(4)]],
+    constant uint& H       [[buffer(5)]],
     uint tgid  [[threadgroup_position_in_grid]],
     uint sg    [[simdgroup_index_in_threadgroup]],
     uint lane  [[thread_index_in_simdgroup]])
 {{
+    constexpr uint R = {R};
+    const uint i0 = (tgid * NSG + sg) * COLS;
+    if (i0 >= D) return;
     const uint H4 = H / 4;
     device const T4* a4 = (device const T4*)act;
-    for (uint c = 0; c < COLS; ++c) {{
-        const uint i = (tgid * NSG + sg) * COLS + c;
-        if (i >= D) return;
-        device const T4* w = (device const T4*)(wd + (ulong)i * H);
-        float acc[MAX_R];
-        for (uint r = 0; r < MAX_R; ++r) acc[r] = 0.0f;
-        for (uint k = lane; k < H4; k += 32) {{
-            const float4 wk = float4(w[k]);
-            for (uint r = 0; r < R; ++r) acc[r] += dot(float4(a4[r * H4 + k]), wk);
-        }}
+    device const T4* w[COLS];
+    for (uint c = 0; c < COLS; ++c) w[c] = (device const T4*)(wd + (ulong)min(i0 + c, D - 1) * H);
+    float acc[R][COLS];
+    for (uint r = 0; r < R; ++r)
+        for (uint c = 0; c < COLS; ++c) acc[r][c] = 0.0f;
+    for (uint k = lane; k < H4; k += 32) {{
+        float4 wk[COLS];
+        for (uint c = 0; c < COLS; ++c) wk[c] = float4(w[c][k]);
         for (uint r = 0; r < R; ++r) {{
-            const float s = simd_sum(acc[r]);
-            if (lane == 0) out[r * D + i] = T(float(res[r * D + i]) + s);
+            const float4 av = float4(a4[r * H4 + k]);
+            for (uint c = 0; c < COLS; ++c) acc[r][c] += dot(av, wk[c]);
+        }}
+    }}
+    for (uint r = 0; r < R; ++r) {{
+        for (uint c = 0; c < COLS; ++c) {{
+            const float s = simd_sum(acc[r][c]);
+            const uint i = i0 + c;
+            if (lane == 0 && i < D) out[r * D + i] = T(float(res[r * D + i]) + s);
         }}
     }}
 }}
+"""
 
+_HELPERS = r"""
 // ---- large-batch helpers -------------------------------------------------------------
 
 kernel void rmsnorm(
@@ -200,7 +220,9 @@ class LaunchConfig:
 
 
 def source(dtype: torch.dtype, cfg: LaunchConfig) -> str:
-    return _SOURCE.format(T=_MSL_TYPES[dtype], MAX_R=MAX_ROWS, NSG=cfg.nsg, COLS=cfg.cols)
+    head = _HEADER.format(T=_MSL_TYPES[dtype], NSG=cfg.nsg, COLS=cfg.cols)
+    gemvs = "".join(_GEMV.format(R=r) for r in range(1, MAX_ROWS + 1))
+    return head + gemvs + _HELPERS
 
 
 DEFAULT_LAUNCH = LaunchConfig()
@@ -230,13 +252,12 @@ def norm_gate_up_silu(
     h = wgu.shape[0] // 2
     if out is None:
         out = torch.empty(rows, h, device=x.device, dtype=x.dtype)
-    lib = library(x.dtype, cfg)
-    lib.norm_gate_up_silu(
+    kernel = getattr(library(x.dtype, cfg), f"norm_gate_up_silu_r{rows}")
+    kernel(
         x,
         g,
         wgu,
         out,
-        rows,
         d,
         h,
         eps,
@@ -257,13 +278,12 @@ def down_residual(
     d = wd.shape[0]
     if out is None:
         out = torch.empty(rows, d, device=act.device, dtype=act.dtype)
-    lib = library(act.dtype, cfg)
-    lib.down_residual(
+    kernel = getattr(library(act.dtype, cfg), f"down_residual_r{rows}")
+    kernel(
         act,
         wd,
         res,
         out,
-        rows,
         d,
         h,
         threads=_grid(d, cfg) * cfg.threads,
