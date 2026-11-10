@@ -92,34 +92,41 @@ class RateLimiter:
 
 
 class DailyCap:
-    """Global cap on measurements per UTC day: bounds total GPU spend for a public demo."""
+    """Global cap on measurements per UTC day: bounds total spend for a public demo.
 
-    def __init__(self, limit: int | None) -> None:
+    Counts live in ``store`` (any mapping with ``get`` and item assignment), keyed by UTC date.
+    The default is process memory, which resets when the process restarts. A scale-to-zero
+    deployment must pass a persistent store (e.g. a ``modal.Dict``) or the cap would reset on
+    every cold start. The lock serializes this process; the deployment runs one container.
+    """
+
+    def __init__(self, limit: int | None, store: Any = None) -> None:
         self.limit = limit
-        self.day = datetime.now(UTC).date()
-        self.used = 0
+        self.store: Any = {} if store is None else store
         self.lock = threading.Lock()
 
-    def _roll(self) -> None:
-        today = datetime.now(UTC).date()
-        if today != self.day:
-            self.day, self.used = today, 0
+    @staticmethod
+    def _key() -> str:
+        return "runs-" + datetime.now(UTC).date().isoformat()
+
+    def _used(self) -> int:
+        return int(self.store.get(self._key(), 0) or 0)
 
     def remaining(self) -> int | None:
         with self.lock:
-            self._roll()
-            return None if self.limit is None else max(0, self.limit - self.used)
+            return None if self.limit is None else max(0, self.limit - self._used())
 
     def take(self) -> bool:
         with self.lock:
-            self._roll()
-            if self.limit is not None and self.used >= self.limit:
+            used = self._used()
+            if self.limit is not None and used >= self.limit:
                 return False
-            self.used += 1
+            self.store[self._key()] = used + 1
             return True
 
 
-def create_app() -> FastAPI:
+def create_app(usage_store: Any = None) -> FastAPI:
+    """``usage_store``: persistent mapping for the daily cap (default: process memory)."""
     api_key = os.environ.get("GPULAB_API_KEY") or None
     origins = [o.strip() for o in os.environ.get("GPULAB_CORS_ORIGINS", "").split(",") if o.strip()]
     trust_proxy = os.environ.get("GPULAB_TRUST_PROXY") == "1"
@@ -127,7 +134,7 @@ def create_app() -> FastAPI:
     device = resolve_device(os.environ.get("GPULAB_DEVICE", "auto"))
     limiter = RateLimiter(int(os.environ.get("GPULAB_RATE_PER_MIN", "6")))
     cap_env = os.environ.get("GPULAB_DAILY_RUN_CAP")
-    daily = DailyCap(int(cap_env) if cap_env else None)
+    daily = DailyCap(int(cap_env) if cap_env else None, usage_store)
     gpu_lock = threading.Lock()  # one measurement at a time: concurrent runs would contaminate
     prov = collect_provenance()
     host_label = os.environ.get("GPULAB_HOST_LABEL") or None

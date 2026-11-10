@@ -61,6 +61,9 @@ image = image.env(
 
 app = modal.App("gpulab-api", image=image)
 
+# persistent counter for the daily cap: survives scale-to-zero restarts (in-memory would not)
+usage = modal.Dict.from_name("gpulab-api-usage", create_if_missing=True)
+
 
 @app.function(
     gpu=GPU if ON_GPU else None,
@@ -76,4 +79,4 @@ app = modal.App("gpulab-api", image=image)
 def api():  # type: ignore[no-untyped-def]
     from gpulab.api import create_app
 
-    return create_app()
+    return create_app(usage_store=usage)

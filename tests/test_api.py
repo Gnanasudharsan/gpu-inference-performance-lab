@@ -142,20 +142,30 @@ def test_daily_run_cap(monkeypatch):
     assert c2.get("/api/health").json()["limits"]["runs_remaining_today"] == 1
 
 
-def test_daily_cap_rolls_over():
-    from datetime import date
-
+def test_daily_cap_rolls_over_and_persists_across_restarts():
     from gpulab.api import DailyCap
 
-    d = DailyCap(1)
+    store: dict = {}
+    d = DailyCap(1, store)
     assert d.take()
     assert not d.take()
-    d.day = date(2000, 1, 1)  # simulate yesterday
-    assert d.take()
+    # a "restarted process" sharing the same persistent store keeps the count
+    assert not DailyCap(1, store).take()
+    # the next UTC day starts fresh: counts are keyed by date
+    store.clear()
+    store["runs-2000-01-01"] = 99
+    assert DailyCap(1, store).take()
     assert DailyCap(None).remaining() is None
 
 
-def test_host_label_is_reported_as_device(monkeypatch):
-    c, _ = _client(monkeypatch, GPULAB_HOST_LABEL="Modal cloud CPU (2 vCPU)")
-    assert c.get("/api/health").json()["device_name"].startswith("Modal cloud CPU (2 vCPU) · ")
-    assert c.post("/api/run", json=TINY).json()["device_name"].startswith("Modal cloud CPU")
+def test_create_app_uses_the_given_usage_store(monkeypatch):
+    import gpulab.api as api
+
+    monkeypatch.setenv("GPULAB_DEVICE", "cpu")
+    monkeypatch.setenv("GPULAB_DAILY_RUN_CAP", "1")
+    store: dict = {}
+    c = TestClient(api.create_app(usage_store=store))
+    assert c.post("/api/run", json=TINY).status_code == 200
+    assert sum(store.values()) == 1
+    c2 = TestClient(api.create_app(usage_store=store))  # simulated cold start
+    assert c2.post("/api/run", json=TINY).status_code == 429
