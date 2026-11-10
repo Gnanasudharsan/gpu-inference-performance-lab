@@ -1,0 +1,29 @@
+{
+  "steps": [
+    {
+      "step": "provenance",
+      "status": "ok",
+      "detail": {
+        "cuda": true,
+        "torch": "2.11.0+cu130",
+        "triton": "3.6.0",
+        "gpu": "Tesla T4",
+        "capability": "7.5"
+      },
+      "seconds": 1.6
+    },
+    {
+      "step": "capability gate",
+      "status": "ok",
+      "detail": "capability (7, 5) ok",
+      "seconds": 0.0
+    },
+    {
+      "step": "correctness gate",
+      "status": "failed",
+      "reason": "RuntimeError: pytest exit 1: ['1 failed, 278 passed, 175 skipped, 23 warnings in 2091.42s (0:34:51)']",
+      "traceback": "Traceback (most recent call last):\n  File \"/tmp/gpulab/scripts/gpu_session.py\", line 54, in step\n    detail = fn()\n  File \"/tmp/gpulab/scripts/gpu_session.py\", line 150, in correctness_gate\n    raise RuntimeError(f\"pytest exit {rc}: {tail}\")\nRuntimeError: pytest exit 1: ['1 failed, 278 passed, 175 skipped, 23 warnings in 2091.42s (0:34:51)']\n",
+      "seconds": 2100.2
+    }
+  ]
+}

@@ -89,7 +89,7 @@ def test_run_experiment_records_skips_and_analyzes(tmp_path):
     assert len(s["benchmarks"]) == 4 + (2 if has_cuda else 0)
     assert {c["mode"] for c in s["comparisons"]} == {"latency", "throughput"}
     assert s["serving"][0]["policy"] == "direct"
-    assert any("NVIDIA" in u for u in s["unavailable"])
+    assert has_cuda != any("NVIDIA" in u for u in s["unavailable"])
     md = render(s)
     assert "## Regressions" in md
     assert "fused_weights" in md

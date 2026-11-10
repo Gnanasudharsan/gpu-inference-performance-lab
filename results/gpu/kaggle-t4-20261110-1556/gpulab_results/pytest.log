@@ -1,0 +1,78 @@
+........................................................................ [ 15%]
+........s............F...ssssss..sssss.ssssss..sssss.ssssss.ssssss..ssss [ 31%]
+s.ssssss..sssss.ssssss.ssssss..sssss.ssssss..sssss.ssssss.ss...s..s..... [ 47%]
+ss...s..s.....ss...s.ss...s..s.....ss...s..s.....ss...s.sss.ss..ss.s..ss [ 63%]
+s.ss..ss.s..sss.ss..sssss..sssss..sssss..s......s......ss.s..ssss.s.ssss [ 79%]
+ssssssssssssss..............................................s..s..s..s.. [ 95%]
+......................                                                   [100%]
+=================================== FAILURES ===================================
+________________ test_run_experiment_records_skips_and_analyzes ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_run_experiment_records_sk0')
+
+    def test_run_experiment_records_skips_and_analyzes(tmp_path):
+        cfg = tmp_path / "t.toml"
+        cfg.write_text(CONFIG)
+        out = tmp_path / "out"
+        manifest = run_experiment(load_experiment(cfg), out, log=lambda *_: None)
+        import torch
+    
+        has_cuda = torch.cuda.is_available()
+        # CPU group: 2 impls x 2 modes; the CUDA group (1 impl x 2 modes) runs only where CUDA exists
+        assert manifest["counts"] == {"bench": 4 + (2 if has_cuda else 0), "serving": 1}
+        reasons = {(s.get("impl"), s["reason"]) for s in manifest["skipped"]}
+        assert ("metal", "Metal kernels run only on Apple GPUs (MPS)") in reasons
+        assert has_cuda or any("no cuda device" in r for _, r in reasons)
+        # analysis over a results tree laid out like the repository's
+        results = tmp_path / "results"
+        (results / "phase3").mkdir(parents=True)
+        (results / "phase4").mkdir(parents=True)
+        (out / "bench.jsonl").rename(results / "phase3" / "bench_t.jsonl")
+        (out / "serving.jsonl").rename(results / "phase4" / "serving_sweep.jsonl")
+        s = build_summary(results)
+        assert len(s["benchmarks"]) == 4 + (2 if has_cuda else 0)
+        assert {c["mode"] for c in s["comparisons"]} == {"latency", "throughput"}
+        assert s["serving"][0]["policy"] == "direct"
+>       assert any("NVIDIA" in u for u in s["unavailable"])
+E       assert False
+E        +  where False = any(<generator object test_run_experiment_records_skips_and_analyzes.<locals>.<genexpr> at 0x7995a7fcd2f0>)
+
+tests/test_experiment.py:92: AssertionError
+=============================== warnings summary ===============================
+tests/test_bench.py::test_profile_dispatches_scale_with_depth
+  /usr/local/lib/python3.13/dist-packages/torch/profiler/profiler.py:224: UserWarning: Warning: Profiler clears events at the end of each cycle.Only events from the current cycle will be reported.To keep events across cycles, set acc_events=True.
+    _warn_once(
+
+tests/test_cuda_only.py::test_runners_have_no_hidden_host_syncs[eager]
+  /usr/local/lib/python3.13/dist-packages/torch/cuda/__init__.py:1270: UserWarning: Synchronization debug mode is a prototype feature and does not yet detect all synchronizing operations (Triggered internally at /pytorch/torch/csrc/cuda/Module.cpp:1003.)
+    torch._C._cuda_set_sync_debug_mode(debug_mode)
+
+tests/test_cuda_only.py: 14 warnings
+  /usr/local/lib/python3.13/dist-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.
+    warnings.warn(
+
+tests/test_impls.py::test_matches_reference[cuda-bfloat16-3x96x256x2-compile]
+tests/test_impls.py::test_matches_reference[cuda-bfloat16-3x96x256x2-compile]
+tests/test_impls.py::test_matches_reference[cuda-bfloat16-3x96x256x2-compile_cudagraphs]
+tests/test_impls.py::test_matches_reference[cuda-bfloat16-17x128x352x2-compile]
+tests/test_impls.py::test_matches_reference[cuda-bfloat16-17x128x352x2-compile_cudagraphs]
+tests/test_impls.py::test_strided_input_and_repeatability[cuda-bfloat16-compile]
+tests/test_impls.py::test_strided_input_and_repeatability[cuda-bfloat16-compile_cudagraphs]
+  /usr/local/lib/python3.13/dist-packages/torch/_inductor/compile_fx.py:2941: UserWarning: Tesla T4 does not support bfloat16 compilation natively, skipping
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+-------- generated xml file: /kaggle/working/gpulab_results/pytest.xml ---------
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_cuda_only.py:22: Metal kernels run only on Apple GPUs (MPS)
+SKIPPED [36] tests/test_impls.py:47: compile coverage limited to two shapes
+SKIPPED [36] tests/test_impls.py:27: Metal kernels run only on Apple GPUs (MPS)
+SKIPPED [18] tests/test_impls.py:27: Triton needs an NVIDIA GPU (or TRITON_INTERPRET=1 on CPU for correctness)
+SKIPPED [45] tests/test_impls.py:27: CUDA graphs require an NVIDIA GPU
+SKIPPED [12] tests/test_impls.py:27: bf16 tl.dot needs compute capability >= 8.0 (Ampere or newer)
+SKIPPED [7] tests/test_impls.py:63: unsupported or static-shape
+SKIPPED [15] tests/test_impls.py:70: requires MPS
+SKIPPED [1] tests/test_impls.py:86: requires MPS
+SKIPPED [4] tests/test_triton_kernels.py:38: bf16 tl.dot needs compute capability >= 8.0 (Ampere or newer)
+FAILED tests/test_experiment.py::test_run_experiment_records_skips_and_analyzes
+1 failed, 278 passed, 175 skipped, 23 warnings in 2091.42s (0:34:51)

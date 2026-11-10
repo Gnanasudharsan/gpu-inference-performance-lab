@@ -1,0 +1,44 @@
+[{"stream_name":"stdout","time":0.864259174,"data":"+ git clone --filter=blob:none https://github.com/Gnanasudharsan/gpu-inference-performance-lab /tmp/gpulab\n"}
+,{"stream_name":"stderr","time":0.921795583,"data":"Cloning into '/tmp/gpulab'...\n"}
+,{"stream_name":"stdout","time":2.447968915,"data":"+ git checkout --detach 79011c10c2cd946cc3b030bee1367a45f89201b0\n"}
+,{"stream_name":"stderr","time":2.4753967709999998,"data":"HEAD is now at 79011c1 deploy: verified public live execution; record the T4 CUDA-graph fix verification\n"}
+,{"stream_name":"stdout","time":2.47683679,"data":"+ nvidia-smi\n"}
+,{"stream_name":"stdout","time":2.5089950290000003,"data":"Tue Nov 10 20:56:39 2026       \n"}
+,{"stream_name":"stdout","time":2.509017208,"data":"+-----------------------------------------------------------------------------------------+\n"}
+,{"stream_name":"stdout","time":2.509023507,"data":"| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |\n"}
+,{"stream_name":"stdout","time":2.50902855,"data":"+-----------------------------------------+------------------------+----------------------+\n"}
+,{"stream_name":"stdout","time":2.509033577,"data":"| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |\n"}
+,{"stream_name":"stdout","time":2.509040166,"data":"| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |\n"}
+,{"stream_name":"stdout","time":2.509045053,"data":"|                                         |                        |               MIG M. |\n"}
+,{"stream_name":"stdout","time":2.509051966,"data":"|=========================================+========================+======================|\n"}
+,{"stream_name":"stdout","time":2.541429274,"data":"|   0  Tesla T4                       Off |   00000000:00:04.0 Off |                    0 |\n"}
+,{"stream_name":"stdout","time":2.541447071,"data":"| N/A   36C    P8              9W /   70W |       0MiB /  15360MiB |      0%      Default |\n"}
+,{"stream_name":"stdout","time":2.541453142,"data":"|                                         |                        |                  N/A |\n"}
+,{"stream_name":"stdout","time":2.5414601,"data":"+-----------------------------------------+------------------------+----------------------+\n"}
+,{"stream_name":"stdout","time":2.541467078,"data":"|   1  Tesla T4                       Off |   00000000:00:05.0 Off |                    0 |\n"}
+,{"stream_name":"stdout","time":2.541472621,"data":"| N/A   41C    P8             11W /   70W |       0MiB /  15360MiB |      0%      Default |\n"}
+,{"stream_name":"stdout","time":2.541479394,"data":"|                                         |                        |                  N/A |\n"}
+,{"stream_name":"stdout","time":2.541486393,"data":"+-----------------------------------------+------------------------+----------------------+\n"}
+,{"stream_name":"stdout","time":2.542225629,"data":"\n"}
+,{"stream_name":"stdout","time":2.542238379,"data":"+-----------------------------------------------------------------------------------------+\n"}
+,{"stream_name":"stdout","time":2.54224476,"data":"| Processes:                                                                              |\n"}
+,{"stream_name":"stdout","time":2.542250079,"data":"|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |\n"}
+,{"stream_name":"stdout","time":2.542256787,"data":"|        ID   ID                                                               Usage      |\n"}
+,{"stream_name":"stdout","time":2.54226369,"data":"|=========================================================================================|\n"}
+,{"stream_name":"stdout","time":2.543742684,"data":"|  No running processes found                                                             |\n"}
+,{"stream_name":"stdout","time":2.543769931,"data":"+-----------------------------------------------------------------------------------------+\n"}
+,{"stream_name":"stdout","time":2.863813217,"data":"+ /usr/bin/python3 -m pip install -q -e .[dev]\n"}
+,{"stream_name":"stdout","time":27.781019443,"data":"[20:57:04] == provenance\n"}
+,{"stream_name":"stdout","time":29.386114911,"data":"[20:57:06] == capability gate\n"}
+,{"stream_name":"stdout","time":29.386388372,"data":"[20:57:06] == correctness gate\n"}
+,{"stream_name":"stdout","time":2129.565736156,"data":"[21:32:06]    FAILED: RuntimeError: pytest exit 1: ['1 failed, 278 passed, 175 skipped, 23 warnings in 2091.42s (0:34:51)']\n"}
+,{"stream_name":"stdout","time":2129.566062171,"data":"[21:32:06] aborting: correctness gate failed, no benchmarks were run\n"}
+,{"stream_name":"stdout","time":2129.573717422,"data":"archive: /kaggle/working/gpulab_results.tar.gz\n"}
+,{"stream_name":"stdout","time":2130.074663562,"data":"gpu_session exit code: 1\n"}
+,{"stream_name":"stderr","time":2132.264384137,"data":"/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":2132.264434809,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":2132.568856596,"data":"/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":2132.568885442,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":2133.445745537,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":2134.480923015,"data":"[NbConvertApp] Writing 284710 bytes to __results__.html\n"}
+]
