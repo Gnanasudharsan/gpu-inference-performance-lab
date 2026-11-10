@@ -10,6 +10,7 @@ from pathlib import Path
 
 REPO = "https://github.com/Gnanasudharsan/gpu-inference-performance-lab"
 COMMIT = "__COMMIT__"
+TASK = "__TASK__"  # "session" (full measurement session) or "diag" (CUDA-graph diagnostic)
 CONFIG = "experiments/nvidia_t4.toml"
 SRC = Path("/tmp/gpulab")  # not /kaggle/working: keep the source out of the outputs
 OUT = Path("/kaggle/working/gpulab_results")
@@ -25,7 +26,14 @@ sh("git", "clone", "--filter=blob:none", REPO, str(SRC))
 sh("git", "checkout", "--detach", COMMIT, cwd=SRC)
 sh("nvidia-smi")
 # keep Kaggle's preinstalled CUDA build of torch (and its bundled triton); add only our deps
-sh(sys.executable, "-m", "pip", "install", "-q", "-e", ".[dev]", cwd=SRC)
+sh(sys.executable, "-m", "pip", "install", "-q", "-e", ".[dev]" if TASK == "session" else ".", cwd=SRC)
+if TASK == "diag":
+    rc = subprocess.run(
+        [sys.executable, "scripts/diag_cuda_graph.py", "--out", "/kaggle/working/gpulab_diag"],
+        cwd=SRC,
+    ).returncode
+    print(f"diag exit code: {rc}", flush=True)
+    raise SystemExit(0)
 OUT.mkdir(parents=True, exist_ok=True)
 (OUT / "pip_freeze.txt").write_text(
     subprocess.run([sys.executable, "-m", "pip", "freeze"], capture_output=True, text=True).stdout

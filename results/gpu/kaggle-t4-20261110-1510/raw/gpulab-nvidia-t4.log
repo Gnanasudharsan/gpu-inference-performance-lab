@@ -1,0 +1,45 @@
+[{"stream_name":"stdout","time":0.584968629,"data":"+ git clone --filter=blob:none https://github.com/Gnanasudharsan/gpu-inference-performance-lab /tmp/gpulab\n"}
+,{"stream_name":"stderr","time":0.614397858,"data":"Cloning into '/tmp/gpulab'...\n"}
+,{"stream_name":"stderr","time":2.6389105,"data":"Updating files:   1% (2/162)\rUpdating files:   2% (4/162)\rUpdating files:   3% (5/162)\rUpdating files:   4% (7/162)\rUpdating files:   5% (9/162)\rUpdating files:   6% (10/162)\rUpdating files:   7% (12/162)\rUpdating files:   8% (13/162)\rUpdating files:   9% (15/162)\rUpdating files:  10% (17/162)\rUpdating files:  11% (18/162)\rUpdating files:  12% (20/162)\rUpdating files:  13% (22/162)\rUpdating files:  14% (23/162)\rUpdating files:  15% (25/162)\rUpdating files:  16% (26/162)\rUpdating files:  17% (28/162)\rUpdating files:  18% (30/162)\rUpdating files:  19% (31/162)\rUpdating files:  20% (33/162)\rUpdating files:  21% (35/162)\rUpdating files:  22% (36/162)\rUpdating files:  23% (38/162)\rUpdating files:  24% (39/162)\rUpdating files:  25% (41/162)\rUpdating files:  26% (43/162)\rUpdating files:  27% (44/162)\rUpdating files:  28% (46/162)\rUpdating files:  29% (47/162)\rUpdating files:  30% (49/162)\rUpdating files:  31% (51/162)\rUpdating files:  32% (52/162)\rUpdating files:  33% (54/162)\rUpdating files:  34% (56/162)\rUpdating files:  35% (57/162)\rUpdating files:  36% (59/162)\rUpdating files:  37% (60/162)\rUpdating files:  38% (62/162)\rUpdating files:  39% (64/162)\rUpdating files:  40% (65/162)\rUpdating files:  41% (67/162)\rUpdating files:  42% (69/162)\rUpdating files:  43% (70/162)\rUpdating files:  44% (72/162)\rUpdating files:  45% (73/162)\rUpdating files:  46% (75/162)\rUpdating files:  47% (77/162)\rUpdating files:  48% (78/162)\rUpdating files:  49% (80/162)\rUpdating files:  50% (81/162)\rUpdating files:  51% (83/162)\rUpdating files:  52% (85/162)\rUpdating files:  53% (86/162)\rUpdating files:  54% (88/162)\rUpdating files:  55% (90/162)\rUpdating files:  56% (91/162)\rUpdating files:  57% (93/162)\rUpdating files:  58% (94/162)\rUpdating files:  59% (96/162)\rUpdating files:  60% (98/162)\rUpdating files:  61% (99/162)\rUpdating files:  62% (101/162)\rUpdating files:  63% (103/162)\rUpdating files:  64% (104/162)\rUpdating files:  65% (106/162)\rUpdating files:  66% (107/162)\rUpdating files:  67% (109/162)\rUpdating files:  68% (111/162)\rUpdating files:  69% (112/162)\rUpdating files:  70% (114/162)\rUpdating files:  71% (116/162)\rUpdating files:  72% (117/162)\rUpdating files:  73% (119/162)\rUpdating files:  74% (120/162)\rUpdating files:  75% (122/162)\rUpdating files:  76% (124/162)\rUpdating files:  77% (125/162)\rUpdating files:  78% (127/162)\rUpdating files:  79% (128/162)\rUpdating files:  80% (130/162)\rUpdating files:  81% (132/162)\rUpdating files:  82% (133/162)\rUpdating files:  83% (135/162)\rUpdating files:  84% (137/162)\rUpdating files:  85% (138/162)\rUpdating files:  86% (140/162)\rUpdating files:  87% (141/162)\rUpdating files:  88% (143/162)\rUpdating files:  89% (145/162)\rUpdating files:  90% (146/162)\rUpdating files:  91% (148/162)\rUpdating files:  92% (150/162)\rUpdating files:  93% (151/162)\rUpdating files:  94% (153/162)\rUpdating files:  95% (154/162)\rUpdating files:  96% (156/162)\rUpdating files:  97% (158/162)\rUpdating files:  98% (159/162)\rUpdating files:  99% (161/162)\rUpdating files: 100% (162/162)\rUpdating files: 100% (162/162), done.\n"}
+,{"stream_name":"stdout","time":2.639980334,"data":"+ git checkout --detach 1e4076a530888033da3797453143118e4f3410ff\n"}
+,{"stream_name":"stderr","time":2.672255973,"data":"HEAD is now at 1e4076a fix(kaggle): accept OAuth login by checking authentication with the API itself\n"}
+,{"stream_name":"stdout","time":2.673264739,"data":"+ nvidia-smi\n"}
+,{"stream_name":"stdout","time":2.707415507,"data":"Tue Nov 10 19:35:54 2026       \n"}
+,{"stream_name":"stdout","time":2.707437042,"data":"+-----------------------------------------------------------------------------------------+\n"}
+,{"stream_name":"stdout","time":2.707451432,"data":"| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |\n"}
+,{"stream_name":"stdout","time":2.7074559259999997,"data":"+-----------------------------------------+------------------------+----------------------+\n"}
+,{"stream_name":"stdout","time":2.707459235,"data":"| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |\n"}
+,{"stream_name":"stdout","time":2.707462848,"data":"| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |\n"}
+,{"stream_name":"stdout","time":2.707466589,"data":"|                                         |                        |               MIG M. |\n"}
+,{"stream_name":"stdout","time":2.707470472,"data":"|=========================================+========================+======================|\n"}
+,{"stream_name":"stdout","time":2.739894913,"data":"|   0  Tesla T4                       Off |   00000000:00:04.0 Off |                    0 |\n"}
+,{"stream_name":"stdout","time":2.739924813,"data":"| N/A   53C    P8             10W /   70W |       0MiB /  15360MiB |      0%      Default |\n"}
+,{"stream_name":"stdout","time":2.739928192,"data":"|                                         |                        |                  N/A |\n"}
+,{"stream_name":"stdout","time":2.739930629,"data":"+-----------------------------------------+------------------------+----------------------+\n"}
+,{"stream_name":"stdout","time":2.739932976,"data":"|   1  Tesla T4                       Off |   00000000:00:05.0 Off |                    0 |\n"}
+,{"stream_name":"stdout","time":2.73993524,"data":"| N/A   57C    P8             10W /   70W |       0MiB /  15360MiB |      0%      Default |\n"}
+,{"stream_name":"stdout","time":2.7399377190000003,"data":"|                                         |                        |                  N/A |\n"}
+,{"stream_name":"stdout","time":2.739940212,"data":"+-----------------------------------------+------------------------+----------------------+\n"}
+,{"stream_name":"stdout","time":2.740664685,"data":"\n"}
+,{"stream_name":"stdout","time":2.74067529,"data":"+-----------------------------------------------------------------------------------------+\n"}
+,{"stream_name":"stdout","time":2.74067785,"data":"| Processes:                                                                              |\n"}
+,{"stream_name":"stdout","time":2.740680185,"data":"|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |\n"}
+,{"stream_name":"stdout","time":2.74068245,"data":"|        ID   ID                                                               Usage      |\n"}
+,{"stream_name":"stdout","time":2.740684701,"data":"|=========================================================================================|\n"}
+,{"stream_name":"stdout","time":2.7421455740000003,"data":"|  No running processes found                                                             |\n"}
+,{"stream_name":"stdout","time":2.742161465,"data":"+-----------------------------------------------------------------------------------------+\n"}
+,{"stream_name":"stdout","time":3.065880548,"data":"+ /usr/bin/python3 -m pip install -q -e .[dev]\n"}
+,{"stream_name":"stdout","time":23.854709292,"data":"[19:36:16] == provenance\n"}
+,{"stream_name":"stdout","time":25.108122539,"data":"[19:36:17] == capability gate\n"}
+,{"stream_name":"stdout","time":25.10854069,"data":"[19:36:17] == correctness gate\n"}
+,{"stream_name":"stdout","time":2028.259032134,"data":"[20:09:40]    FAILED: RuntimeError: pytest exit 1: ['4 failed, 265 passed, 175 skipped, 23 warnings in 1995.74s (0:33:15)']\n"}
+,{"stream_name":"stdout","time":2028.259384529,"data":"[20:09:40] aborting: correctness gate failed, no benchmarks were run\n"}
+,{"stream_name":"stdout","time":2028.269050935,"data":"archive: /kaggle/working/gpulab_results.tar.gz\n"}
+,{"stream_name":"stdout","time":2028.728498402,"data":"gpu_session exit code: 1\n"}
+,{"stream_name":"stderr","time":2030.619640833,"data":"/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":2030.619674013,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":2030.852170468,"data":"/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":2030.852226845,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":2031.581633799,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":2032.443881607,"data":"[NbConvertApp] Writing 279553 bytes to __results__.html\n"}
+]

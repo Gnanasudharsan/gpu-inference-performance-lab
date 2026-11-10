@@ -34,3 +34,12 @@
   service that has not been deployed (credentials and spend not authorized).
 - **Docker image not built locally.** The Docker daemon was unavailable and disk was limited, so
   `deploy/Dockerfile` is unverified until built on a CUDA host.
+- **First NVIDIA session (Kaggle T4, torch 2.11+cu130, commit `1e4076a`): the correctness gate
+  failed, so no benchmarks ran** (`results/gpu/kaggle-t4-20261110-1510/`). 265 tests passed on the
+  real T4, including the Triton kernels in fp16 and fp32. Four failed:
+  - *One test assumed no CUDA device* (fixed).
+  - *`cuda_graph_eager` changed an output it had already returned when the graph was replayed
+    again* (fp32, fp16, bf16). `cuda_graph_triton`, which has no cuBLAS, was stable. Hypothesis: the
+    replay writes cuBLAS workspace into memory the allocator considers free. Under investigation
+    with `scripts/diag_cuda_graph.py`. Until it is resolved, `cuda_graph_eager` results must not be
+    trusted.

@@ -8,8 +8,9 @@
 #      or a legacy ~/.kaggle/kaggle.json. Put your username in ~/.kaggle/username (not secret).
 #   3. The commit to measure is pushed to GitHub (the kernel clones it by SHA).
 #
-# Usage: scripts/kaggle_run.sh            # push, run (<= 3 h), wait, download, analyze
-#        scripts/kaggle_run.sh --fetch    # only download + ingest the latest run
+# Usage: scripts/kaggle_run.sh                # full session: push, run (<= 3 h), wait, download, analyze
+#        scripts/kaggle_run.sh --task diag    # CUDA-graph memory-safety diagnostic (<= 30 min)
+#        scripts/kaggle_run.sh --fetch        # only download + ingest the latest run
 set -euo pipefail
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 cd "$ROOT"
@@ -36,16 +37,24 @@ k kernels list --mine > /dev/null 2>&1 || {
 }
 SLUG="$KUSER/gpulab-nvidia-t4"
 
+TASK=session
+TIMEOUT=10800
+DEST="results/gpu/kaggle-t4-$(date +%Y%m%d-%H%M)"
+case "${1:-}" in
+  --task) TASK=${2:?session or diag}; shift 2 ;;
+esac
+if [ "$TASK" = diag ]; then TIMEOUT=1800; DEST="results/gpu/diag-t4-$(date +%Y%m%d-%H%M)"; fi
+
 if [ "${1:-}" != "--fetch" ]; then
   COMMIT=$(git rev-parse HEAD)
   git fetch -q origin main
   git merge-base --is-ancestor "$COMMIT" origin/main || { echo "push $COMMIT to origin/main first" >&2; exit 2; }
   [ -z "$(git status --porcelain --untracked-files=no)" ] || { echo "commit your changes first" >&2; exit 2; }
   STAGE=$(mktemp -d)
-  sed "s/__COMMIT__/$COMMIT/" deploy/kaggle/run.py > "$STAGE/run.py"
+  sed -e "s/__COMMIT__/$COMMIT/" -e "s/__TASK__/$TASK/" deploy/kaggle/run.py > "$STAGE/run.py"
   sed "s/__USERNAME__/$KUSER/" deploy/kaggle/kernel-metadata.template.json > "$STAGE/kernel-metadata.json"
-  echo "pushing $SLUG at commit ${COMMIT:0:7} (T4, 3 h cap)"
-  k kernels push -p "$STAGE" --accelerator NvidiaTeslaT4 -t 10800
+  echo "pushing $SLUG at commit ${COMMIT:0:7} task=$TASK (T4, ${TIMEOUT}s cap)"
+  k kernels push -p "$STAGE" --accelerator NvidiaTeslaT4 -t "$TIMEOUT"
   # poll the remote run (an external queue the harness cannot watch); give up after 4 h
   for _ in $(seq 240); do
     st=$(k kernels status "$SLUG" 2>&1 | tr '[:upper:]' '[:lower:]')
@@ -58,12 +67,16 @@ if [ "${1:-}" != "--fetch" ]; then
   done
 fi
 
-DEST="results/gpu/kaggle-t4-$(date +%Y%m%d-%H%M)"
 mkdir -p "$DEST/raw"
 k kernels output "$SLUG" -p "$DEST/raw" --force
 if [ -f "$DEST/raw/gpulab_results.tar.gz" ]; then
   tar -xzf "$DEST/raw/gpulab_results.tar.gz" -C "$DEST"
   rm "$DEST/raw/gpulab_results.tar.gz"
+fi
+if [ "$TASK" = diag ]; then
+  mv "$DEST/raw/gpulab_diag" "$DEST/" 2>/dev/null || true
+  cat "$DEST/gpulab_diag/diag_cuda_graph.json" 2>/dev/null || echo "no diagnostic output (see $DEST/raw/*.log)"
+  exit 0
 fi
 python3 -c "import json,sys; [print(f\"{s['step']:<18} {s['status']:<8} {s.get('reason','')}\") for s in json.load(open(sys.argv[1]))['steps']]" "$DEST/gpulab_results/session.json" || true
 .venv/bin/gpulab analyze

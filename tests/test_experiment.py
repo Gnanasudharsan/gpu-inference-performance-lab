@@ -71,10 +71,14 @@ def test_run_experiment_records_skips_and_analyzes(tmp_path):
     cfg.write_text(CONFIG)
     out = tmp_path / "out"
     manifest = run_experiment(load_experiment(cfg), out, log=lambda *_: None)
-    assert manifest["counts"] == {"bench": 4, "serving": 1}  # 2 impls x 2 modes; 1 serving
+    import torch
+
+    has_cuda = torch.cuda.is_available()
+    # CPU group: 2 impls x 2 modes; the CUDA group (1 impl x 2 modes) runs only where CUDA exists
+    assert manifest["counts"] == {"bench": 4 + (2 if has_cuda else 0), "serving": 1}
     reasons = {(s.get("impl"), s["reason"]) for s in manifest["skipped"]}
     assert ("metal", "Metal kernels run only on Apple GPUs (MPS)") in reasons
-    assert any("no cuda device" in r for _, r in reasons) or __import__("torch").cuda.is_available()
+    assert has_cuda or any("no cuda device" in r for _, r in reasons)
     # analysis over a results tree laid out like the repository's
     results = tmp_path / "results"
     (results / "phase3").mkdir(parents=True)
@@ -82,7 +86,7 @@ def test_run_experiment_records_skips_and_analyzes(tmp_path):
     (out / "bench.jsonl").rename(results / "phase3" / "bench_t.jsonl")
     (out / "serving.jsonl").rename(results / "phase4" / "serving_sweep.jsonl")
     s = build_summary(results)
-    assert len(s["benchmarks"]) == 4
+    assert len(s["benchmarks"]) == 4 + (2 if has_cuda else 0)
     assert {c["mode"] for c in s["comparisons"]} == {"latency", "throughput"}
     assert s["serving"][0]["policy"] == "direct"
     assert any("NVIDIA" in u for u in s["unavailable"])

@@ -1,0 +1,128 @@
+........................................................................ [ 16%]
+.....s......F...ssssss..sssss.ssssss..sssss.ssssss.ssssss..sssss.ssssss. [ 32%]
+.sssss.ssssss.ssssss..sssss.ssssss..sssss.ssssss.ss...s..s.....ss...s..s [ 48%]
+.....ss...s.ss...s..s.....ss...s..s.....ss...s.sss.ss..ss.s..sss.ss..ss. [ 64%]
+s..sss.ss..sssss..sssss..sssss..s.F....s.F....ssFs..ssss.s.sssssssssssss [ 81%]
+sssss.............................................s..s..s..s............ [ 97%]
+............                                                             [100%]
+=================================== FAILURES ===================================
+________________ test_run_experiment_records_skips_and_analyzes ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_run_experiment_records_sk0')
+
+    def test_run_experiment_records_skips_and_analyzes(tmp_path):
+        cfg = tmp_path / "t.toml"
+        cfg.write_text(CONFIG)
+        out = tmp_path / "out"
+        manifest = run_experiment(load_experiment(cfg), out, log=lambda *_: None)
+>       assert manifest["counts"] == {"bench": 4, "serving": 1}  # 2 impls x 2 modes; 1 serving
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert {'bench': 6, 'serving': 1} == {'bench': 4, 'serving': 1}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'bench': 6} != {'bench': 4}
+E         Use -v to get more diff
+
+tests/test_experiment.py:74: AssertionError
+_____ test_strided_input_and_repeatability[cuda-float32-cuda_graph_eager] ______
+
+name = 'cuda_graph_eager', device = 'cuda', dtype = torch.float32
+
+    @pytest.mark.parametrize("name", OPTIMIZED)
+    def test_strided_input_and_repeatability(name, device, dtype):
+        run, x, y = _check(name, device, dtype, 5, 96, 256, 2, strided=True)
+        for _ in range(3):
+>           assert torch.equal(run(x).cpu(), y.cpu()), "repeated execution must be bitwise stable"
+E           AssertionError: repeated execution must be bitwise stable
+E           assert False
+E            +  where False = <built-in method equal of type object at 0x7a13587f1000>(tensor([[ 1.1793,  3.6419, -1.3333,  1.0518, -1.6091,  0.0488, -0.7804, -0.2506,\n         -0.8115,  2.3250,  1.5849, -...  0.1679,  2.5769,  2.4376, -2.3485,\n          2.3454, -1.7410,  2.2429, -0.3846, -2.4996,  0.5378, -0.0571, -0.1820]]), tensor([[-2.1741e-01,  4.6092e-01,  1.1646e+00, -7.2534e-01, -2.8353e-01,\n         -8.7467e-01, -3.4855e-01, -8.0656e-...234e-01, -1.0871e+00,\n          3.0910e+00, -3.3156e-01, -2.2040e-01, -1.3360e+00, -6.7936e-01,\n         -1.2641e-01]]))
+E            +    where <built-in method equal of type object at 0x7a13587f1000> = torch.equal
+E            +    and   tensor([[ 1.1793,  3.6419, -1.3333,  1.0518, -1.6091,  0.0488, -0.7804, -0.2506,\n         -0.8115,  2.3250,  1.5849, -...  0.1679,  2.5769,  2.4376, -2.3485,\n          2.3454, -1.7410,  2.2429, -0.3846, -2.4996,  0.5378, -0.0571, -0.1820]]) = <built-in method cpu of Tensor object at 0x7a12e939a260>()
+E            +      where <built-in method cpu of Tensor object at 0x7a12e939a260> = tensor([[ 1.1793,  3.6419, -1.3333,  1.0518, -1.6091,  0.0488, -0.7804, -0.2506,\n         -0.8115,  2.3250,  1.5849, -...76, -2.3485,\n          2.3454, -1.7410,  2.2429, -0.3846, -2.4996,  0.5378, -0.0571, -0.1820]],\n       device='cuda:0').cpu
+E            +        where tensor([[ 1.1793,  3.6419, -1.3333,  1.0518, -1.6091,  0.0488, -0.7804, -0.2506,\n         -0.8115,  2.3250,  1.5849, -...76, -2.3485,\n          2.3454, -1.7410,  2.2429, -0.3846, -2.4996,  0.5378, -0.0571, -0.1820]],\n       device='cuda:0') = <function CudaGraphImpl.build.<locals>.run at 0x7a12e983fba0>(tensor([[-0.1117,  0.1631,  0.0539, -0.0597, -0.2153, -0.7584, -0.3424,  0.3206,\n          0.7988, -0.7049,  0.2891, -...74, -0.7797,\n         -0.0362, -2.5790,  1.8991,  0.2305, -0.1098, -0.4748, -0.2411,  0.1008]],\n       device='cuda:0'))
+E            +    and   tensor([[-2.1741e-01,  4.6092e-01,  1.1646e+00, -7.2534e-01, -2.8353e-01,\n         -8.7467e-01, -3.4855e-01, -8.0656e-...234e-01, -1.0871e+00,\n          3.0910e+00, -3.3156e-01, -2.2040e-01, -1.3360e+00, -6.7936e-01,\n         -1.2641e-01]]) = <built-in method cpu of Tensor object at 0x7a12e939b430>()
+E            +      where <built-in method cpu of Tensor object at 0x7a12e939b430> = tensor([[-2.1741e-01,  4.6092e-01,  1.1646e+00, -7.2534e-01, -2.8353e-01,\n         -8.7467e-01, -3.4855e-01, -8.0656e-...+00,\n          3.0910e+00, -3.3156e-01, -2.2040e-01, -1.3360e+00, -6.7936e-01,\n         -1.2641e-01]], device='cuda:0').cpu
+
+tests/test_impls.py:55: AssertionError
+_____ test_strided_input_and_repeatability[cuda-float16-cuda_graph_eager] ______
+
+name = 'cuda_graph_eager', device = 'cuda', dtype = torch.float16
+
+    @pytest.mark.parametrize("name", OPTIMIZED)
+    def test_strided_input_and_repeatability(name, device, dtype):
+        run, x, y = _check(name, device, dtype, 5, 96, 256, 2, strided=True)
+        for _ in range(3):
+>           assert torch.equal(run(x).cpu(), y.cpu()), "repeated execution must be bitwise stable"
+E           AssertionError: repeated execution must be bitwise stable
+E           assert False
+E            +  where False = <built-in method equal of type object at 0x7a13587f1000>(tensor([[ 1.2041e+00,  3.4199e+00, -9.2383e-01,  1.2988e+00, -1.6113e+00,\n          3.6255e-01, -5.0195e-01,  9.6558e-...\n          2.4414e+00, -4.9219e-01, -1.4258e+00, -1.0176e+00, -3.6499e-01,\n          3.4863e-01]], dtype=torch.float16), tensor([[-2.1741e-01,  4.6143e-01,  1.1650e+00, -7.2510e-01, -2.8320e-01,\n         -8.7451e-01, -3.4888e-01, -8.0664e-...\n          3.0898e+00, -3.3154e-01, -2.1973e-01, -1.3359e+00, -6.8018e-01,\n         -1.2720e-01]], dtype=torch.float16))
+E            +    where <built-in method equal of type object at 0x7a13587f1000> = torch.equal
+E            +    and   tensor([[ 1.2041e+00,  3.4199e+00, -9.2383e-01,  1.2988e+00, -1.6113e+00,\n          3.6255e-01, -5.0195e-01,  9.6558e-...\n          2.4414e+00, -4.9219e-01, -1.4258e+00, -1.0176e+00, -3.6499e-01,\n          3.4863e-01]], dtype=torch.float16) = <built-in method cpu of Tensor object at 0x7a127239bcf0>()
+E            +      where <built-in method cpu of Tensor object at 0x7a127239bcf0> = tensor([[ 1.2041e+00,  3.4199e+00, -9.2383e-01,  1.2988e+00, -1.6113e+00,\n          3.6255e-01, -5.0195e-01,  9.6558e-...e+00, -4.9219e-01, -1.4258e+00, -1.0176e+00, -3.6499e-01,\n          3.4863e-01]], device='cuda:0', dtype=torch.float16).cpu
+E            +        where tensor([[ 1.2041e+00,  3.4199e+00, -9.2383e-01,  1.2988e+00, -1.6113e+00,\n          3.6255e-01, -5.0195e-01,  9.6558e-...e+00, -4.9219e-01, -1.4258e+00, -1.0176e+00, -3.6499e-01,\n          3.4863e-01]], device='cuda:0', dtype=torch.float16) = <function CudaGraphImpl.build.<locals>.run at 0x7a1233fd2200>(tensor([[-0.1117,  0.1631,  0.0539, -0.0597, -0.2152, -0.7583, -0.3423,  0.3206,\n          0.7988, -0.7051,  0.2891, -... -0.0362, -2.5781,  1.8994,  0.2306, -0.1098, -0.4749, -0.2411,  0.1008]],\n       device='cuda:0', dtype=torch.float16))
+E            +    and   tensor([[-2.1741e-01,  4.6143e-01,  1.1650e+00, -7.2510e-01, -2.8320e-01,\n         -8.7451e-01, -3.4888e-01, -8.0664e-...\n          3.0898e+00, -3.3154e-01, -2.1973e-01, -1.3359e+00, -6.8018e-01,\n         -1.2720e-01]], dtype=torch.float16) = <built-in method cpu of Tensor object at 0x7a12e9df1360>()
+E            +      where <built-in method cpu of Tensor object at 0x7a12e9df1360> = tensor([[-2.1741e-01,  4.6143e-01,  1.1650e+00, -7.2510e-01, -2.8320e-01,\n         -8.7451e-01, -3.4888e-01, -8.0664e-...e+00, -3.3154e-01, -2.1973e-01, -1.3359e+00, -6.8018e-01,\n         -1.2720e-01]], device='cuda:0', dtype=torch.float16).cpu
+
+tests/test_impls.py:55: AssertionError
+_____ test_strided_input_and_repeatability[cuda-bfloat16-cuda_graph_eager] _____
+
+name = 'cuda_graph_eager', device = 'cuda', dtype = torch.bfloat16
+
+    @pytest.mark.parametrize("name", OPTIMIZED)
+    def test_strided_input_and_repeatability(name, device, dtype):
+        run, x, y = _check(name, device, dtype, 5, 96, 256, 2, strided=True)
+        for _ in range(3):
+>           assert torch.equal(run(x).cpu(), y.cpu()), "repeated execution must be bitwise stable"
+E           AssertionError: repeated execution must be bitwise stable
+E           assert False
+E            +  where False = <built-in method equal of type object at 0x7a13587f1000>(tensor([[ 1.1875e+00,  3.4062e+00, -9.4922e-01,  1.3047e+00, -1.5859e+00,\n          3.5547e-01, -4.9609e-01,  9.9609e-...          2.4375e+00, -4.9219e-01, -1.4375e+00, -1.0000e+00, -3.7305e-01,\n          3.4961e-01]], dtype=torch.bfloat16), tensor([[-2.1875e-01,  4.6484e-01,  1.1719e+00, -7.2656e-01, -2.8125e-01,\n         -8.7500e-01, -3.5156e-01, -8.0469e-...          3.0938e+00, -3.3008e-01, -2.1875e-01, -1.3438e+00, -6.8750e-01,\n         -1.3086e-01]], dtype=torch.bfloat16))
+E            +    where <built-in method equal of type object at 0x7a13587f1000> = torch.equal
+E            +    and   tensor([[ 1.1875e+00,  3.4062e+00, -9.4922e-01,  1.3047e+00, -1.5859e+00,\n          3.5547e-01, -4.9609e-01,  9.9609e-...          2.4375e+00, -4.9219e-01, -1.4375e+00, -1.0000e+00, -3.7305e-01,\n          3.4961e-01]], dtype=torch.bfloat16) = <built-in method cpu of Tensor object at 0x7a1272484cd0>()
+E            +      where <built-in method cpu of Tensor object at 0x7a1272484cd0> = tensor([[ 1.1875e+00,  3.4062e+00, -9.4922e-01,  1.3047e+00, -1.5859e+00,\n          3.5547e-01, -4.9609e-01,  9.9609e-...+00, -4.9219e-01, -1.4375e+00, -1.0000e+00, -3.7305e-01,\n          3.4961e-01]], device='cuda:0', dtype=torch.bfloat16).cpu
+E            +        where tensor([[ 1.1875e+00,  3.4062e+00, -9.4922e-01,  1.3047e+00, -1.5859e+00,\n          3.5547e-01, -4.9609e-01,  9.9609e-...+00, -4.9219e-01, -1.4375e+00, -1.0000e+00, -3.7305e-01,\n          3.4961e-01]], device='cuda:0', dtype=torch.bfloat16) = <function CudaGraphImpl.build.<locals>.run at 0x7a12e8e7b060>(tensor([[-0.1118,  0.1631,  0.0540, -0.0596, -0.2148, -0.7578, -0.3418,  0.3203,\n          0.8008, -0.7031,  0.2891, -...-0.0361, -2.5781,  1.8984,  0.2305, -0.1099, -0.4746, -0.2412,  0.1006]],\n       device='cuda:0', dtype=torch.bfloat16))
+E            +    and   tensor([[-2.1875e-01,  4.6484e-01,  1.1719e+00, -7.2656e-01, -2.8125e-01,\n         -8.7500e-01, -3.5156e-01, -8.0469e-...          3.0938e+00, -3.3008e-01, -2.1875e-01, -1.3438e+00, -6.8750e-01,\n         -1.3086e-01]], dtype=torch.bfloat16) = <built-in method cpu of Tensor object at 0x7a1272486fd0>()
+E            +      where <built-in method cpu of Tensor object at 0x7a1272486fd0> = tensor([[-2.1875e-01,  4.6484e-01,  1.1719e+00, -7.2656e-01, -2.8125e-01,\n         -8.7500e-01, -3.5156e-01, -8.0469e-...+00, -3.3008e-01, -2.1875e-01, -1.3438e+00, -6.8750e-01,\n         -1.3086e-01]], device='cuda:0', dtype=torch.bfloat16).cpu
+
+tests/test_impls.py:55: AssertionError
+=============================== warnings summary ===============================
+tests/test_bench.py::test_profile_dispatches_scale_with_depth
+  /usr/local/lib/python3.13/dist-packages/torch/profiler/profiler.py:224: UserWarning: Warning: Profiler clears events at the end of each cycle.Only events from the current cycle will be reported.To keep events across cycles, set acc_events=True.
+    _warn_once(
+
+tests/test_cuda_only.py::test_runners_have_no_hidden_host_syncs[eager]
+  /usr/local/lib/python3.13/dist-packages/torch/cuda/__init__.py:1270: UserWarning: Synchronization debug mode is a prototype feature and does not yet detect all synchronizing operations (Triggered internally at /pytorch/torch/csrc/cuda/Module.cpp:1003.)
+    torch._C._cuda_set_sync_debug_mode(debug_mode)
+
+tests/test_cuda_only.py: 14 warnings
+  /usr/local/lib/python3.13/dist-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.
+    warnings.warn(
+
+tests/test_impls.py::test_matches_reference[cuda-bfloat16-3x96x256x2-compile]
+tests/test_impls.py::test_matches_reference[cuda-bfloat16-3x96x256x2-compile]
+tests/test_impls.py::test_matches_reference[cuda-bfloat16-3x96x256x2-compile_cudagraphs]
+tests/test_impls.py::test_matches_reference[cuda-bfloat16-17x128x352x2-compile]
+tests/test_impls.py::test_matches_reference[cuda-bfloat16-17x128x352x2-compile_cudagraphs]
+tests/test_impls.py::test_strided_input_and_repeatability[cuda-bfloat16-compile]
+tests/test_impls.py::test_strided_input_and_repeatability[cuda-bfloat16-compile_cudagraphs]
+  /usr/local/lib/python3.13/dist-packages/torch/_inductor/compile_fx.py:2941: UserWarning: Tesla T4 does not support bfloat16 compilation natively, skipping
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+-------- generated xml file: /kaggle/working/gpulab_results/pytest.xml ---------
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_cuda_only.py:22: Metal kernels run only on Apple GPUs (MPS)
+SKIPPED [36] tests/test_impls.py:47: compile coverage limited to two shapes
+SKIPPED [36] tests/test_impls.py:27: Metal kernels run only on Apple GPUs (MPS)
+SKIPPED [18] tests/test_impls.py:27: Triton needs an NVIDIA GPU (or TRITON_INTERPRET=1 on CPU for correctness)
+SKIPPED [45] tests/test_impls.py:27: CUDA graphs require an NVIDIA GPU
+SKIPPED [12] tests/test_impls.py:27: bf16 tl.dot needs compute capability >= 8.0 (Ampere or newer)
+SKIPPED [7] tests/test_impls.py:63: unsupported or static-shape
+SKIPPED [15] tests/test_impls.py:70: requires MPS
+SKIPPED [1] tests/test_impls.py:86: requires MPS
+SKIPPED [4] tests/test_triton_kernels.py:38: bf16 tl.dot needs compute capability >= 8.0 (Ampere or newer)
+FAILED tests/test_experiment.py::test_run_experiment_records_skips_and_analyzes
+FAILED tests/test_impls.py::test_strided_input_and_repeatability[cuda-float32-cuda_graph_eager]
+FAILED tests/test_impls.py::test_strided_input_and_repeatability[cuda-float16-cuda_graph_eager]
+FAILED tests/test_impls.py::test_strided_input_and_repeatability[cuda-bfloat16-cuda_graph_eager]
+4 failed, 265 passed, 175 skipped, 23 warnings in 1995.74s (0:33:15)
