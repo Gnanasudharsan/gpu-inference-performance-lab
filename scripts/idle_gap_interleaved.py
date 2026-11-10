@@ -17,9 +17,9 @@ from pathlib import Path
 import numpy as np
 
 from gpulab import impls
+from gpulab.analysis import paired_ratio_ci, verdict
 from gpulab.device import device_name, parse_dtype, resolve_device, synchronize
 from gpulab.provenance import collect_provenance
-from gpulab.report import paired_speedup
 from gpulab.workload import ModelConfig, make_inputs, make_weights
 
 
@@ -71,10 +71,16 @@ def main() -> None:
         "trials": a.trials,
         "per_trial": a.per_trial,
         "median_of_trial_medians_us": {str(g): float(np.median(v)) for g, v in medians.items()},
-        # >1 means the gap condition is slower than back-to-back (paired per trial)
+        # >1 means the gap condition is slower than back-to-back (paired per trial, 95% CI)
         "slowdown_vs_no_gap": {
-            str(g): paired_speedup(v, base) for g, v in medians.items() if g != a.gaps_us[0]
+            str(g): dict(
+                zip(("geomean", "ci_low", "ci_high"), paired_ratio_ci(v, base), strict=True)
+            )
+            | {"verdict": verdict(*paired_ratio_ci(v, base)[1:])}
+            for g, v in medians.items()
+            if g != a.gaps_us[0]
         },
+        "trial_medians_us": {str(g): v for g, v in medians.items()},
         "git_commit": prov.git_commit,
         "git_dirty": prov.git_dirty,
     }
