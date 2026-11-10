@@ -1,0 +1,52 @@
+[{"stream_name":"stdout","time":0.625484922,"data":"+ git clone --filter=blob:none https://github.com/Gnanasudharsan/gpu-inference-performance-lab /tmp/gpulab\n"}
+,{"stream_name":"stderr","time":0.655853416,"data":"Cloning into '/tmp/gpulab'...\n"}
+,{"stream_name":"stdout","time":2.227048301,"data":"+ git checkout --detach 6345adb2df4395ef62ad6ada0ab5c227589d0208\n"}
+,{"stream_name":"stderr","time":2.253259079,"data":"HEAD is now at 6345adb data: include the first T4 session record in the summary dataset\n"}
+,{"stream_name":"stdout","time":2.254362332,"data":"+ nvidia-smi\n"}
+,{"stream_name":"stdout","time":2.284475711,"data":"Tue Nov 10 20:14:39 2026       \n"}
+,{"stream_name":"stdout","time":2.284493288,"data":"+-----------------------------------------------------------------------------------------+\n"}
+,{"stream_name":"stdout","time":2.284500323,"data":"| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |\n"}
+,{"stream_name":"stdout","time":2.284509031,"data":"+-----------------------------------------+------------------------+----------------------+\n"}
+,{"stream_name":"stdout","time":2.284527824,"data":"| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |\n"}
+,{"stream_name":"stdout","time":2.284532609,"data":"| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |\n"}
+,{"stream_name":"stdout","time":2.28453784,"data":"|                                         |                        |               MIG M. |\n"}
+,{"stream_name":"stdout","time":2.28454203,"data":"|=========================================+========================+======================|\n"}
+,{"stream_name":"stdout","time":2.316366515,"data":"|   0  Tesla T4                       Off |   00000000:00:04.0 Off |                    0 |\n"}
+,{"stream_name":"stdout","time":2.316385817,"data":"| N/A   54C    P8             10W /   70W |       0MiB /  15360MiB |      0%      Default |\n"}
+,{"stream_name":"stdout","time":2.316391786,"data":"|                                         |                        |                  N/A |\n"}
+,{"stream_name":"stdout","time":2.316398551,"data":"+-----------------------------------------+------------------------+----------------------+\n"}
+,{"stream_name":"stdout","time":2.316403853,"data":"|   1  Tesla T4                       Off |   00000000:00:05.0 Off |                    0 |\n"}
+,{"stream_name":"stdout","time":2.3164105839999998,"data":"| N/A   59C    P8             12W /   70W |       0MiB /  15360MiB |      0%      Default |\n"}
+,{"stream_name":"stdout","time":2.3164173359999998,"data":"|                                         |                        |                  N/A |\n"}
+,{"stream_name":"stdout","time":2.316422866,"data":"+-----------------------------------------+------------------------+----------------------+\n"}
+,{"stream_name":"stdout","time":2.317192902,"data":"\n"}
+,{"stream_name":"stdout","time":2.317207935,"data":"+-----------------------------------------------------------------------------------------+\n"}
+,{"stream_name":"stdout","time":2.317213717,"data":"| Processes:                                                                              |\n"}
+,{"stream_name":"stdout","time":2.3172205200000002,"data":"|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |\n"}
+,{"stream_name":"stdout","time":2.317227134,"data":"|        ID   ID                                                               Usage      |\n"}
+,{"stream_name":"stdout","time":2.317234151,"data":"|=========================================================================================|\n"}
+,{"stream_name":"stdout","time":2.31877237,"data":"|  No running processes found                                                             |\n"}
+,{"stream_name":"stdout","time":2.318796385,"data":"+-----------------------------------------------------------------------------------------+\n"}
+,{"stream_name":"stdout","time":2.646218361,"data":"+ /usr/bin/python3 -m pip install -q -e .\n"}
+,{"stream_name":"stdout","time":21.851226891,"data":"{\"variant\": \"A_current_eager\", \"strided_input\": true, \"kept_output_changed\": false, \"sentinels_corrupted\": 0, \"outputs_correct\": true, \"outputs_stable\": true, \"first_output_correct\": true, \"description\": \"current CudaGraphImpl('eager')\"}\n"}
+,{"stream_name":"stdout","time":24.477256592,"data":"{\"variant\": \"A_current_eager\", \"strided_input\": false, \"kept_output_changed\": false, \"sentinels_corrupted\": 0, \"outputs_correct\": true, \"outputs_stable\": true, \"first_output_correct\": true, \"description\": \"current CudaGraphImpl('eager')\"}\n"}
+,{"stream_name":"stdout","time":210.171777149,"data":"{\"variant\": \"B_current_triton\", \"strided_input\": true, \"kept_output_changed\": false, \"sentinels_corrupted\": 0, \"outputs_correct\": false, \"outputs_stable\": false, \"first_output_correct\": true, \"description\": \"current CudaGraphImpl('triton') (control: no cuBLAS)\"}\n"}
+,{"stream_name":"stdout","time":225.061774546,"data":"{\"variant\": \"B_current_triton\", \"strided_input\": false, \"kept_output_changed\": false, \"sentinels_corrupted\": 0, \"outputs_correct\": false, \"outputs_stable\": false, \"first_output_correct\": true, \"description\": \"current CudaGraphImpl('triton') (control: no cuBLAS)\"}\n"}
+,{"stream_name":"stdout","time":227.667468143,"data":"{\"variant\": \"C_eager_capture_on_warmup_stream\", \"strided_input\": true, \"kept_output_changed\": false, \"sentinels_corrupted\": 0, \"outputs_correct\": true, \"outputs_stable\": true, \"first_output_correct\": true, \"description\": \"eager; warm up and capture on the same explicit stream\"}\n"}
+,{"stream_name":"stdout","time":230.311325768,"data":"{\"variant\": \"C_eager_capture_on_warmup_stream\", \"strided_input\": false, \"kept_output_changed\": false, \"sentinels_corrupted\": 0, \"outputs_correct\": true, \"outputs_stable\": true, \"first_output_correct\": true, \"description\": \"eager; warm up and capture on the same explicit stream\"}\n"}
+,{"stream_name":"stdout","time":233.07243131,"data":"{\"variant\": \"D_eager_cublas_not_lt\", \"strided_input\": true, \"kept_output_changed\": false, \"sentinels_corrupted\": 0, \"outputs_correct\": true, \"outputs_stable\": true, \"first_output_correct\": true, \"description\": \"eager; torch.backends.cuda.preferred_blas_library('cublas')\"}\n"}
+,{"stream_name":"stdout","time":235.69515378,"data":"{\"variant\": \"D_eager_cublas_not_lt\", \"strided_input\": false, \"kept_output_changed\": false, \"sentinels_corrupted\": 0, \"outputs_correct\": true, \"outputs_stable\": true, \"first_output_correct\": true, \"description\": \"eager; torch.backends.cuda.preferred_blas_library('cublas')\"}\n"}
+,{"stream_name":"stdout","time":238.318828229,"data":"{\"variant\": \"E_eager_make_graphed_callables\", \"strided_input\": true, \"kept_output_changed\": false, \"sentinels_corrupted\": 0, \"outputs_correct\": true, \"outputs_stable\": true, \"first_output_correct\": true, \"description\": \"eager via torch.cuda.make_graphed_callables\"}\n"}
+,{"stream_name":"stdout","time":240.952462684,"data":"{\"variant\": \"E_eager_make_graphed_callables\", \"strided_input\": false, \"kept_output_changed\": false, \"sentinels_corrupted\": 0, \"outputs_correct\": true, \"outputs_stable\": true, \"first_output_correct\": true, \"description\": \"eager via torch.cuda.make_graphed_callables\"}\n"}
+,{"stream_name":"stdout","time":243.651135673,"data":"{\"variant\": \"F_eager_workspace_env\", \"strided_input\": true, \"kept_output_changed\": false, \"sentinels_corrupted\": 0, \"outputs_correct\": true, \"outputs_stable\": true, \"first_output_correct\": true, \"description\": \"current eager with CUBLAS_WORKSPACE_CONFIG=:4096:8\"}\n"}
+,{"stream_name":"stdout","time":246.246216004,"data":"{\"variant\": \"F_eager_workspace_env\", \"strided_input\": false, \"kept_output_changed\": false, \"sentinels_corrupted\": 0, \"outputs_correct\": true, \"outputs_stable\": true, \"first_output_correct\": true, \"description\": \"current eager with CUBLAS_WORKSPACE_CONFIG=:4096:8\"}\n"}
+,{"stream_name":"stdout","time":248.840781933,"data":"{\"variant\": \"G_eager_cublaslt_workspace_0\", \"strided_input\": true, \"kept_output_changed\": false, \"sentinels_corrupted\": 0, \"outputs_correct\": true, \"outputs_stable\": true, \"first_output_correct\": true, \"description\": \"current eager with CUBLASLT_WORKSPACE_SIZE=0\"}\n"}
+,{"stream_name":"stdout","time":251.465373604,"data":"{\"variant\": \"G_eager_cublaslt_workspace_0\", \"strided_input\": false, \"kept_output_changed\": false, \"sentinels_corrupted\": 0, \"outputs_correct\": true, \"outputs_stable\": true, \"first_output_correct\": true, \"description\": \"current eager with CUBLASLT_WORKSPACE_SIZE=0\"}\n"}
+,{"stream_name":"stdout","time":251.932027627,"data":"diag exit code: 0\n"}
+,{"stream_name":"stderr","time":253.978716768,"data":"/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":253.978769838,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":254.234596837,"data":"/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":254.234616754,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":255.008326361,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":255.931539843,"data":"[NbConvertApp] Writing 281244 bytes to __results__.html\n"}
+]

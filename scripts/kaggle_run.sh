@@ -76,6 +76,7 @@ fi
 if [ "$TASK" = diag ]; then
   mv "$DEST/raw/gpulab_diag" "$DEST/" 2>/dev/null || true
   cat "$DEST/gpulab_diag/diag_cuda_graph.json" 2>/dev/null || echo "no diagnostic output (see $DEST/raw/*.log)"
+  tail -3 "$DEST/gpulab_diag/pytest_gpu.log" 2>/dev/null || true
   exit 0
 fi
 python3 -c "import json,sys; [print(f\"{s['step']:<18} {s['status']:<8} {s.get('reason','')}\") for s in json.load(open(sys.argv[1]))['steps']]" "$DEST/gpulab_results/session.json" || true

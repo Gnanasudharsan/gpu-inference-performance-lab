@@ -1,0 +1,149 @@
+{
+  "env": {
+    "torch": "2.11.0+cu130",
+    "cuda": "13.0",
+    "gpu": "Tesla T4"
+  },
+  "results": [
+    {
+      "variant": "A_current_eager",
+      "strided_input": true,
+      "kept_output_changed": false,
+      "sentinels_corrupted": 0,
+      "outputs_correct": true,
+      "outputs_stable": true,
+      "first_output_correct": true,
+      "description": "current CudaGraphImpl('eager')"
+    },
+    {
+      "variant": "A_current_eager",
+      "strided_input": false,
+      "kept_output_changed": false,
+      "sentinels_corrupted": 0,
+      "outputs_correct": true,
+      "outputs_stable": true,
+      "first_output_correct": true,
+      "description": "current CudaGraphImpl('eager')"
+    },
+    {
+      "variant": "B_current_triton",
+      "strided_input": true,
+      "kept_output_changed": false,
+      "sentinels_corrupted": 0,
+      "outputs_correct": false,
+      "outputs_stable": false,
+      "first_output_correct": true,
+      "description": "current CudaGraphImpl('triton') (control: no cuBLAS)"
+    },
+    {
+      "variant": "B_current_triton",
+      "strided_input": false,
+      "kept_output_changed": false,
+      "sentinels_corrupted": 0,
+      "outputs_correct": false,
+      "outputs_stable": false,
+      "first_output_correct": true,
+      "description": "current CudaGraphImpl('triton') (control: no cuBLAS)"
+    },
+    {
+      "variant": "C_eager_capture_on_warmup_stream",
+      "strided_input": true,
+      "kept_output_changed": false,
+      "sentinels_corrupted": 0,
+      "outputs_correct": true,
+      "outputs_stable": true,
+      "first_output_correct": true,
+      "description": "eager; warm up and capture on the same explicit stream"
+    },
+    {
+      "variant": "C_eager_capture_on_warmup_stream",
+      "strided_input": false,
+      "kept_output_changed": false,
+      "sentinels_corrupted": 0,
+      "outputs_correct": true,
+      "outputs_stable": true,
+      "first_output_correct": true,
+      "description": "eager; warm up and capture on the same explicit stream"
+    },
+    {
+      "variant": "D_eager_cublas_not_lt",
+      "strided_input": true,
+      "kept_output_changed": false,
+      "sentinels_corrupted": 0,
+      "outputs_correct": true,
+      "outputs_stable": true,
+      "first_output_correct": true,
+      "description": "eager; torch.backends.cuda.preferred_blas_library('cublas')"
+    },
+    {
+      "variant": "D_eager_cublas_not_lt",
+      "strided_input": false,
+      "kept_output_changed": false,
+      "sentinels_corrupted": 0,
+      "outputs_correct": true,
+      "outputs_stable": true,
+      "first_output_correct": true,
+      "description": "eager; torch.backends.cuda.preferred_blas_library('cublas')"
+    },
+    {
+      "variant": "E_eager_make_graphed_callables",
+      "strided_input": true,
+      "kept_output_changed": false,
+      "sentinels_corrupted": 0,
+      "outputs_correct": true,
+      "outputs_stable": true,
+      "first_output_correct": true,
+      "description": "eager via torch.cuda.make_graphed_callables"
+    },
+    {
+      "variant": "E_eager_make_graphed_callables",
+      "strided_input": false,
+      "kept_output_changed": false,
+      "sentinels_corrupted": 0,
+      "outputs_correct": true,
+      "outputs_stable": true,
+      "first_output_correct": true,
+      "description": "eager via torch.cuda.make_graphed_callables"
+    },
+    {
+      "variant": "F_eager_workspace_env",
+      "strided_input": true,
+      "kept_output_changed": false,
+      "sentinels_corrupted": 0,
+      "outputs_correct": true,
+      "outputs_stable": true,
+      "first_output_correct": true,
+      "description": "current eager with CUBLAS_WORKSPACE_CONFIG=:4096:8"
+    },
+    {
+      "variant": "F_eager_workspace_env",
+      "strided_input": false,
+      "kept_output_changed": false,
+      "sentinels_corrupted": 0,
+      "outputs_correct": true,
+      "outputs_stable": true,
+      "first_output_correct": true,
+      "description": "current eager with CUBLAS_WORKSPACE_CONFIG=:4096:8"
+    },
+    {
+      "variant": "G_eager_cublaslt_workspace_0",
+      "strided_input": true,
+      "kept_output_changed": false,
+      "sentinels_corrupted": 0,
+      "outputs_correct": true,
+      "outputs_stable": true,
+      "first_output_correct": true,
+      "description": "current eager with CUBLASLT_WORKSPACE_SIZE=0"
+    },
+    {
+      "variant": "G_eager_cublaslt_workspace_0",
+      "strided_input": false,
+      "kept_output_changed": false,
+      "sentinels_corrupted": 0,
+      "outputs_correct": true,
+      "outputs_stable": true,
+      "first_output_correct": true,
+      "description": "current eager with CUBLASLT_WORKSPACE_SIZE=0"
+    }
+  ]
+}

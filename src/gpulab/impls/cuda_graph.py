@@ -6,6 +6,13 @@ frozen at capture time, so the runner owns a static input buffer: each call copi
 request into it, replays, and clones the static output (two small device copies, both
 included in measurements). A request with a different row count is rejected rather than
 silently re-captured.
+
+Lifetime rule: a captured graph keeps reading the exact device addresses it saw at capture
+(weights, packed weight copies, static buffers). The runner therefore OWNS everything the graph
+references: the inner runner (whose closure holds e.g. Triton's packed gate|up weights), the
+weights, and the static buffers. Without this, a caller that drops its own reference lets the
+allocator reuse that memory and later replays read garbage. That bug was caught on a real T4:
+the first replay was correct, later ones were not (results/gpu/diag-t4-20261110-1514).
 """
 
 from __future__ import annotations
@@ -46,12 +53,32 @@ class CudaGraphImpl(Implementation):
         with torch.cuda.graph(graph):
             static_y = inner(static_x)
 
-        def run(x: torch.Tensor) -> torch.Tensor:
-            h = flatten_rows(x, cfg.d_model)
-            if h.shape[0] != rows:
-                raise ValueError(f"graph captured for {rows} rows, got {h.shape[0]}")
-            static_x.copy_(h)
-            graph.replay()
-            return static_y.clone().reshape(x.shape)
+        return GraphRunner(graph, static_x, static_y, rows, cfg.d_model, keepalive=(inner, weights))
 
-        return run
+
+class GraphRunner:
+    """Callable that replays a captured graph and owns every tensor the graph reads or writes."""
+
+    def __init__(
+        self,
+        graph: torch.cuda.CUDAGraph,
+        static_x: torch.Tensor,
+        static_y: torch.Tensor,
+        rows: int,
+        d_model: int,
+        keepalive: tuple[object, ...],
+    ) -> None:
+        self.graph = graph
+        self.static_x = static_x
+        self.static_y = static_y
+        self.rows = rows
+        self.d_model = d_model
+        self._keepalive = keepalive  # inner runner + weights: must outlive the graph
+
+    def __call__(self, x: torch.Tensor) -> torch.Tensor:
+        h = flatten_rows(x, self.d_model)
+        if h.shape[0] != self.rows:
+            raise ValueError(f"graph captured for {self.rows} rows, got {h.shape[0]}")
+        self.static_x.copy_(h)
+        self.graph.replay()
+        return self.static_y.clone().reshape(x.shape)

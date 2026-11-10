@@ -24,21 +24,23 @@ import subprocess
 import sys
 from pathlib import Path
 
+# v1 (commit 6345adb) compared capture/cuBLAS variants and disproved the workspace hypothesis:
+# the eager graph was clean in isolation while the Triton graph broke, which pointed to graph
+# LIFETIMES (the runner did not own what the graph reads). v2 checks the fixed runner, with the
+# caller's references kept or dropped (dropped = weights deleted, freed memory scribbled with NaN).
 VARIANTS = {
-    "A_current_eager": "current CudaGraphImpl('eager')",
-    "B_current_triton": "current CudaGraphImpl('triton') (control: no cuBLAS)",
-    "C_eager_capture_on_warmup_stream": "eager; warm up and capture on the same explicit stream",
-    "D_eager_cublas_not_lt": "eager; torch.backends.cuda.preferred_blas_library('cublas')",
-    "E_eager_make_graphed_callables": "eager via torch.cuda.make_graphed_callables",
-    "F_eager_workspace_env": "current eager with CUBLAS_WORKSPACE_CONFIG=:4096:8",
-    "G_eager_cublaslt_workspace_0": "current eager with CUBLASLT_WORKSPACE_SIZE=0",
+    "eager_refs_kept": "fixed CudaGraphImpl('eager'), caller keeps the weights",
+    "eager_refs_dropped": "fixed CudaGraphImpl('eager'), caller drops the weights",
+    "triton_refs_kept": "fixed CudaGraphImpl('triton'), caller keeps the weights",
+    "triton_refs_dropped": "fixed CudaGraphImpl('triton'), caller drops the weights",
 }
 
 
 def run_variant(name: str, strided: bool) -> dict:
+    import gc
+
     import torch
 
-    from gpulab import impls
     from gpulab.correctness import compare
     from gpulab.impls.cuda_graph import CudaGraphImpl
     from gpulab.workload import ModelConfig, make_inputs, make_weights, reference_forward
@@ -51,54 +53,29 @@ def run_variant(name: str, strided: bool) -> dict:
     else:
         x = make_inputs(rows, d, device=dev, dtype=dt)
     ref = reference_forward(w, x)
-
-    if name.startswith("D_"):
-        torch.backends.cuda.preferred_blas_library("cublas")
-
-    if name.startswith(("A_", "D_", "F_", "G_")):
-        run = CudaGraphImpl("eager").build(w, rows=rows)
-    elif name.startswith("B_"):
-        run = CudaGraphImpl("triton").build(w, rows=rows)
-    elif name.startswith("C_"):
-        inner = impls.get("eager").build(w)
-        static_x = torch.zeros(rows, d, device=dev, dtype=dt)
-        s = torch.cuda.Stream()
-        s.wait_stream(torch.cuda.current_stream())
-        with torch.cuda.stream(s):
-            for _ in range(3):
-                inner(static_x)
-        torch.cuda.current_stream().wait_stream(s)
-        g = torch.cuda.CUDAGraph()
-        with torch.cuda.graph(g, stream=s):
-            static_y = inner(static_x)
-
-        def run(xx):
-            static_x.copy_(xx.reshape(rows, d))
-            g.replay()
-            return static_y.clone()
-    elif name.startswith("E_"):
-        inner = impls.get("eager").build(w)
-        sample = torch.zeros(rows, d, device=dev, dtype=dt)
-        graphed = torch.cuda.make_graphed_callables(inner, (sample,))
-
-        def run(xx):
-            return graphed(xx.reshape(rows, d).contiguous()).clone()
-    else:
-        raise SystemExit(f"unknown variant {name}")
+    run = CudaGraphImpl(name.split("_")[0]).build(w, rows=rows)
 
     y1 = run(x)
     torch.cuda.synchronize()
     kept = y1.clone().cpu()
+    scribble = []
+    if name.endswith("dropped"):
+        del w
+        gc.collect()
+        scribble = [
+            torch.full((n,), float("nan"), device=dev, dtype=dt)
+            for n in (d * 256, 2 * d * 256, 4096, 65536)
+            for _ in range(8)
+        ]
     sentinels = [
         torch.full((n,), 7.0, device=dev, dtype=torch.float32)
         for n in (256, 4096, 65536, 1 << 20, 1 << 22)
         for _ in range(4)
     ]
     torch.cuda.synchronize()
-    outs = []
-    for _ in range(5):
-        outs.append(run(x).cpu())
+    outs = [run(x).cpu() for _ in range(5)]
     torch.cuda.synchronize()
+    del scribble
     return {
         "variant": name,
         "strided_input": strided,
@@ -132,10 +109,6 @@ def main() -> int:
     for name, desc in VARIANTS.items():
         for strided in (True, False):
             env = dict(os.environ)
-            if name.startswith("F_"):
-                env["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
-            if name.startswith("G_"):
-                env["CUBLASLT_WORKSPACE_SIZE"] = "0"
             cmd = [sys.executable, __file__, "--variant", name] + (["--strided"] if strided else [])
             r = subprocess.run(cmd, capture_output=True, text=True, env=env, timeout=900)
             try:

@@ -39,7 +39,13 @@
   real T4, including the Triton kernels in fp16 and fp32. Four failed:
   - *One test assumed no CUDA device* (fixed).
   - *`cuda_graph_eager` changed an output it had already returned when the graph was replayed
-    again* (fp32, fp16, bf16). `cuda_graph_triton`, which has no cuBLAS, was stable. Hypothesis: the
-    replay writes cuBLAS workspace into memory the allocator considers free. Under investigation
-    with `scripts/diag_cuda_graph.py`. Until it is resolved, `cuda_graph_eager` results must not be
-    trusted.
+    again* (fp32, fp16, bf16). **Root cause, found with an on-GPU diagnostic:** the CUDA-graph
+    runner did not own what the graph reads.
+    - *What the evidence showed* (`results/gpu/diag-t4-20261110-1514/`): the cuBLAS-workspace
+      hypothesis was disproved. The eager graph was clean in isolation, while the Triton graph
+      broke, because Triton's packed weight copy was owned only by the inner runner, which had been
+      garbage-collected.
+    - *The fix:* `GraphRunner` owns the inner runner, the weights and the static buffers.
+    - *The new test:* `test_graph_runner_owns_what_it_replays` drops every outside reference and
+      overwrites freed memory with NaN before replaying, so the bug fails deterministically.
+    - *Status:* pending verification on the T4.

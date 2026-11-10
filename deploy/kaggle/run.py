@@ -28,11 +28,23 @@ sh("nvidia-smi")
 # keep Kaggle's preinstalled CUDA build of torch (and its bundled triton); add only our deps
 sh(sys.executable, "-m", "pip", "install", "-q", "-e", ".[dev]" if TASK == "session" else ".", cwd=SRC)
 if TASK == "diag":
+    diag = Path("/kaggle/working/gpulab_diag")
+    diag.mkdir(parents=True, exist_ok=True)
     rc = subprocess.run(
-        [sys.executable, "scripts/diag_cuda_graph.py", "--out", "/kaggle/working/gpulab_diag"],
-        cwd=SRC,
+        [sys.executable, "scripts/diag_cuda_graph.py", "--out", str(diag)], cwd=SRC
     ).returncode
     print(f"diag exit code: {rc}", flush=True)
+    # the CUDA-only and Triton test files, on the real GPU (incl. the graph-lifetime test)
+    with (diag / "pytest_gpu.log").open("w") as f:
+        rc = subprocess.run(
+            [sys.executable, "-m", "pip", "install", "-q", "pytest", "hypothesis"], cwd=SRC
+        ).returncode or subprocess.run(
+            [sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider",
+             "tests/test_cuda_only.py", "tests/test_triton_kernels.py",
+             "tests/test_triton_bf16_diagnostic.py"],
+            cwd=SRC, stdout=f, stderr=subprocess.STDOUT,
+        ).returncode
+    print(f"gpu tests exit code: {rc}", flush=True)
     raise SystemExit(0)
 OUT.mkdir(parents=True, exist_ok=True)
 (OUT / "pip_freeze.txt").write_text(
