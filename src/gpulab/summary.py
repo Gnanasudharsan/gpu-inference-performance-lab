@@ -101,15 +101,35 @@ def _load_json(path: Path) -> Any:
     return json.loads(path.read_text()) if path.exists() else None
 
 
+def _gate_passed(run: Path) -> bool:
+    sess = _load_json(run / "session.json") or {}
+    return any(
+        s.get("step") == "correctness gate" and s.get("status") == "ok"
+        for s in sess.get("steps", [])
+    )
+
+
+def _measurement_runs(gpu_runs: list[Path]) -> list[Path]:
+    """GPU sessions whose measurements are reported: the latest one that passed its gate.
+
+    A session that failed its correctness gate produced no trusted numbers, and mixing two
+    sessions would pool trials from different runs into one comparison. Every session is
+    still listed under ``gpu_sessions`` with its step statuses.
+    """
+    passed = [g for g in gpu_runs if _gate_passed(g)]
+    return passed[-1:]
+
+
 def build_summary(results: Path) -> dict[str, Any]:
     p3, p4, p1, p2 = (results / d for d in ("phase3", "phase4", "phase1", "phase2"))
     gpu_runs = sorted((results / "gpu").glob("*/gpulab_results"))
+    measured = _measurement_runs(gpu_runs)
     bench = _read_all(
-        sorted(p3.glob("bench_*.jsonl")) + [g / "experiment/bench.jsonl" for g in gpu_runs]
+        sorted(p3.glob("bench_*.jsonl")) + [g / "experiment/bench.jsonl" for g in measured]
     )
     serving = _read_all(
         [p4 / "serving_sweep.jsonl", p4 / "serving_bursty.jsonl"]
-        + [g / "experiment/serving.jsonl" for g in gpu_runs]
+        + [g / "experiment/serving.jsonl" for g in measured]
     )
     correctness = _read_all([p1 / "correctness.jsonl"])
     unavailable = []
@@ -119,13 +139,17 @@ def build_summary(results: Path) -> dict[str, Any]:
         unavailable.append("phase4 serving")
     profiles = {}
     cuda_profiles: dict[str, Any] = {}
-    for g in gpu_runs:
+    for g in measured:
         for f in sorted(g.glob("profile_*_cuda.json")):
             d = json.loads(f.read_text())
+            # profiles recorded before the annotation fix counted the GPU-side copy of the
+            # record_function range as a kernel: their kernel counts and times are invalid
+            valid = bool(d.get("annotations_excluded"))
             cuda_profiles[f"{d['impl']}/r{d['rows']}"] = {
                 "aten": d["dispatches_per_forward"],
-                "cuda_kernels": d.get("cuda_kernels_per_forward"),
-                "cuda_kernel_us": d.get("cuda_kernel_us_per_forward"),
+                "cuda_kernels": d.get("cuda_kernels_per_forward") if valid else None,
+                "cuda_kernel_us": d.get("cuda_kernel_us_per_forward") if valid else None,
+                "gpu_forward_span_us": d.get("gpu_forward_span_us") if valid else None,
             }
     sessions: list[dict[str, Any]] = []
     for g in gpu_runs:
@@ -135,6 +159,7 @@ def build_summary(results: Path) -> dict[str, Any]:
         sessions.append(
             {
                 "run": g.parent.name,
+                "measurements_reported": g in measured,
                 "gpu": cuda_acc[0]["name"] if cuda_acc else None,
                 "git_commit": envj.get("git_commit"),
                 "steps": [

@@ -173,11 +173,32 @@ def profile_forward(
         ],
     }
     if device.type == "cuda":
-        kernels = [
-            e
-            for e in prof.events()
-            if getattr(e, "device_type", None) == torch.autograd.DeviceType.CUDA
-        ]
+        kernels, spans = split_cuda_events(prof.events())
         out["cuda_kernels_per_forward"] = len(kernels) / iters
         out["cuda_kernel_us_per_forward"] = sum(e.device_time_total for e in kernels) / iters
+        # GPU-side span of each forward (kernels + gaps between them), under profiler overhead
+        out["gpu_forward_span_us"] = (
+            sum(e.device_time_total for e in spans) / len(spans) if spans else None
+        )
+        out["annotations_excluded"] = True
+        out["cuda_kernel_names"] = dict(Counter(e.name for e in kernels).most_common(12))
     return out
+
+
+def split_cuda_events(events: Any) -> tuple[list[Any], list[Any]]:
+    """Separate real device kernels from GPU-side copies of ``record_function`` ranges.
+
+    Kineto mirrors each ``record_function`` range onto the GPU timeline as a CUDA-typed event
+    spanning everything launched inside it. Counting it as a kernel adds one fake "kernel"
+    per forward whose duration is the whole forward, idle gaps included (observed on a T4:
+    "kernel time" exceeded the measured wall time).
+    """
+    kernels, spans = [], []
+    for e in events:
+        if getattr(e, "device_type", None) != torch.autograd.DeviceType.CUDA:
+            continue
+        if getattr(e, "is_user_annotation", False) or e.name.startswith("gpulab."):
+            spans.append(e)
+        else:
+            kernels.append(e)
+    return kernels, spans

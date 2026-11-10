@@ -150,3 +150,58 @@ def test_summary_ingests_gpu_sessions(tmp_path):
     assert s["gpu_sessions"][0]["steps"][1]["status"] == "skipped"
     assert not any("NVIDIA GPU results" in u for u in s["unavailable"])
     assert any("Nsight" in u for u in s["unavailable"])  # nsys was skipped
+
+
+def test_summary_reports_only_the_latest_gate_passing_gpu_session(tmp_path):
+    """A failed gate's numbers are never reported, and two sessions are never pooled."""
+    from gpulab.records import append_jsonl, read_jsonl
+
+    cfg = tmp_path / "t.toml"
+    cfg.write_text(CONFIG)
+    run_experiment(load_experiment(cfg), tmp_path / "out", log=lambda *_: None)
+    recs = read_jsonl(tmp_path / "out" / "bench.jsonl")
+    results = tmp_path / "results"
+    (results / "phase3").mkdir(parents=True)
+
+    def session(name: str, gate: str, n_recs: int, profile: dict | None = None) -> None:
+        d = results / "gpu" / name / "gpulab_results"
+        (d / "experiment").mkdir(parents=True)
+        # TEST FIXTURE: CPU records relabeled as cuda, only to exercise the ingestion logic.
+        for r in recs[:n_recs]:
+            r.device = "cuda"
+        append_jsonl(d / "experiment" / "bench.jsonl", recs[:n_recs])
+        (d / "session.json").write_text(
+            json.dumps({"steps": [{"step": "correctness gate", "status": gate}]})
+        )
+        if profile is not None:
+            (d / "profile_eager_r8_cuda.json").write_text(json.dumps(profile))
+
+    old_profile = {
+        "impl": "eager",
+        "rows": 8,
+        "dispatches_per_forward": 60,
+        "cuda_kernels_per_forward": 61,
+        "cuda_kernel_us_per_forward": 2828.0,
+    }
+    session("t4-1-failed", "failed", 4)
+    session("t4-2-passed", "ok", 2, profile=old_profile)
+    session("t4-3-failed", "failed", 4)
+    s = build_summary(results)
+    assert len(s["benchmarks"]) == 2  # only t4-2's records
+    flags = {g["run"]: g["measurements_reported"] for g in s["gpu_sessions"]}
+    assert flags == {"t4-1-failed": False, "t4-2-passed": True, "t4-3-failed": False}
+    # pre-fix profile: kernel count/time counted the record_function span -> withheld
+    prof = s["kernels"]["cuda_profiles"]["eager/r8"]
+    assert prof["aten"] == 60
+    assert prof["cuda_kernels"] is None
+    assert prof["cuda_kernel_us"] is None
+
+    session(
+        "t4-4-passed",
+        "ok",
+        3,
+        profile={**old_profile, "annotations_excluded": True, "cuda_kernels_per_forward": 60},
+    )
+    s = build_summary(results)
+    assert len(s["benchmarks"]) == 3  # the newest passing session replaces t4-2
+    assert s["kernels"]["cuda_profiles"]["eager/r8"]["cuda_kernels"] == 60

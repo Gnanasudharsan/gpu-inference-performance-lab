@@ -24,6 +24,8 @@ import torch
 import triton
 import triton.language as tl
 
+from gpulab.kernels.tuning import autotune_m_key
+
 INTERPRET = os.environ.get("TRITON_INTERPRET") == "1"
 
 if INTERPRET:
@@ -40,7 +42,7 @@ else:
     ]
 
 
-@triton.autotune(configs=_CONFIGS, key=["M", "D", "H"])
+@triton.autotune(configs=_CONFIGS, key=["M_KEY", "D", "H"])
 @triton.jit
 def _norm_gate_up_silu_kernel(
     x_ptr,
@@ -50,6 +52,7 @@ def _norm_gate_up_silu_kernel(
     M,
     D,
     H,
+    M_KEY,
     stride_xm,
     stride_xk,
     stride_wn,
@@ -103,7 +106,7 @@ def _norm_gate_up_silu_kernel(
     )
 
 
-@triton.autotune(configs=_CONFIGS, key=["M", "D", "H"])
+@triton.autotune(configs=_CONFIGS, key=["M_KEY", "D", "H"])
 @triton.jit
 def _down_residual_kernel(
     a_ptr,
@@ -113,6 +116,7 @@ def _down_residual_kernel(
     M,
     D,
     H,
+    M_KEY,
     stride_am,
     stride_ak,
     stride_wn,
@@ -180,6 +184,7 @@ def norm_gate_up_silu(
         M,
         D,
         H,
+        autotune_m_key(M),
         x.stride(0),
         x.stride(1),
         wgu.stride(0),
@@ -209,6 +214,7 @@ def down_residual(act: torch.Tensor, wd: torch.Tensor, res: torch.Tensor) -> tor
         M,
         D,
         H,
+        autotune_m_key(M),
         act.stride(0),
         act.stride(1),
         wd.stride(0),
