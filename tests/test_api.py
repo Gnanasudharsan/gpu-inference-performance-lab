@@ -125,3 +125,31 @@ def test_private_network_access_preflight(monkeypatch):
     bad = c.options("/api/run", headers=h)
     assert bad.status_code == 400  # browsers refuse the request: no allow-origin header
     assert bad.headers.get("access-control-allow-origin") is None
+
+
+def test_daily_run_cap(monkeypatch):
+    c, _ = _client(monkeypatch, GPULAB_DAILY_RUN_CAP="1", GPULAB_RATE_PER_MIN="10")
+    assert c.get("/api/health").json()["limits"]["runs_remaining_today"] == 1
+    assert c.post("/api/run", json=TINY).status_code == 200
+    r = c.post("/api/run", json=TINY)
+    assert r.status_code == 429
+    assert "daily" in r.json()["detail"]
+    assert c.get("/api/health").json()["limits"]["runs_remaining_today"] == 0
+    # rejected requests (validation, unsupported impl) never consume the budget
+    c2, _ = _client(monkeypatch, GPULAB_DAILY_RUN_CAP="1", GPULAB_RATE_PER_MIN="10")
+    assert c2.post("/api/run", json={**TINY, "rows": 0}).status_code == 422
+    assert c2.post("/api/run", json={**TINY, "impl": "metal"}).status_code == 400
+    assert c2.get("/api/health").json()["limits"]["runs_remaining_today"] == 1
+
+
+def test_daily_cap_rolls_over():
+    from datetime import date
+
+    from gpulab.api import DailyCap
+
+    d = DailyCap(1)
+    assert d.take()
+    assert not d.take()
+    d.day = date(2000, 1, 1)  # simulate yesterday
+    assert d.take()
+    assert DailyCap(None).remaining() is None

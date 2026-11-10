@@ -13,6 +13,7 @@ Configuration (environment variables):
   GPULAB_DEVICE         cpu | mps | cuda | auto (default auto)
   GPULAB_TRUST_PROXY    "1" to take the client address from X-Forwarded-For (behind a proxy)
   GPULAB_MAX_RUN_S      soft per-request runtime cap reported in /api/health (default 30)
+  GPULAB_DAILY_RUN_CAP  global measurements per UTC day (unset: unlimited); bounds demo spend
 
 Run: ``uvicorn gpulab.api:app --host 0.0.0.0 --port 8000``
 """
@@ -89,6 +90,34 @@ class RateLimiter:
             return True, 0.0
 
 
+class DailyCap:
+    """Global cap on measurements per UTC day: bounds total GPU spend for a public demo."""
+
+    def __init__(self, limit: int | None) -> None:
+        self.limit = limit
+        self.day = datetime.now(UTC).date()
+        self.used = 0
+        self.lock = threading.Lock()
+
+    def _roll(self) -> None:
+        today = datetime.now(UTC).date()
+        if today != self.day:
+            self.day, self.used = today, 0
+
+    def remaining(self) -> int | None:
+        with self.lock:
+            self._roll()
+            return None if self.limit is None else max(0, self.limit - self.used)
+
+    def take(self) -> bool:
+        with self.lock:
+            self._roll()
+            if self.limit is not None and self.used >= self.limit:
+                return False
+            self.used += 1
+            return True
+
+
 def create_app() -> FastAPI:
     api_key = os.environ.get("GPULAB_API_KEY") or None
     origins = [o.strip() for o in os.environ.get("GPULAB_CORS_ORIGINS", "").split(",") if o.strip()]
@@ -96,6 +125,8 @@ def create_app() -> FastAPI:
     max_run_s = float(os.environ.get("GPULAB_MAX_RUN_S", "30"))
     device = resolve_device(os.environ.get("GPULAB_DEVICE", "auto"))
     limiter = RateLimiter(int(os.environ.get("GPULAB_RATE_PER_MIN", "6")))
+    cap_env = os.environ.get("GPULAB_DAILY_RUN_CAP")
+    daily = DailyCap(int(cap_env) if cap_env else None)
     gpu_lock = threading.Lock()  # one measurement at a time: concurrent runs would contaminate
     prov = collect_provenance()
 
@@ -166,6 +197,8 @@ def create_app() -> FastAPI:
                 "models": list(MODELS),
                 "runs_per_minute": limiter.limit,
                 "max_run_s": max_run_s,
+                "daily_run_cap": daily.limit,
+                "runs_remaining_today": daily.remaining(),
             },
         }
 
@@ -197,9 +230,22 @@ def create_app() -> FastAPI:
         reason = impls.get(req.impl).unsupported_reason(device, dt)
         if reason:
             raise HTTPException(400, f"{req.impl} is not available on this server: {reason}")
+        if daily.remaining() == 0:
+            raise HTTPException(
+                429,
+                "the demo's daily measurement budget is used up; it resets at 00:00 UTC",
+                headers={"Retry-After": "3600"},
+            )
         if not gpu_lock.acquire(blocking=False):
             raise HTTPException(
                 429, "a measurement is already running; retry shortly", headers={"Retry-After": "5"}
+            )
+        if not daily.take():  # lost a race with another request for the last slot
+            gpu_lock.release()
+            raise HTTPException(
+                429,
+                "the demo's daily measurement budget is used up; it resets at 00:00 UTC",
+                headers={"Retry-After": "3600"},
             )
         started = datetime.now(UTC)
         t0 = time.perf_counter()

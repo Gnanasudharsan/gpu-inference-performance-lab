@@ -8,9 +8,21 @@
 | GPU execution API | **Not deployed.** Manifests prepared; needs GPU-cloud credentials and an agreed spending cap | `deploy/Dockerfile`, `deploy/modal_app.py` |
 | Local execution API | **Verified** on Apple M4 (MPS): `gpulab serve` | this repository |
 
-The deployed dashboard shows only recorded measurements, labeled with their commit and hardware. Its
-Live page connects to whatever API URL the visitor enters. With no reachable backend it says
-*offline*; it never substitutes recorded numbers for live ones.
+The deployed dashboard shows only recorded measurements, labeled with their commit and hardware.
+
+**Live page behavior.**
+- *Probing:* it probes only the deployment's hosted backend (`NEXT_PUBLIC_API_URL`, baked in at build
+  time) or a URL the visitor chose. It never probes `localhost` uninvited, because on a public page that
+  fails for every visitor and can trigger a browser local-network permission prompt.
+- *States:* not connected, then connecting (with an elapsed timer and a 90 s cold-start window for
+  hosted backends), then online, or offline with a diagnosed reason and fix:
+  - mixed content (an `http://` API from an `https://` page)
+  - a timeout or cold start
+  - an unreachable or CORS-blocked server, with the exact `gpulab serve` command for the page's origin
+  - HTTP errors
+- *Run failures are explained:* busy or rate-limited (with retry-after), a missing key, out-of-range
+  settings, or a lost connection.
+- *It never substitutes recorded numbers for live ones.*
 
 ## Architecture
 
@@ -73,6 +85,7 @@ Sources consulted: [Modal pricing explained (Beam)](https://www.beam.cloud/blog/
 | Authentication | Optional `GPULAB_API_KEY`, required for `/api/run` when set; constant-time comparison |
 | Rate limiting | Sliding window per client (default 6 runs/min); `Retry-After` on 429 |
 | Concurrency | One measurement at a time (a lock); concurrent runs would also contaminate timing. Busy → 429 |
+| Spend bound | `GPULAB_DAILY_RUN_CAP`: a global cap on measurements per UTC day (30 in `modal_app.py`). Only runs that actually start count; once reached → 429 until 00:00 UTC. `/api/health` reports runs remaining |
 | Bounded runtime | Inputs cap the work (≤ 20 trials × small bursts); `timeout=120` in Modal; reported `over_soft_cap` |
 | CORS | Explicit allowlist (`GPULAB_CORS_ORIGINS`), including Chrome Private Network Access preflights (`allow_private_network`) for listed origins only |
 | Logging | Structured JSON, one line per request. Client addresses are SHA-256 hashed and never logged raw |
