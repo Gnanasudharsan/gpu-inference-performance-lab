@@ -22,6 +22,13 @@ from gpulab.device import device_name, parse_dtype, resolve_device, synchronize
 from gpulab.provenance import collect_provenance
 from gpulab.workload import ModelConfig, make_inputs, make_weights
 
+# The ratio here is gap / no-gap latency, so a ratio CI above 1 means the gap made it slower.
+_GAP_VERDICT = {
+    "faster": "slower with gap",
+    "slower": "faster with gap",
+    "no significant difference": "no significant difference",
+}
+
 
 def spin(us: float) -> None:
     end = time.perf_counter_ns() + int(us * 1e3)
@@ -76,7 +83,7 @@ def main() -> None:
             str(g): dict(
                 zip(("geomean", "ci_low", "ci_high"), paired_ratio_ci(v, base), strict=True)
             )
-            | {"verdict": verdict(*paired_ratio_ci(v, base)[1:])}
+            | {"verdict": _GAP_VERDICT[verdict(*paired_ratio_ci(v, base)[1:])]}
             for g, v in medians.items()
             if g != a.gaps_us[0]
         },
