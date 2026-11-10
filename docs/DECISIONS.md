@@ -107,3 +107,21 @@ DRAM bandwidth at small M (for example, if split-K is needed).
 Synchronous single-request latency on this laptop is dominated by clustered power-state noise
 (Phase 2). Pipelined bursts isolate the cost of the work, and their CIs are 3–5× tighter. Synchronous
 latency is still measured and reported for every comparison.
+
+## D15. Open-loop, single-threaded discrete-event replay
+
+A closed-loop client hides queueing. A separate client thread fights the GIL and adds up to 5 ms of
+switch-interval jitter. Admitting arrivals at each scheduling point with their true timestamps is
+exact for a non-preemptive single-device server.
+
+## D16. Spin-wait while idle (configurable)
+
+Measured: macOS `time.sleep` woke up as much as ~10 ms late under background QoS, which inflated
+queueing delays. Spinning had p99 lateness of ~0.1 ms and did not slow GPU service (spin vs sleep:
+service p50 2.0–2.1 ms vs 2.1–2.6 ms). Spinning costs one CPU core, so `idle_wait="sleep"` is kept
+as an option, and lateness is reported for every run.
+
+## D17. Dynamic batching uses a p90 service prediction and an explicit slack margin
+
+Waiting until exactly *deadline − median service* missed deadlines in testing, through service
+variance and wake-up jitter. A p90 prediction plus a 300 µs margin is the conservative default.

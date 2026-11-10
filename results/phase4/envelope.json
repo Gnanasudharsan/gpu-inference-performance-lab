@@ -1,0 +1,26 @@
+{
+  "miss_budget": 0.01,
+  "deadline_us": 10000.0,
+  "rates": [
+    50,
+    100,
+    200,
+    300,
+    400,
+    600,
+    800,
+    1200,
+    1600
+  ],
+  "max_sustainable_rps": {
+    "compile/direct": null,
+    "compile/dynamic": 100,
+    "compile/static8": null,
+    "eager/direct": 100,
+    "eager/dynamic": null,
+    "eager/static8": null,
+    "metal/direct": null,
+    "metal/dynamic": null,
+    "metal/static8": null
+  }
+}

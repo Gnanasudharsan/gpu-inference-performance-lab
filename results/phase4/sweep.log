@@ -1,0 +1,110 @@
+eager: calibrated service time per bucket (us): {1: 1910, 2: 2400, 4: 2553, 8: 4010, 16: 9037, 32: 3892}
+  direct       50 rps  p50    3207  p99    8589 us  miss 0.006  goodput      59 rows/s  batch  1.0  util 0.21
+  direct      100 rps  p50    2262  p99    6705 us  miss 0.000  goodput      99 rows/s  batch  1.0  util 0.23
+  direct      200 rps  p50    2381  p99   19036 us  miss 0.074  goodput     181 rows/s  batch  1.0  util 0.47
+  direct      300 rps  p50    4500  p99   24321 us  miss 0.279  goodput     218 rows/s  batch  1.0  util 0.78
+  direct      400 rps  p50    5380  p99   25188 us  miss 0.366  goodput     251 rows/s  batch  1.0  util 0.85
+  direct      600 rps  p50    8724  p99   22962 us  miss 0.614  goodput     232 rows/s  batch  1.0  util 0.97
+  direct      800 rps  p50   10961  p99   27618 us  miss 0.871  goodput     104 rows/s  batch  1.0  util 0.99
+  direct     1200 rps  p50   11534  p99   29953 us  miss 0.972  goodput      34 rows/s  batch  1.0  util 0.99
+  direct     1600 rps  p50   11521  p99   25807 us  miss 0.986  goodput      22 rows/s  batch  1.0  util 0.99
+  static8      50 rps  p50       0  p99       0 us  miss 1.000  goodput       0 rows/s  batch  0.0  util 0.00
+  static8     100 rps  p50       0  p99       0 us  miss 1.000  goodput       0 rows/s  batch  0.0  util 0.00
+  static8     200 rps  p50       0  p99       0 us  miss 1.000  goodput       0 rows/s  batch  0.0  util 0.00
+  static8     300 rps  p50   10168  p99   35865 us  miss 0.942  goodput      18 rows/s  batch  8.0  util 0.03
+  static8     400 rps  p50    8359  p99   18556 us  miss 0.808  goodput      76 rows/s  batch  8.0  util 0.07
+  static8     600 rps  p50    9332  p99   30589 us  miss 0.674  goodput     197 rows/s  batch  8.0  util 0.27
+  static8     800 rps  p50    9375  p99   30679 us  miss 0.567  goodput     348 rows/s  batch  8.0  util 0.47
+  static8    1200 rps  p50    7577  p99   37978 us  miss 0.417  goodput     700 rows/s  batch  8.0  util 0.70
+  static8    1600 rps  p50    7078  p99   27913 us  miss 0.395  goodput     975 rows/s  batch  8.0  util 0.81
+  dynamic      50 rps  p50    4074  p99   42292 us  miss 0.141  goodput      51 rows/s  batch  1.1  util 0.27
+  dynamic     100 rps  p50    3448  p99   26083 us  miss 0.164  goodput      83 rows/s  batch  1.2  util 0.37
+  dynamic     200 rps  p50    4569  p99   48105 us  miss 0.370  goodput     122 rows/s  batch  1.7  util 0.66
+  dynamic     300 rps  p50    3477  p99  392408 us  miss 0.379  goodput     190 rows/s  batch  2.1  util 0.69
+  dynamic     400 rps  p50    3507  p99  273956 us  miss 0.334  goodput     264 rows/s  batch  2.4  util 0.76
+  dynamic     600 rps  p50    3717  p99   67412 us  miss 0.317  goodput     409 rows/s  batch  3.3  util 0.85
+  dynamic     800 rps  p50    3329  p99   30824 us  miss 0.160  goodput     678 rows/s  batch  3.4  util 0.88
+  dynamic    1200 rps  p50    4949  p99   87758 us  miss 0.397  goodput     727 rows/s  batch  6.7  util 0.98
+  dynamic    1600 rps  p50    4551  p99   33418 us  miss 0.284  goodput    1158 rows/s  batch  8.1  util 0.98
+metal: calibrated service time per bucket (us): {1: 9424, 2: 5796, 4: 4984, 8: 6140, 16: 6431, 32: 6777}
+  direct       50 rps  p50    2860  p99   29951 us  miss 0.192  goodput      48 rows/s  batch  1.0  util 0.27
+  direct      100 rps  p50    2288  p99   22802 us  miss 0.117  goodput      88 rows/s  batch  1.0  util 0.31
+  direct      200 rps  p50    2729  p99   24982 us  miss 0.104  goodput     174 rows/s  batch  1.0  util 0.51
+  direct      300 rps  p50    3313  p99   23649 us  miss 0.277  goodput     220 rows/s  batch  1.0  util 0.70
+  direct      400 rps  p50    4226  p99   27516 us  miss 0.394  goodput     238 rows/s  batch  1.0  util 0.85
+  direct      600 rps  p50    8094  p99   34660 us  miss 0.609  goodput     235 rows/s  batch  1.0  util 0.96
+  direct      800 rps  p50    9949  p99   20193 us  miss 0.693  goodput     247 rows/s  batch  1.0  util 0.99
+  direct     1200 rps  p50   10958  p99   22711 us  miss 0.928  goodput      86 rows/s  batch  1.0  util 0.99
+  direct     1600 rps  p50   11235  p99   27181 us  miss 0.979  goodput      34 rows/s  batch  1.0  util 0.99
+  static8      50 rps  p50       0  p99       0 us  miss 1.000  goodput       0 rows/s  batch  0.0  util 0.00
+  static8     100 rps  p50       0  p99       0 us  miss 1.000  goodput       0 rows/s  batch  0.0  util 0.00
+  static8     200 rps  p50       0  p99       0 us  miss 1.000  goodput       0 rows/s  batch  0.0  util 0.00
+  static8     300 rps  p50    7791  p99   36213 us  miss 0.928  goodput      22 rows/s  batch  8.0  util 0.03
+  static8     400 rps  p50    7725  p99   35481 us  miss 0.794  goodput      81 rows/s  batch  8.0  util 0.07
+  static8     600 rps  p50    8193  p99   22642 us  miss 0.607  goodput     236 rows/s  batch  8.0  util 0.22
+  static8     800 rps  p50    7111  p99   19260 us  miss 0.387  goodput     495 rows/s  batch  8.0  util 0.32
+  static8    1200 rps  p50    6160  p99   25371 us  miss 0.188  goodput     975 rows/s  batch  8.0  util 0.55
+  static8    1600 rps  p50    5919  p99   25144 us  miss 0.241  goodput    1223 rows/s  batch  8.0  util 0.72
+  dynamic      50 rps  p50    2529  p99   22387 us  miss 0.051  goodput      56 rows/s  batch  1.1  util 0.18
+  dynamic     100 rps  p50    2675  p99   24123 us  miss 0.101  goodput      89 rows/s  batch  1.2  util 0.29
+  dynamic     200 rps  p50    2546  p99   24882 us  miss 0.123  goodput     171 rows/s  batch  1.4  util 0.45
+  dynamic     300 rps  p50    2667  p99   22258 us  miss 0.097  goodput     275 rows/s  batch  1.7  util 0.54
+  dynamic     400 rps  p50    2928  p99   30107 us  miss 0.228  goodput     306 rows/s  batch  2.2  util 0.71
+  dynamic     600 rps  p50    2909  p99  119359 us  miss 0.382  goodput     370 rows/s  batch  3.2  util 0.83
+  dynamic     800 rps  p50    3075  p99   57884 us  miss 0.308  goodput     557 rows/s  batch  4.2  util 0.88
+  dynamic    1200 rps  p50    3081  p99   52048 us  miss 0.309  goodput     833 rows/s  batch  5.3  util 0.94
+  dynamic    1600 rps  p50    3433  p99   35119 us  miss 0.312  goodput    1114 rows/s  batch  7.4  util 0.97
+compile: calibrated service time per bucket (us): {1: 15335, 2: 3535, 4: 3023, 8: 14953, 16: 13033, 32: 18457}
+  direct       50 rps  p50    2403  p99   11038 us  miss 0.034  goodput      57 rows/s  batch  1.0  util 0.17
+  direct      100 rps  p50    2466  p99   21700 us  miss 0.084  goodput      91 rows/s  batch  1.0  util 0.30
+  direct      200 rps  p50    2450  p99   24437 us  miss 0.146  goodput     166 rows/s  batch  1.0  util 0.49
+  direct      300 rps  p50    3175  p99   25528 us  miss 0.294  goodput     215 rows/s  batch  1.0  util 0.69
+  direct      400 rps  p50    3620  p99   23047 us  miss 0.281  goodput     285 rows/s  batch  1.0  util 0.77
+  direct      600 rps  p50    6868  p99   22003 us  miss 0.462  goodput     324 rows/s  batch  1.0  util 0.94
+  direct      800 rps  p50   10215  p99   21002 us  miss 0.743  goodput     207 rows/s  batch  1.0  util 0.99
+  direct     1200 rps  p50   11046  p99   22883 us  miss 0.935  goodput      78 rows/s  batch  1.0  util 0.99
+  direct     1600 rps  p50   11262  p99   23063 us  miss 0.980  goodput      32 rows/s  batch  1.0  util 0.99
+  static8      50 rps  p50       0  p99       0 us  miss 1.000  goodput       0 rows/s  batch  0.0  util 0.00
+  static8     100 rps  p50       0  p99       0 us  miss 1.000  goodput       0 rows/s  batch  0.0  util 0.00
+  static8     200 rps  p50       0  p99       0 us  miss 1.000  goodput       0 rows/s  batch  0.0  util 0.00
+  static8     300 rps  p50    8974  p99   24862 us  miss 0.941  goodput      18 rows/s  batch  8.0  util 0.02
+  static8     400 rps  p50    8616  p99   18812 us  miss 0.817  goodput      72 rows/s  batch  8.0  util 0.07
+  static8     600 rps  p50    8448  p99   20530 us  miss 0.605  goodput     238 rows/s  batch  8.0  util 0.23
+  static8     800 rps  p50    7989  p99   23456 us  miss 0.466  goodput     430 rows/s  batch  8.0  util 0.41
+  static8    1200 rps  p50    6785  p99   22949 us  miss 0.257  goodput     890 rows/s  batch  8.0  util 0.62
+  static8    1600 rps  p50    6576  p99   22558 us  miss 0.343  goodput    1058 rows/s  batch  8.0  util 0.81
+  dynamic      50 rps  p50    2334  p99   27120 us  miss 0.147  goodput      50 rows/s  batch  1.0  util 0.20
+  dynamic     100 rps  p50    2237  p99    5943 us  miss 0.003  goodput      99 rows/s  batch  1.1  util 0.22
+  dynamic     200 rps  p50    2073  p99   20815 us  miss 0.072  goodput     181 rows/s  batch  1.2  util 0.41
+  dynamic     300 rps  p50    2217  p99   20811 us  miss 0.106  goodput     273 rows/s  batch  1.6  util 0.55
+  dynamic     400 rps  p50    3048  p99   30009 us  miss 0.172  goodput     328 rows/s  batch  2.0  util 0.72
+  dynamic     600 rps  p50    3345  p99   37027 us  miss 0.251  goodput     452 rows/s  batch  3.1  util 0.85
+  dynamic     800 rps  p50    3836  p99   29550 us  miss 0.292  goodput     567 rows/s  batch  4.2  util 0.93
+  dynamic    1200 rps  p50    4705  p99   24069 us  miss 0.220  goodput     939 rows/s  batch  5.9  util 0.98
+  dynamic    1600 rps  p50    4495  p99   26307 us  miss 0.071  goodput    1503 rows/s  batch  6.2  util 0.99
+{
+  "miss_budget": 0.01,
+  "deadline_us": 10000.0,
+  "rates": [
+    50,
+    100,
+    200,
+    300,
+    400,
+    600,
+    800,
+    1200,
+    1600
+  ],
+  "max_sustainable_rps": {
+    "compile/direct": null,
+    "compile/dynamic": 100,
+    "compile/static8": null,
+    "eager/direct": 100,
+    "eager/dynamic": null,
+    "eager/static8": null,
+    "metal/direct": null,
+    "metal/dynamic": null,
+    "metal/static8": null
+  }
+}

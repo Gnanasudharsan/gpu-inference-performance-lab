@@ -6,7 +6,7 @@
 | 1 | Workload and correctness baseline | **complete** | see git log |
 | 2 | Benchmarking and profiling | **complete** | `d82a86a`, `18e7cbf`, `fa7ac5f`, data commit |
 | 3 | GPU kernel optimization | **complete** (Apple GPU measured; NVIDIA paths correctness-only) | `cb577af`→`8cff002`→`605be56`, phase commit |
-| 4 | Scheduling and end-to-end systems | pending | |
+| 4 | Scheduling and end-to-end systems | **complete** | `758dbd6`, phase commit |
 | 5 | Experimental analysis | pending | |
 | 6 | Web dashboard | pending | |
 | 7 | Deployment and live execution | pending | |
@@ -67,3 +67,18 @@
 - Gate: correctness passes; speedups and regressions are backed by paired CIs; profiler launch counts
   explain the gains. Process bugs found and fixed on the way: the interleaved CLI silently skipped
   throughput mode, the profiler missed custom kernels, and lint failures were masked by pipes.
+
+## Phase 4 report
+
+- Serving layer: deterministic traces, open-loop single-threaded replay, direct/static/dynamic
+  policies, bounded queue, expired-request dropping, bucket padding, failure isolation, and
+  replay-fidelity (wake-lateness) metrics. 22 serving tests, stress-run for flakiness.
+- Bugs found by tests and fixed: slack scheduling without a margin missed deadlines because of
+  wake-up jitter; macOS sleep overshoot (up to ~10 ms) corrupted replay fidelity, so spin-wait is
+  now the default and lateness is always reported.
+- Measured: dynamic batching gives 4–5× the peak goodput of direct execution and the lowest miss rate
+  under bursts. Static batching fails at low load. The operating envelope is narrow, because of
+  measured 3–10 ms GPU round-trip stalls in ~7% of requests. The idle-gap penalty is confirmed with
+  paired CIs.
+- Gate: reproducible replay (seeded traces), load sweep with p99, documented envelope. Caveat:
+  each sweep point is one run.

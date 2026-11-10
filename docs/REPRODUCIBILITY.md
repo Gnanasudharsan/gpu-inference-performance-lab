@@ -35,5 +35,14 @@ scripts/phase3_benchmarks.sh                                 # full matrix -> re
 TRITON_INTERPRET=1 pytest -m triton                          # Linux, needs triton
 ```
 
+## Phase 4: serving
+
+```bash
+python scripts/phase4_serving.py            # sweep + bursty + envelope -> results/phase4/
+python scripts/idle_gap_interleaved.py      # -> results/phase4/idle_gap_interleaved.json
+```
+
+Traces are seeded by rate (`seed = int(rate)`), so every replay is regenerated identically.
+
 Further sections (workload generation, benchmarks, experiments, dashboard) are added as each phase
 lands.

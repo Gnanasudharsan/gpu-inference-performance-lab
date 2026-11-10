@@ -20,3 +20,11 @@
   (`tests/test_triton_bf16_diagnostic.py`).
 - **Launch counts for `torch.compile` are incomplete.** Inductor-generated Metal kernels are invisible
   to the ATen-level profiler proxy.
+- **Serving sweep points are single 3-second runs.** Point-to-point noise is visible. Repeated runs
+  with CIs per point are a follow-up.
+- **Queue bound not tuned.** The serving runs used `max_queue = 256`, too deep for a 10 ms deadline.
+  A deadline-derived bound is a documented follow-up.
+- **Single-device, single-worker serving.** There is no multi-stream pipelining of H2D/compute/D2H,
+  and no multi-GPU.
+- **Root cause of the 3–10 ms MPS round-trip stalls is undetermined.** The display-frame hypothesis
+  was tested and rejected.
