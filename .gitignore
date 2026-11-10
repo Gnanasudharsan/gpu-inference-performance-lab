@@ -22,3 +22,4 @@ web/out/
 .env
 .env.*
 !.env.example
+.claude/

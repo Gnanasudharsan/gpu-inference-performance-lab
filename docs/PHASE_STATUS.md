@@ -8,7 +8,7 @@
 | 3 | GPU kernel optimization | **complete** (Apple GPU measured; NVIDIA paths correctness-only) | `cb577af`→`8cff002`→`605be56`, phase commit |
 | 4 | Scheduling and end-to-end systems | **complete** | `758dbd6`, phase commit |
 | 5 | Experimental analysis | **complete** | `10828f8`, phase commit |
-| 6 | Web dashboard | pending | |
+| 6 | Web dashboard | **complete** | phase commit |
 | 7 | Deployment and live execution | pending | |
 | 8 | Final hardening and showcase | pending | |
 
@@ -95,3 +95,15 @@
   speedups within overlapping CIs (`results/phase5/repro_comparison.json`).
 - Narrative: [ENGINEERING_REPORT.md](ENGINEERING_REPORT.md), covering bottlenecks, wins, failures,
   constraints, evidence categories and next steps.
+
+## Phase 6 report
+
+- A static Next.js dashboard with 9 sections: overview, live execution, benchmark explorer, latency
+  analysis, serving, kernel analysis, engineering decisions, reproducibility, architecture.
+- Live execution goes through a bounded FastAPI service (`gpulab serve`). It was verified from the
+  browser against the local Apple M4 backend: a 1.25× [1.19, 1.35] paired result, labeled LIVE.
+- The palette was validated (CVD, contrast) against the real surface. Accessibility and responsive
+  checks were run on every page ([DASHBOARD.md](DASHBOARD.md)). Screenshots of the real app are in
+  `docs/screenshots/`.
+- Gate: production build succeeds (CI job added); no fabricated live state; recorded and live data
+  are kept separate.

@@ -23,6 +23,7 @@ make check      # lint + typecheck + tests
 - [Kernel optimization and results](docs/KERNELS.md)
 - [Latency-aware serving](docs/SERVING.md)
 - [Engineering report](docs/ENGINEERING_REPORT.md) and [generated analysis](results/ANALYSIS.md)
+- [Dashboard](docs/DASHBOARD.md)
 - [Decisions](docs/DECISIONS.md)
 - [Benchmark methodology](docs/BENCHMARK_METHODOLOGY.md) and [profiling](docs/PROFILING.md)
 - [Reproducibility](docs/REPRODUCIBILITY.md)

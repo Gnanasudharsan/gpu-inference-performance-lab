@@ -213,6 +213,13 @@ def _cmd_analyze(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_serve(args: argparse.Namespace) -> int:
+    import uvicorn
+
+    uvicorn.run("gpulab.api:app", host=args.host, port=args.port, log_level="warning")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="gpulab", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -274,6 +281,11 @@ def build_parser() -> argparse.ArgumentParser:
     ana.add_argument("--summary", default="results/summary.json")
     ana.add_argument("--report", default="results/ANALYSIS.md")
     ana.set_defaults(func=_cmd_analyze)
+
+    srv = sub.add_parser("serve", help="run the live-benchmark HTTP API (see gpulab.api)")
+    srv.add_argument("--host", default="127.0.0.1")
+    srv.add_argument("--port", type=int, default=8000)
+    srv.set_defaults(func=_cmd_serve)
     return parser
 
 
