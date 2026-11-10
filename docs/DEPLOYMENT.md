@@ -5,8 +5,24 @@
 | Component | Status | Where |
 |---|---|---|
 | Dashboard (static) | **Deployed and verified** | https://gpu-inference-performance-lab.vercel.app |
-| GPU execution API | **Not deployed.** Manifests prepared; needs GPU-cloud credentials and an agreed spending cap | `deploy/Dockerfile`, `deploy/modal_app.py` |
-| Local execution API | **Verified** on Apple M4 (MPS): `gpulab serve` | this repository |
+| Live execution API | **Deployed and verified**: free Modal **CPU** container | https://gnanasudharsan--gpulab-api-api.us-east.modal.run (`/api/health`) |
+| GPU execution API | Prepared, not deployed: Modal requires a payment method for GPU functions, and the account deliberately has none | `GPULAB_MODAL_GPU=L4` in `deploy/modal_app.py` |
+
+**Why the hosted backend is a CPU.** Deploying the GPU variant was refused with "Please add a payment
+method to use L4 GPU functions". The owner chose zero spend, so no card was added. An account with no
+payment method cannot be charged: if the free credit runs out, the endpoint stops answering and the
+Live page reports it offline. The hosted backend therefore measures the CPU implementations (eager,
+fused_weights, torch.compile), and labels its device as "Modal cloud CPU (2 vCPU)". GPU kernel
+results stay on the recorded pages.
+
+**Verified in production (2026-11-10):**
+- The production Live page connected to the hosted backend automatically.
+- A visitor-style run completed in 5 s. The result was fused_weights vs eager 1.00× [0.95, 1.04],
+  *no significant difference*, with correctness passing, labeled LIVE, and the device and commit
+  shown.
+- CORS allows only the dashboard's origin; preflights from other origins get 400.
+- The daily cap is persisted in a `modal.Dict`. Verified 40 → 39 after a run, and still 39 after a
+  full stop and cold restart.
 
 The deployed dashboard shows only recorded measurements, labeled with their commit and hardware.
 
@@ -85,7 +101,7 @@ Sources consulted: [Modal pricing explained (Beam)](https://www.beam.cloud/blog/
 | Authentication | Optional `GPULAB_API_KEY`, required for `/api/run` when set; constant-time comparison |
 | Rate limiting | Sliding window per client (default 6 runs/min); `Retry-After` on 429 |
 | Concurrency | One measurement at a time (a lock); concurrent runs would also contaminate timing. Busy → 429 |
-| Spend bound | `GPULAB_DAILY_RUN_CAP`: a global cap on measurements per UTC day (8 in `modal_app.py`: about $8/month worst case at the reported L4 rate; deployed on an account with no payment method, so nothing can be charged). Only runs that actually start count; once reached → 429 until 00:00 UTC. `/api/health` reports runs remaining |
+| Spend bound | `GPULAB_DAILY_RUN_CAP`: a global cap on measurements per UTC day, persisted across restarts (`modal.Dict`) (8 in `modal_app.py`: about $8/month worst case at the reported L4 rate; deployed on an account with no payment method, so nothing can be charged). Only runs that actually start count; once reached → 429 until 00:00 UTC. `/api/health` reports runs remaining |
 | Bounded runtime | Inputs cap the work (≤ 20 trials × small bursts); `timeout=120` in Modal; reported `over_soft_cap` |
 | CORS | Explicit allowlist (`GPULAB_CORS_ORIGINS`), including Chrome Private Network Access preflights (`allow_private_network`) for listed origins only |
 | Logging | Structured JSON, one line per request. Client addresses are SHA-256 hashed and never logged raw |

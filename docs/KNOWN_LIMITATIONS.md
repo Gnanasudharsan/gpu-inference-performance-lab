@@ -30,8 +30,9 @@
   and no multi-GPU.
 - **Root cause of the 3–10 ms MPS round-trip stalls is undetermined.** The display-frame hypothesis
   was tested and rejected.
-- **No public GPU backend.** The deployed dashboard's Live page needs a user-run local API, or a GPU
-  service that has not been deployed (credentials and spend not authorized).
+- **The public live backend is a CPU.** Modal requires a payment method for GPU functions, and none
+  was added. Live runs on the public site compare CPU implementations; a user-run backend on a GPU
+  machine shows GPU results.
 - **Docker image not built locally.** The Docker daemon was unavailable and disk was limited, so
   `deploy/Dockerfile` is unverified until built on a CUDA host.
 - **First NVIDIA session (Kaggle T4, torch 2.11+cu130, commit `1e4076a`): the correctness gate
@@ -48,4 +49,7 @@
     - *The fix:* `GraphRunner` owns the inner runner, the weights and the static buffers.
     - *The new test:* `test_graph_runner_owns_what_it_replays` drops every outside reference and
       overwrites freed memory with NaN before replaying, so the bug fails deterministically.
-    - *Status:* pending verification on the T4.
+    - *Status:* **verified on the T4** (`results/gpu/diag-t4-20261110-1523/`). All variants are clean
+      with references kept or dropped, strided or contiguous, eager and Triton. The CUDA-only and
+      Triton test files pass on the real GPU (25 passed; bf16 Triton skipped below compute
+      capability 8.0).

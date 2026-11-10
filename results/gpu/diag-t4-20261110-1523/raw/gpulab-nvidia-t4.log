@@ -1,0 +1,47 @@
+[{"stream_name":"stdout","time":0.778115083,"data":"+ git clone --filter=blob:none https://github.com/Gnanasudharsan/gpu-inference-performance-lab /tmp/gpulab\n"}
+,{"stream_name":"stderr","time":0.834955374,"data":"Cloning into '/tmp/gpulab'...\n"}
+,{"stream_name":"stdout","time":2.110102159,"data":"+ git checkout --detach 87a7def19225d075fdb046e997b606be92da4f8d\n"}
+,{"stream_name":"stderr","time":2.134778663,"data":"HEAD is now at 87a7def fix(cuda-graph): runner owns everything the captured graph reads\n"}
+,{"stream_name":"stdout","time":2.135902519,"data":"+ nvidia-smi\n"}
+,{"stream_name":"stdout","time":2.165812119,"data":"Tue Nov 10 20:23:10 2026       \n"}
+,{"stream_name":"stdout","time":2.165853051,"data":"+-----------------------------------------------------------------------------------------+\n"}
+,{"stream_name":"stdout","time":2.165860438,"data":"| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |\n"}
+,{"stream_name":"stdout","time":2.165866531,"data":"+-----------------------------------------+------------------------+----------------------+\n"}
+,{"stream_name":"stdout","time":2.165872078,"data":"| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |\n"}
+,{"stream_name":"stdout","time":2.165877976,"data":"| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |\n"}
+,{"stream_name":"stdout","time":2.165883841,"data":"|                                         |                        |               MIG M. |\n"}
+,{"stream_name":"stdout","time":2.1658890140000002,"data":"|=========================================+========================+======================|\n"}
+,{"stream_name":"stdout","time":2.197508578,"data":"|   0  Tesla T4                       Off |   00000000:00:04.0 Off |                    0 |\n"}
+,{"stream_name":"stdout","time":2.198313181,"data":"| N/A   53C    P8             10W /   70W |       0MiB /  15360MiB |      0%      Default |\n"}
+,{"stream_name":"stdout","time":2.198324261,"data":"|                                         |                        |                  N/A |\n"}
+,{"stream_name":"stdout","time":2.198329879,"data":"+-----------------------------------------+------------------------+----------------------+\n"}
+,{"stream_name":"stdout","time":2.19833516,"data":"|   1  Tesla T4                       Off |   00000000:00:05.0 Off |                    0 |\n"}
+,{"stream_name":"stdout","time":2.198351716,"data":"| N/A   49C    P8             10W /   70W |       0MiB /  15360MiB |      0%      Default |\n"}
+,{"stream_name":"stdout","time":2.198357225,"data":"|                                         |                        |                  N/A |\n"}
+,{"stream_name":"stdout","time":2.198362948,"data":"+-----------------------------------------+------------------------+----------------------+\n"}
+,{"stream_name":"stdout","time":2.19837509,"data":"\n"}
+,{"stream_name":"stdout","time":2.198380273,"data":"+-----------------------------------------------------------------------------------------+\n"}
+,{"stream_name":"stdout","time":2.198385846,"data":"| Processes:                                                                              |\n"}
+,{"stream_name":"stdout","time":2.198391518,"data":"|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |\n"}
+,{"stream_name":"stdout","time":2.198397152,"data":"|        ID   ID                                                               Usage      |\n"}
+,{"stream_name":"stdout","time":2.198402439,"data":"|=========================================================================================|\n"}
+,{"stream_name":"stdout","time":2.199728891,"data":"|  No running processes found                                                             |\n"}
+,{"stream_name":"stdout","time":2.199752463,"data":"+-----------------------------------------------------------------------------------------+\n"}
+,{"stream_name":"stdout","time":2.52497718,"data":"+ /usr/bin/python3 -m pip install -q -e .\n"}
+,{"stream_name":"stdout","time":24.575196635,"data":"{\"variant\": \"eager_refs_kept\", \"strided_input\": true, \"kept_output_changed\": false, \"sentinels_corrupted\": 0, \"outputs_correct\": true, \"outputs_stable\": true, \"first_output_correct\": true, \"description\": \"fixed CudaGraphImpl('eager'), caller keeps the weights\"}\n"}
+,{"stream_name":"stdout","time":27.233058078,"data":"{\"variant\": \"eager_refs_kept\", \"strided_input\": false, \"kept_output_changed\": false, \"sentinels_corrupted\": 0, \"outputs_correct\": true, \"outputs_stable\": true, \"first_output_correct\": true, \"description\": \"fixed CudaGraphImpl('eager'), caller keeps the weights\"}\n"}
+,{"stream_name":"stdout","time":29.913946703,"data":"{\"variant\": \"eager_refs_dropped\", \"strided_input\": true, \"kept_output_changed\": false, \"sentinels_corrupted\": 0, \"outputs_correct\": true, \"outputs_stable\": true, \"first_output_correct\": true, \"description\": \"fixed CudaGraphImpl('eager'), caller drops the weights\"}\n"}
+,{"stream_name":"stdout","time":32.638955665,"data":"{\"variant\": \"eager_refs_dropped\", \"strided_input\": false, \"kept_output_changed\": false, \"sentinels_corrupted\": 0, \"outputs_correct\": true, \"outputs_stable\": true, \"first_output_correct\": true, \"description\": \"fixed CudaGraphImpl('eager'), caller drops the weights\"}\n"}
+,{"stream_name":"stdout","time":219.135376732,"data":"{\"variant\": \"triton_refs_kept\", \"strided_input\": true, \"kept_output_changed\": false, \"sentinels_corrupted\": 0, \"outputs_correct\": true, \"outputs_stable\": true, \"first_output_correct\": true, \"description\": \"fixed CudaGraphImpl('triton'), caller keeps the weights\"}\n"}
+,{"stream_name":"stdout","time":234.229725888,"data":"{\"variant\": \"triton_refs_kept\", \"strided_input\": false, \"kept_output_changed\": false, \"sentinels_corrupted\": 0, \"outputs_correct\": true, \"outputs_stable\": true, \"first_output_correct\": true, \"description\": \"fixed CudaGraphImpl('triton'), caller keeps the weights\"}\n"}
+,{"stream_name":"stdout","time":249.195136943,"data":"{\"variant\": \"triton_refs_dropped\", \"strided_input\": true, \"kept_output_changed\": false, \"sentinels_corrupted\": 0, \"outputs_correct\": true, \"outputs_stable\": true, \"first_output_correct\": true, \"description\": \"fixed CudaGraphImpl('triton'), caller drops the weights\"}\n"}
+,{"stream_name":"stdout","time":264.230382062,"data":"{\"variant\": \"triton_refs_dropped\", \"strided_input\": false, \"kept_output_changed\": false, \"sentinels_corrupted\": 0, \"outputs_correct\": true, \"outputs_stable\": true, \"first_output_correct\": true, \"description\": \"fixed CudaGraphImpl('triton'), caller drops the weights\"}\n"}
+,{"stream_name":"stdout","time":264.664781063,"data":"diag exit code: 0\n"}
+,{"stream_name":"stdout","time":1643.793505309,"data":"gpu tests exit code: 0\n"}
+,{"stream_name":"stderr","time":1645.924763149,"data":"/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":1645.924813052,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":1646.207724299,"data":"/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":1646.207766698,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":1647.046382706,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":1648.091805445,"data":"[NbConvertApp] Writing 284707 bytes to __results__.html\n"}
+]

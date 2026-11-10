@@ -7,8 +7,9 @@ PyTorch baseline, finds the bottleneck by measurement, removes it with fused GPU
 the result under deadlines. Every number comes from a record with hardware, software and Git
 provenance. Every comparison is interleaved, paired, and reported with a 95% confidence interval.
 
-**Live dashboard:** https://gpu-inference-performance-lab.vercel.app (recorded measurements; the
-Live page runs real measurements against a gpulab API you point it at).
+**Live dashboard:** https://gpu-inference-performance-lab.vercel.app. It shows recorded
+measurements, and its Live page runs real paired measurements on a hosted backend. That backend is a
+free Modal CPU container, labeled as such; point the page at your own GPU backend for GPU results.
 
 ![Dashboard overview](docs/screenshots/overview.png)
 

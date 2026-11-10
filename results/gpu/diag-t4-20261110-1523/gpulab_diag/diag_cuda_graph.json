@@ -1,0 +1,89 @@
+{
+  "env": {
+    "torch": "2.11.0+cu130",
+    "cuda": "13.0",
+    "gpu": "Tesla T4"
+  },
+  "results": [
+    {
+      "variant": "eager_refs_kept",
+      "strided_input": true,
+      "kept_output_changed": false,
+      "sentinels_corrupted": 0,
+      "outputs_correct": true,
+      "outputs_stable": true,
+      "first_output_correct": true,
+      "description": "fixed CudaGraphImpl('eager'), caller keeps the weights"
+    },
+    {
+      "variant": "eager_refs_kept",
+      "strided_input": false,
+      "kept_output_changed": false,
+      "sentinels_corrupted": 0,
+      "outputs_correct": true,
+      "outputs_stable": true,
+      "first_output_correct": true,
+      "description": "fixed CudaGraphImpl('eager'), caller keeps the weights"
+    },
+    {
+      "variant": "eager_refs_dropped",
+      "strided_input": true,
+      "kept_output_changed": false,
+      "sentinels_corrupted": 0,
+      "outputs_correct": true,
+      "outputs_stable": true,
+      "first_output_correct": true,
+      "description": "fixed CudaGraphImpl('eager'), caller drops the weights"
+    },
+    {
+      "variant": "eager_refs_dropped",
+      "strided_input": false,
+      "kept_output_changed": false,
+      "sentinels_corrupted": 0,
+      "outputs_correct": true,
+      "outputs_stable": true,
+      "first_output_correct": true,
+      "description": "fixed CudaGraphImpl('eager'), caller drops the weights"
+    },
+    {
+      "variant": "triton_refs_kept",
+      "strided_input": true,
+      "kept_output_changed": false,
+      "sentinels_corrupted": 0,
+      "outputs_correct": true,
+      "outputs_stable": true,
+      "first_output_correct": true,
+      "description": "fixed CudaGraphImpl('triton'), caller keeps the weights"
+    },
+    {
+      "variant": "triton_refs_kept",
+      "strided_input": false,
+      "kept_output_changed": false,
+      "sentinels_corrupted": 0,
+      "outputs_correct": true,
+      "outputs_stable": true,
+      "first_output_correct": true,
+      "description": "fixed CudaGraphImpl('triton'), caller keeps the weights"
+    },
+    {
+      "variant": "triton_refs_dropped",
+      "strided_input": true,
+      "kept_output_changed": false,
+      "sentinels_corrupted": 0,
+      "outputs_correct": true,
+      "outputs_stable": true,
+      "first_output_correct": true,
+      "description": "fixed CudaGraphImpl('triton'), caller drops the weights"
+    },
+    {
+      "variant": "triton_refs_dropped",
+      "strided_input": false,
+      "kept_output_changed": false,
+      "sentinels_corrupted": 0,
+      "outputs_correct": true,
+      "outputs_stable": true,
+      "first_output_correct": true,
+      "description": "fixed CudaGraphImpl('triton'), caller drops the weights"
+    }
+  ]
+}

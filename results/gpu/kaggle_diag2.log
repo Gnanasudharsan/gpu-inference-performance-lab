@@ -1,0 +1,133 @@
+pushing gnanasudharsan/gpulab-nvidia-t4 at commit 87a7def task=diag (T4, 1800s cap)
+Kernel version 3 successfully pushed.  Please check progress at https://www.kaggle.com/code/gnanasudharsan/gpulab-nvidia-t4
+15:23 gnanasudharsan/gpulab-nvidia-t4 has status "kernelworkerstatus.queued"
+15:24 gnanasudharsan/gpulab-nvidia-t4 has status "kernelworkerstatus.running"
+15:25 gnanasudharsan/gpulab-nvidia-t4 has status "kernelworkerstatus.running"
+15:26 gnanasudharsan/gpulab-nvidia-t4 has status "kernelworkerstatus.running"
+15:27 gnanasudharsan/gpulab-nvidia-t4 has status "kernelworkerstatus.running"
+15:28 gnanasudharsan/gpulab-nvidia-t4 has status "kernelworkerstatus.running"
+15:29 gnanasudharsan/gpulab-nvidia-t4 has status "kernelworkerstatus.running"
+15:30 gnanasudharsan/gpulab-nvidia-t4 has status "kernelworkerstatus.running"
+15:31 gnanasudharsan/gpulab-nvidia-t4 has status "kernelworkerstatus.running"
+15:32 gnanasudharsan/gpulab-nvidia-t4 has status "kernelworkerstatus.running"
+15:33 gnanasudharsan/gpulab-nvidia-t4 has status "kernelworkerstatus.running"
+15:34 gnanasudharsan/gpulab-nvidia-t4 has status "kernelworkerstatus.running"
+15:35 gnanasudharsan/gpulab-nvidia-t4 has status "kernelworkerstatus.running"
+15:36 gnanasudharsan/gpulab-nvidia-t4 has status "kernelworkerstatus.running"
+15:37 gnanasudharsan/gpulab-nvidia-t4 has status "kernelworkerstatus.running"
+15:38 gnanasudharsan/gpulab-nvidia-t4 has status "kernelworkerstatus.running"
+15:39 gnanasudharsan/gpulab-nvidia-t4 has status "kernelworkerstatus.running"
+15:40 gnanasudharsan/gpulab-nvidia-t4 has status "kernelworkerstatus.running"
+15:41 gnanasudharsan/gpulab-nvidia-t4 has status "kernelworkerstatus.running"
+15:42 gnanasudharsan/gpulab-nvidia-t4 has status "kernelworkerstatus.running"
+15:43 gnanasudharsan/gpulab-nvidia-t4 has status "kernelworkerstatus.running"
+15:44 gnanasudharsan/gpulab-nvidia-t4 has status "kernelworkerstatus.running"
+15:45 gnanasudharsan/gpulab-nvidia-t4 has status "kernelworkerstatus.running"
+15:46 gnanasudharsan/gpulab-nvidia-t4 has status "kernelworkerstatus.running"
+15:47 gnanasudharsan/gpulab-nvidia-t4 has status "kernelworkerstatus.running"
+15:48 gnanasudharsan/gpulab-nvidia-t4 has status "kernelworkerstatus.running"
+15:49 gnanasudharsan/gpulab-nvidia-t4 has status "kernelworkerstatus.running"
+15:50 gnanasudharsan/gpulab-nvidia-t4 has status "kernelworkerstatus.running"
+15:51 gnanasudharsan/gpulab-nvidia-t4 has status "kernelworkerstatus.complete"
+Downloading diag_cuda_graph.json to results/gpu/diag-t4-20261110-1523/raw/gpulab_diag
+  0%|          | 0.00/2.64k [00:00<?, ?B/s]100%|██████████| 2.64k/2.64k [00:00<00:00, 3.47MB/s]
+
+Output file downloaded to results/gpu/diag-t4-20261110-1523/raw/gpulab_diag/diag_cuda_graph.json
+Downloading pytest_gpu.log to results/gpu/diag-t4-20261110-1523/raw/gpulab_diag
+  0%|          | 0.00/1.15k [00:00<?, ?B/s]100%|██████████| 1.15k/1.15k [00:00<00:00, 4.13MB/s]
+
+Output file downloaded to results/gpu/diag-t4-20261110-1523/raw/gpulab_diag/pytest_gpu.log
+Kernel log downloaded to results/gpu/diag-t4-20261110-1523/raw/gpulab-nvidia-t4.log 
+{
+  "env": {
+    "torch": "2.11.0+cu130",
+    "cuda": "13.0",
+    "gpu": "Tesla T4"
+  },
+  "results": [
+    {
+      "variant": "eager_refs_kept",
+      "strided_input": true,
+      "kept_output_changed": false,
+      "sentinels_corrupted": 0,
+      "outputs_correct": true,
+      "outputs_stable": true,
+      "first_output_correct": true,
+      "description": "fixed CudaGraphImpl('eager'), caller keeps the weights"
+    },
+    {
+      "variant": "eager_refs_kept",
+      "strided_input": false,
+      "kept_output_changed": false,
+      "sentinels_corrupted": 0,
+      "outputs_correct": true,
+      "outputs_stable": true,
+      "first_output_correct": true,
+      "description": "fixed CudaGraphImpl('eager'), caller keeps the weights"
+    },
+    {
+      "variant": "eager_refs_dropped",
+      "strided_input": true,
+      "kept_output_changed": false,
+      "sentinels_corrupted": 0,
+      "outputs_correct": true,
+      "outputs_stable": true,
+      "first_output_correct": true,
+      "description": "fixed CudaGraphImpl('eager'), caller drops the weights"
+    },
+    {
+      "variant": "eager_refs_dropped",
+      "strided_input": false,
+      "kept_output_changed": false,
+      "sentinels_corrupted": 0,
+      "outputs_correct": true,
+      "outputs_stable": true,
+      "first_output_correct": true,
+      "description": "fixed CudaGraphImpl('eager'), caller drops the weights"
+    },
+    {
+      "variant": "triton_refs_kept",
+      "strided_input": true,
+      "kept_output_changed": false,
+      "sentinels_corrupted": 0,
+      "outputs_correct": true,
+      "outputs_stable": true,
+      "first_output_correct": true,
+      "description": "fixed CudaGraphImpl('triton'), caller keeps the weights"
+    },
+    {
+      "variant": "triton_refs_kept",
+      "strided_input": false,
+      "kept_output_changed": false,
+      "sentinels_corrupted": 0,
+      "outputs_correct": true,
+      "outputs_stable": true,
+      "first_output_correct": true,
+      "description": "fixed CudaGraphImpl('triton'), caller keeps the weights"
+    },
+    {
+      "variant": "triton_refs_dropped",
+      "strided_input": true,
+      "kept_output_changed": false,
+      "sentinels_corrupted": 0,
+      "outputs_correct": true,
+      "outputs_stable": true,
+      "first_output_correct": true,
+      "description": "fixed CudaGraphImpl('triton'), caller drops the weights"
+    },
+    {
+      "variant": "triton_refs_dropped",
+      "strided_input": false,
+      "kept_output_changed": false,
+      "sentinels_corrupted": 0,
+      "outputs_correct": true,
+      "outputs_stable": true,
+      "first_output_correct": true,
+      "description": "fixed CudaGraphImpl('triton'), caller drops the weights"
+    }
+  ]
+}
+SKIPPED [1] tests/test_cuda_only.py:22: Metal kernels run only on Apple GPUs (MPS)
+SKIPPED [4] tests/test_triton_kernels.py:38: bf16 tl.dot needs compute capability >= 8.0 (Ampere or newer)
+25 passed, 5 skipped, 15 warnings in 1367.82s (0:22:47)
+exit=0

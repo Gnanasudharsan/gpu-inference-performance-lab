@@ -144,6 +144,7 @@ export default function LivePage() {
         ...f,
         impl: health.device === "cuda" ? "triton" : health.device === "mps" ? "metal" : "fused_weights",
         model: health.device === "cpu" ? "small" : f.model,
+        dtype: health.device === "cpu" ? "float32" : f.dtype, // fp16 matmul is slow on CPUs
       }));
     } catch (e) {
       setConn({ state: "offline", url, ...diagnose(url, e, window.location.origin, timeoutS) });

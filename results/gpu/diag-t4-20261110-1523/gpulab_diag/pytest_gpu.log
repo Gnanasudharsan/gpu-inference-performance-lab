@@ -1,0 +1,15 @@
+...s............s..s..s..s....                                           [100%]
+=============================== warnings summary ===============================
+tests/test_cuda_only.py::test_runners_have_no_hidden_host_syncs[eager]
+  /usr/local/lib/python3.13/dist-packages/torch/cuda/__init__.py:1270: UserWarning: Synchronization debug mode is a prototype feature and does not yet detect all synchronizing operations (Triggered internally at /pytorch/torch/csrc/cuda/Module.cpp:1003.)
+    torch._C._cuda_set_sync_debug_mode(debug_mode)
+
+tests/test_cuda_only.py: 14 warnings
+  /usr/local/lib/python3.13/dist-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_cuda_only.py:22: Metal kernels run only on Apple GPUs (MPS)
+SKIPPED [4] tests/test_triton_kernels.py:38: bf16 tl.dot needs compute capability >= 8.0 (Ampere or newer)
+25 passed, 5 skipped, 15 warnings in 1367.82s (0:22:47)
