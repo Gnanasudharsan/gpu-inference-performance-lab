@@ -25,7 +25,10 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 
 def _run(cmd: list[str], cwd: Path | None = None) -> str | None:
     try:
-        out = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, timeout=10, check=True)
+        # fixed argument lists from this module only; no shell, no user input
+        out = subprocess.run(  # noqa: S603
+            cmd, cwd=cwd, capture_output=True, text=True, timeout=10, check=True
+        )
     except (OSError, subprocess.SubprocessError):
         return None
     return out.stdout.strip() or None

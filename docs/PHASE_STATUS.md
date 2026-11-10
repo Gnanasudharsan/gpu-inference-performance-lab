@@ -10,7 +10,7 @@
 | 5 | Experimental analysis | **complete** | `10828f8`, phase commit |
 | 6 | Web dashboard | **complete** | phase commit |
 | 7 | Deployment and live execution | **complete for the dashboard**; GPU API prepared, not deployed (needs authorization) | phase commit |
-| 8 | Final hardening and showcase | pending | |
+| 8 | Final hardening and showcase | **complete** | release commit |
 
 ## Phase 0 report
 
@@ -119,3 +119,17 @@
 - A cross-origin live run from the production origin to a local M4 API was verified at the HTTP
   level (preflight plus run).
 - See [DEPLOYMENT.md](DEPLOYMENT.md) for the hosting evaluation, cost caps and the exact checklist.
+
+## Phase 8 report
+
+Hardening checks and their results are in [final-audit.md](final-audit.md):
+- tests and the Triton interpreter suite
+- the GPU performance regression gate (passed)
+- static analysis with security rules
+- dependency audits (0 known vulnerabilities)
+- a secrets scan
+- an API load and fuzz test (passed)
+- accessibility, responsiveness, documentation links and a deployment smoke test
+
+The README was rewritten with verified results only. The interview walkthrough and final audit,
+including resume bullets limited to measured outcomes, are in `docs/`.

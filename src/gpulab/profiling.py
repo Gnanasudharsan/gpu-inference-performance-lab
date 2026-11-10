@@ -99,7 +99,7 @@ def _count_custom_kernels() -> Iterator[Counter[str]]:
     for mod_name, fns in _KERNEL_ENTRY_POINTS.items():
         try:
             mod = importlib.import_module(mod_name)
-        except Exception:  # triton not installed
+        except ImportError:  # optional backend (e.g. triton) not installed
             continue
         for fn in fns:
             orig = getattr(mod, fn)

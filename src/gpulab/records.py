@@ -57,7 +57,10 @@ class ExperimentRecord:
                 sort_keys=True,
                 default=str,
             )
-            self.record_id = f"{self.kind[:3]}-{hashlib.sha1(key.encode()).hexdigest()[:10]}"
+            digest = hashlib.sha1(
+                key.encode(), usedforsecurity=False
+            ).hexdigest()  # id, not security
+            self.record_id = f"{self.kind[:3]}-{digest[:10]}"
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
