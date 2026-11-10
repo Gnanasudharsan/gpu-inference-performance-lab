@@ -3,9 +3,9 @@
 #
 # Prerequisites (one-time, done by the account owner):
 #   1. Kaggle account with phone verification (needed for internet + GPU in kernels).
-#   2. API credentials from kaggle.com -> Settings -> API, either:
-#      - new API token  -> save to ~/.kaggle/access_token (chmod 600) and export KAGGLE_USERNAME
-#      - legacy API key -> save the downloaded kaggle.json to ~/.kaggle/kaggle.json (chmod 600)
+#   2. Authenticate the CLI. Easiest: `uvx --with six --from kaggle==2.2.5 kaggle auth login`
+#      (browser sign-in; nothing to paste). Alternatives: an API token in ~/.kaggle/access_token
+#      or a legacy ~/.kaggle/kaggle.json. Put your username in ~/.kaggle/username (not secret).
 #   3. The commit to measure is pushed to GitHub (the kernel clones it by SHA).
 #
 # Usage: scripts/kaggle_run.sh            # push, run (<= 3 h), wait, download, analyze
@@ -28,11 +28,12 @@ else
   echo "no Kaggle username: save ~/.kaggle/kaggle.json, or export KAGGLE_USERNAME=<your username>" >&2
   exit 2
 fi
-if [ ! -f "$HOME/.kaggle/kaggle.json" ] && [ ! -f "$HOME/.kaggle/access_token" ] \
-   && [ -z "${KAGGLE_KEY:-}" ] && [ -z "${KAGGLE_API_TOKEN:-}" ]; then
-  echo "no Kaggle token: see the header of this script" >&2; exit 2
-fi
-k config view > /dev/null 2>&1 || { echo "Kaggle CLI could not authenticate" >&2; exit 2; }
+# Works with any credential the CLI supports (OAuth via `kaggle auth login`, an API token, or
+# a legacy key): ask the API itself whether we are authenticated.
+k kernels list --mine > /dev/null 2>&1 || {
+  echo "Kaggle CLI is not authenticated: run 'uvx --with six --from kaggle==2.2.5 kaggle auth login'" >&2
+  exit 2
+}
 SLUG="$KUSER/gpulab-nvidia-t4"
 
 if [ "${1:-}" != "--fetch" ]; then
