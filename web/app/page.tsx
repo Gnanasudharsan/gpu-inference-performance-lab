@@ -29,12 +29,14 @@ function Overview({ s }: { s: Summary }) {
     points: bySeries.get(k)!.map((b) => ({ x: b.rows, y: b.host_us.p50 })),
   }));
   const gpu = s.environment.accelerators.find((a) => a.backend === "mps" || a.backend === "cuda");
-  const cuda = ["triton", "cuda_graph_triton"].flatMap((cand) =>
-    [1, 8].flatMap((rows) => {
-      const c = findComparison(s, { device: "cuda", dtype: "float16", mode: "throughput", candidate: cand, rows, d_model: 1024 });
-      return c ? [c] : [];
-    }),
-  );
+  const cq = { device: "cuda", dtype: "float16", mode: "throughput", rows: 8, d_model: 1024 } as const;
+  const cuda = ["fused_weights", "compile", "cuda_graph_eager", "triton"].flatMap((candidate) => {
+    const c = findComparison(s, { ...cq, candidate });
+    return c ? [c] : [];
+  });
+  const cudaGraph = findComparison(s, { ...cq, candidate: "cuda_graph_eager" });
+  const cudaTriton = findComparison(s, { ...cq, candidate: "triton" });
+  const cudaTritonGraph = findComparison(s, { ...cq, candidate: "cuda_graph_triton" });
   const cudaGpu = s.benchmarks.find((b) => b.device === "cuda")?.device_name ?? "NVIDIA";
 
   return (
@@ -149,7 +151,10 @@ function Overview({ s }: { s: Summary }) {
       </div>
 
       {cuda.length > 0 && (
-        <Section title={`NVIDIA results · ${cudaGpu}`} description="Same workload, harness and paired method on an NVIDIA GPU. Pipelined fp16 time per forward, 1024×2816×4.">
+        <Section
+          title={`NVIDIA results · ${cudaGpu}`}
+          description="Same workload, harness and paired method on a Kaggle T4 (free tier). Pipelined fp16, 8 rows, 1024×2816×4, speedup over eager."
+        >
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {cuda.map((c) => (
               <StatTile
@@ -161,6 +166,18 @@ function Overview({ s }: { s: Summary }) {
               />
             ))}
           </div>
+          {cudaGraph && cudaTriton && cudaTritonGraph && (
+            <p className="mt-4 max-w-3xl text-xs leading-relaxed text-ink-2">
+              <span className="font-medium text-ink">Launch-bound host, GPU-bound kernel.</span> On this host eager is limited by
+              how fast the CPU issues kernels: replaying the same kernels as one CUDA graph takes {fmtUs(cudaGraph.baseline_p50_us)} →{" "}
+              {fmtUs(cudaGraph.candidate_p50_us)}. The Triton kernel loses for a different reason. Graph replay barely changes it (
+              {fmtUs(cudaTriton.candidate_p50_us)} vs {fmtUs(cudaTritonGraph.candidate_p50_us)}), so the time is spent on the GPU,
+              not in launches.{" "}
+              <Link href="/kernels/" className="text-accent hover:underline">
+                Kernel analysis →
+              </Link>
+            </p>
+          )}
         </Section>
       )}
 

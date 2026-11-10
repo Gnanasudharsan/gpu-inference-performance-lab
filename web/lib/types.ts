@@ -139,7 +139,7 @@ export interface Summary {
   } | null;
   kernels: {
     launches_per_forward: Record<string, { aten: number; custom: number | null; total: number; complete: boolean }>;
-    cuda_profiles?: Record<string, { aten: number; cuda_kernels: number | null; cuda_kernel_us: number | null }>;
+    cuda_profiles?: Record<string, { aten: number; cuda_kernels: number | null; cuda_kernel_us: number | null; gpu_forward_span_us?: number | null }>;
     metal_tuning: { results: Record<string, Record<string, number>>; device_name: string; git_commit: string } | null;
     metal_v1_vs_v2: Record<string, {
       p50_us: Record<string, number>;
@@ -156,6 +156,7 @@ export interface Summary {
   devices?: string[];
   gpu_sessions?: {
     run: string;
+    measurements_reported?: boolean;
     gpu: string | null;
     git_commit: string | null;
     steps: { step: string; status: "ok" | "failed" | "skipped"; reason?: string; seconds?: number }[];

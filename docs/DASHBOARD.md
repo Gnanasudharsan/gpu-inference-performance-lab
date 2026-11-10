@@ -44,6 +44,19 @@ node validate_palette.js "#3987e5,#d55181,#9085e9,#1798a8" --mode dark --surface
 - Blue and violet fail the *all-pairs* check, which matters where all four lines overlap. The eager
   baseline is therefore always **dashed**, and lines are direct-labeled (secondary encoding).
 - Emerald, amber and coral are reserved for verdict status, always paired with an icon and a label.
+- **Fifth hue (NVIDIA views): yellow `#c98500` for eager + CUDA graph.** It was added when the T4 data
+  showed that the CUDA graph was the main result. It was validated pairwise against each existing
+  hue on `#111C2E`, and all passed. Rejected candidates and the pair that failed:
+
+  | candidate | failing pair | ΔE, normal vision |
+  |---|---|---|
+  | orange `#d95926` | vs magenta | 11.6 |
+  | red `#e66767` | vs magenta | 7.8 |
+  | aqua `#199e70` | vs teal | 9.2 |
+
+  Green `#008300` passed but would read as the emerald "faster" status. Implementations without a
+  hue of their own (`cuda_graph_triton`, `compile_cudagraphs`) render neutral and are identified
+  by label, so no hue stands for two entities.
 - Text contrast on the surfaces (WCAG): primary 15.8:1, secondary 7.2:1, muted 5.0:1 (4.56:1 on
   elevated cards), accent button 10.6:1.
 

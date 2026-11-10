@@ -353,7 +353,9 @@ export function ForestPlot({ rows, ariaLabel }: { rows: ForestRow[]; ariaLabel: 
   const [ref, width] = useWidth<HTMLDivElement>();
   const [hover, setHover] = useState<string | null>(null);
   const rowH = 26;
-  const labelW = Math.min(170, Math.max(110, width * 0.3));
+  // fit the longest label (11px text is ~6px per character) but never take more than 45% of the width
+  const longest = Math.max(0, ...rows.map((r) => r.label.length));
+  const labelW = Math.min(width * 0.45, Math.max(110, longest * 6 + 16));
   const m = { top: 8, right: 64, bottom: 30, left: labelW };
   const iw = Math.max(10, width - m.left - m.right);
   const lo = Math.min(0.8, ...rows.map((r) => r.lo));

@@ -96,7 +96,7 @@ function Latency({ s }: { s: Summary }) {
         </ChartFrame>
       </Section>
 
-      <Section title="Why the tails look this way" description="Measured properties of this machine, not of the kernels.">
+      <Section title="Why the tails look this way" description="Measured on the Apple M4: properties of that machine, not of the kernels. Not yet characterized on the T4.">
         <div className="grid gap-4 md:grid-cols-3">
           <Card>
             <div className="flex items-start justify-between">

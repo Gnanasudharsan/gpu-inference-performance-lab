@@ -13,6 +13,7 @@ const SHORT: Record<string, string> = {
   metal: "metal",
   triton: "triton",
   cuda_graph_triton: "triton+graph",
+  cuda_graph_eager: "eager+graph",
   compile_cudagraphs: "compile+graphs",
 };
 
@@ -21,7 +22,7 @@ function Kernels({ s }: { s: Summary }) {
   const isCuda = device === "cuda";
   const cp = s.kernels.cuda_profiles ?? {};
   const lp = s.kernels.launches_per_forward;
-  const cudaBars = ["eager", "fused_weights", "compile", "triton", "cuda_graph_triton", "compile_cudagraphs"].flatMap((k) =>
+  const cudaBars = ["eager", "fused_weights", "compile", "triton", "cuda_graph_eager", "cuda_graph_triton", "compile_cudagraphs"].flatMap((k) =>
     [8, 32].flatMap((r) => {
       const v = cp[`${k}/r${r}`];
       if (!v || v.cuda_kernels == null) return [];
@@ -52,6 +53,8 @@ function Kernels({ s }: { s: Summary }) {
     .filter((c) => custom.includes(c.candidate) && c.mode === "throughput" && c.device === device)
     .sort((a, b) => a.d_model - b.d_model || a.dtype.localeCompare(b.dtype) || a.rows - b.rows);
 
+  const regressions = s.regressions.filter((c) => c.device === device);
+
   const tuning = s.kernels.metal_tuning?.results ?? {};
   const tRows = Object.keys(tuning);
   const tCfgs = tRows.length ? Object.keys(tuning[tRows[0]!]!).sort() : [];
@@ -69,7 +72,15 @@ function Kernels({ s }: { s: Summary }) {
       <DeviceToggle devices={s.devices ?? ["mps"]} value={device} onChange={setDevice} />
       <div className="grid gap-4 lg:grid-cols-2">
         <ChartFrame title={isCuda ? "CUDA kernels per forward" : "Launches per forward"} subtitle={isCuda ? "Device kernels recorded by the PyTorch profiler (CUDA activity) · fp16 · 1024×2816×4" : "Measured with the profiler plus instrumented kernel launchers · fp16 · 1024×2816×4"} table={<Table head={["implementation", "launches"]} rows={bars.map((b) => [b.label, fmtNum(b.value)])} />}>
-          <HBarChart bars={bars} format={(v) => fmtNum(v)} ariaLabel="Kernel launches per forward by implementation" />
+          {bars.length > 0 ? (
+            <HBarChart bars={bars} format={(v) => fmtNum(v)} ariaLabel="Kernel launches per forward by implementation" />
+          ) : (
+            <p className="py-6 text-xs leading-relaxed text-ink-2">
+              Withheld. The profiler in the reported session also counted the GPU-side copy of each <code className="font-mono">record_function</code>{" "}
+              range as a kernel, so its counts and kernel times are invalid (kernel time exceeded wall time). The profiler is fixed; counts appear
+              here once a session with the fix is ingested.
+            </p>
+          )}
           {!isCuda && <p className="mt-2 text-xs text-ink-3">* torch.compile: only ATen-visible launches are counted; Inductor-generated kernels are not visible to this method.</p>}
         </ChartFrame>
         <ChartFrame
@@ -87,15 +98,22 @@ function Kernels({ s }: { s: Summary }) {
         </ChartFrame>
       </div>
 
-      <Section title={isCuda ? "Paired speedup of the fused Triton path (with and without CUDA graphs)" : "Paired speedup of the fused Metal path"} description="Pipelined time, interleaved trials, 95% bootstrap CI. It helps most where launches dominate (the small model, 2–8 rows), and not at all at 16 rows, where the path falls back to vendor GEMM.">
+      <Section
+        title={isCuda ? "Paired speedup of the fused Triton path (with and without CUDA graphs)" : "Paired speedup of the fused Metal path"}
+        description={
+          isCuda
+            ? "Pipelined time, interleaved trials, 95% bootstrap CI. The Triton kernel is slower than eager everywhere on the T4, and CUDA-graph replay barely changes it, so its time is on the GPU, not in launches. Likely cause (a hypothesis, not yet profiled): too little parallelism at small M. The grid is one program per output tile, at most 32 for the down projection on a 40-SM GPU, and each streams the full K dimension serially (no split-K)."
+            : "Pipelined time, interleaved trials, 95% bootstrap CI. It helps most where launches dominate (the small model, 2–8 rows), and not at all at 16 rows, where the path falls back to vendor GEMM."
+        }
+      >
         <ChartFrame
           title={isCuda ? "Triton fused kernels vs eager" : "Metal fused kernels vs eager"}
           subtitle="▲ faster (CI above 1) · ◆ not significant · ▼ slower (CI below 1)"
-          table={<Table head={["model", "dtype", "rows", "eager", "metal", "speedup", "95% CI", "verdict"]} rows={metalComps.map((c) => [`${c.d_model}×${c.d_hidden}`, c.dtype, c.rows, fmtUs(c.baseline_p50_us), fmtUs(c.candidate_p50_us), `${c.speedup_geomean.toFixed(2)}×`, `${c.ci_low.toFixed(2)}–${c.ci_high.toFixed(2)}`, c.verdict])} />}
+          table={<Table head={["model", "dtype", "rows", "candidate", "eager", "candidate p50", "speedup", "95% CI", "verdict"]} rows={metalComps.map((c) => [`${c.d_model}×${c.d_hidden}`, c.dtype, c.rows, SHORT[c.candidate] ?? c.candidate, fmtUs(c.baseline_p50_us), fmtUs(c.candidate_p50_us), `${c.speedup_geomean.toFixed(2)}×`, `${c.ci_low.toFixed(2)}–${c.ci_high.toFixed(2)}`, c.verdict])} />}
         >
           <ForestPlot
-            ariaLabel="Metal speedup with confidence intervals by configuration"
-            rows={metalComps.map((c) => ({ key: `${c.candidate}-${c.d_model}-${c.dtype}-${c.rows}`, label: `${isCuda ? `${SHORT[c.candidate]} · ` : ""}${c.d_model} · ${c.dtype} · ${c.rows} rows`, value: c.speedup_geomean, lo: c.ci_low, hi: c.ci_high, verdict: c.verdict, detail: `${fmtUs(c.baseline_p50_us)} → ${fmtUs(c.candidate_p50_us)}` }))}
+            ariaLabel={`${isCuda ? "Triton" : "Metal"} speedup with confidence intervals by configuration`}
+            rows={metalComps.map((c) => ({ key: `${c.candidate}-${c.d_model}-${c.dtype}-${c.rows}`, label: `${isCuda ? `${SHORT[c.candidate]} · ` : ""}${c.d_model} · ${c.dtype.replace("float", "fp")} · ${c.rows} rows`, value: c.speedup_geomean, lo: c.ci_low, hi: c.ci_high, verdict: c.verdict, detail: `${fmtUs(c.baseline_p50_us)} → ${fmtUs(c.candidate_p50_us)}` }))}
           />
         </ChartFrame>
       </Section>
@@ -139,13 +157,17 @@ function Kernels({ s }: { s: Summary }) {
       <Section title="Regressions and limits" description="Reported with the same rigor as the wins.">
         <div className="grid gap-4 md:grid-cols-2">
           <Card>
-            <div className="mb-2 text-sm font-medium">Regressions (CI entirely below 1)</div>
-            <ul className="space-y-1.5 text-xs text-ink-2">
-              {s.regressions.map((c) => (
-                <li key={`${c.device}${c.dtype}${c.mode}${c.candidate}${c.rows}`} className="flex flex-wrap items-center gap-2">
-                  <VerdictBadge verdict="slower" />
+            <div className="mb-2 text-sm font-medium">
+              Regressions (CI entirely below 1) · {regressions.length} on this device
+            </div>
+            <ul className="max-h-96 space-y-1.5 overflow-y-auto pr-1 text-xs text-ink-2">
+              {regressions.map((c) => (
+                <li key={`${c.device}${c.dtype}${c.d_model}${c.mode}${c.candidate}${c.rows}`} className="flex items-start gap-2">
+                  <span className="shrink-0">
+                    <VerdictBadge verdict="slower" />
+                  </span>
                   <span>
-                    {c.device}/{c.dtype} · {IMPL_LABEL[c.candidate] ?? c.candidate} · {c.rows} rows · {c.mode}:{" "}
+                    {c.dtype} · {c.d_model} · {IMPL_LABEL[c.candidate] ?? c.candidate} · {c.rows} rows · {c.mode}:{" "}
                     <span className="tnum text-ink">{c.speedup_geomean.toFixed(2)}×</span> [{c.ci_low.toFixed(2)}, {c.ci_high.toFixed(2)}]
                   </span>
                 </li>
@@ -154,7 +176,7 @@ function Kernels({ s }: { s: Summary }) {
           </Card>
           <Card>
             <div className="mb-2 flex items-center justify-between">
-              <div className="text-sm font-medium">NVIDIA paths</div>
+              <div className="text-sm font-medium">NVIDIA sessions (numbers come only from the latest one whose correctness gate passed)</div>
               <EvidenceTag kind={(s.devices ?? []).includes("cuda") ? "measured" : "pending"} />
             </div>
             {(s.gpu_sessions ?? []).length > 0 ? (
@@ -163,6 +185,7 @@ function Kernels({ s }: { s: Summary }) {
                   <li key={g.run}>
                     <div className="text-ink">
                       {g.gpu ?? "unknown GPU"} · run <span className="font-mono">{g.run}</span> · commit <span className="font-mono">{(g.git_commit ?? "").slice(0, 7)}</span>
+                      {g.measurements_reported && <span className="ml-2 rounded border border-accent/40 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-accent">reported</span>}
                     </div>
                     <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1">
                       {g.steps.map((st) => (

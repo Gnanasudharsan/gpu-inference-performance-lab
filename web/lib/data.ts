@@ -9,7 +9,9 @@ let cache: Promise<Summary> | null = null;
 
 function load(): Promise<Summary> {
   if (!cache) {
-    cache = fetch(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/data/summary.json`, { cache: "force-cache" })
+    // "no-cache" revalidates (a cheap 304 when unchanged). "force-cache" served a stale copy
+    // after a redeploy, so returning visitors kept seeing superseded results.
+    cache = fetch(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/data/summary.json`, { cache: "no-cache" })
       .then((r) => {
         if (!r.ok) throw new Error(`summary.json: HTTP ${r.status}`);
         return r.json() as Promise<Summary>;
@@ -46,7 +48,9 @@ export const IMPL_ORDER = ["eager", "fused_weights", "compile", "metal"] as cons
 export const DEVICE_SERIES: Record<string, readonly string[]> = {
   mps: IMPL_ORDER,
   cpu: ["eager", "fused_weights", "compile"],
-  cuda: ["eager", "cuda_graph_triton", "compile_cudagraphs", "triton"],
+  // the T4 story in four lines: launch-bound eager, fewer launches (fused weights), no launches
+  // (CUDA graph), and the custom kernel; compile/reduce-overhead stay in the tables and forests
+  cuda: ["eager", "fused_weights", "cuda_graph_eager", "triton"],
 };
 
 export function seriesFor(device: string): readonly string[] {
@@ -71,12 +75,13 @@ export const IMPL_COLOR: Record<string, string> = {
   fused_weights: "var(--color-s-fused)",
   compile: "var(--color-s-compile)",
   metal: "var(--color-s-metal)",
-  // colors encode role, so they stay consistent across devices: custom fused kernel = teal,
-  // compiler = violet, CUDA-graph replay of the custom kernel = magenta (never charted with
-  // fused_weights, which only appears on CPU/MPS views)
+  // custom fused kernel = teal on every device (Metal on Apple, Triton on NVIDIA). The fifth hue
+  // (yellow, validated pairwise against the other four in docs/DASHBOARD.md) is eager + CUDA
+  // graph. cuda_graph_triton and compile_cudagraphs get no hue of their own: reusing another
+  // implementation's color would break "color follows the entity", so they render neutral
+  // and are identified by their labels.
   triton: "var(--color-s-metal)",
-  compile_cudagraphs: "var(--color-s-compile)",
-  cuda_graph_triton: "var(--color-s-fused)",
+  cuda_graph_eager: "var(--color-s-graph)",
 };
 
 export const DEFAULT_MODEL = { d_model: 1024, d_hidden: 2816, depth: 4 };

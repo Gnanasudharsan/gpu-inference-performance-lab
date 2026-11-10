@@ -14,7 +14,7 @@ function ServingPage({ s }: { s: Summary }) {
   const onDevice = s.serving.filter((x) => x.device === device);
   const impls = [...new Set(onDevice.map((x) => x.impl))];
   const [implSel, setImpl] = useState("metal");
-  const impl = impls.includes(implSel) ? implSel : (impls[impls.length - 1] ?? "eager");
+  const impl = impls.includes(implSel) ? implSel : impls.includes("eager") ? "eager" : (impls[impls.length - 1] ?? "eager");
   const sweep = onDevice.filter((x) => x.arrival === "poisson" && x.impl === impl);
   const policies = ["direct", "static8", "dynamic"].filter((p) => sweep.some((x) => x.policy === p));
   const mk = (f: (x: Serving) => number | null | undefined): Series[] =>
@@ -33,7 +33,13 @@ function ServingPage({ s }: { s: Summary }) {
   const miss = mk((x) => x.deadline_miss_rate * 100);
   const p99 = mk((x) => (x.counts.ok > 0 ? (x.latency_us.p99 ?? null) : null)).map((ser) => ({ ...ser, points: ser.points.filter((p) => p.y > 0) }));
   const bursty = onDevice.filter((x) => x.arrival === "bursty");
-  const env = s.envelope;
+  // the envelope and the stall statistics were measured on the Apple M4 only
+  const env = device === "mps" ? s.envelope : null;
+  const direct = sweep.filter((x) => x.policy === "direct").sort((a, b) => a.rate_rps - b.rate_rps);
+  const svc = direct[0]?.service_p50_us ?? null;
+  const dyn = sweep.filter((x) => x.policy === "dynamic");
+  const bestDyn = dyn.reduce<Serving | undefined>((a, b) => (!a || b.goodput_rows_per_s > a.goodput_rows_per_s ? b : a), undefined);
+  const worstSvc = sweep.reduce((m, x) => Math.max(m, x.service_p50_us ?? 0), 0);
   const deadline = sweep[0]?.deadline_us ?? 10_000;
   const tableFor = (ser: Series[], f: (v: number) => string) => (
     <Table head={["offered rps", ...ser.map((x) => x.label)]} rows={(ser.find((x) => x.points.length)?.points ?? []).map((p) => [p.x, ...ser.map((x) => f(x.points.find((q) => q.x === p.x)?.y ?? NaN))])} />
@@ -67,11 +73,40 @@ function ServingPage({ s }: { s: Summary }) {
         <ChartFrame title="Deadline miss rate vs offered load" subtitle="Share of all requests that missed (incl. shed and expired)" legend={miss} table={tableFor(miss, (v) => `${v.toFixed(1)}%`)}>
           <LineChart series={miss} xLabel="offered load (requests/s)" yLabel="% missed" yFormat={(v) => `${v.toFixed(0)}%`} yMax={100} ariaLabel="Deadline miss rate by offered rate per policy" />
         </ChartFrame>
-        <ChartFrame title="p99 latency of completed requests" subtitle="Static batching completes nothing at low load (every request expires), so its points start at 300 rps" legend={p99} table={tableFor(p99, (v) => fmtUs(v))}>
+        <ChartFrame title="p99 latency of completed requests" subtitle="Static batching completes nothing at low load (every request expires), so its line starts at the first rate where any request finished" legend={p99} table={tableFor(p99, (v) => fmtUs(v))}>
           <LineChart series={p99} xLabel="offered load (requests/s)" yLabel="ms" yFormat={(v) => (v / 1000).toFixed(0)} refLine={{ y: deadline, label: `deadline ${deadline / 1000} ms` }} ariaLabel="p99 latency by offered rate" />
         </ChartFrame>
         <Card>
           <div className="text-sm font-medium">Reading these curves</div>
+          {device !== "mps" ? (
+            <ul className="mt-2 space-y-2 text-xs leading-relaxed text-ink-2">
+              <li>
+                <span className="text-ink">Service time sets the ceiling.</span> Direct execution of {IMPL_LABEL[impl] ?? impl} takes{" "}
+                {fmtUs(svc)} end to end (median at the lowest rate), against a {deadline / 1000} ms deadline.{" "}
+                {svc != null && svc > deadline
+                  ? "Service alone exceeds the deadline, so every request misses whatever the policy."
+                  : svc != null
+                    ? `One request at a time saturates near ${fmtNum(1e6 / svc)} rps.`
+                    : ""}
+              </li>
+              {bestDyn && (
+                <li>
+                  <span className="text-ink">Dynamic batching.</span> Peak goodput {fmtNum(bestDyn.goodput_rows_per_s)} rows/s at {fmtNum(bestDyn.rate_rps)} rps
+                  offered (mean batch {fmtNum(bestDyn.mean_batch_rows, 1)}, {(bestDyn.deadline_miss_rate * 100).toFixed(0)}% missed).
+                </li>
+              )}
+              {worstSvc > 100 * deadline && (
+                <li>
+                  <span className="text-bad">Mid-serving stalls.</span> Some batches took {fmtUs(worstSvc)}. The Triton autotuner keyed its cache on the exact
+                  row count, so each new batch size re-ran autotuning inside the serving loop. Fixed by keying on the power-of-two bucket that
+                  calibration already warms.
+                </li>
+              )}
+              <li>
+                <span className="text-ink">Single runs.</span> Each point is one 3-second replay on a shared, virtualized Kaggle T4.
+              </li>
+            </ul>
+          ) : (
           <ul className="mt-2 space-y-2 text-xs leading-relaxed text-ink-2">
             <li>
               <span className="text-ink">Direct execution saturates first.</span> End-to-end service is about 2 ms (H2D, forward, synchronizing D2H),
@@ -89,6 +124,7 @@ function ServingPage({ s }: { s: Summary }) {
               single-batch GPU stalls of 114–392 ms appear as p99 outliers. Each point is a single 3-second run.
             </li>
           </ul>
+          )}
         </Card>
       </div>
 
@@ -104,7 +140,7 @@ function ServingPage({ s }: { s: Summary }) {
       {env && (
         <Section
           title="Operating envelope"
-          description={`Highest tested offered rate at which at most ${env.miss_budget * 100}% of requests missed the ${env.deadline_us / 1000} ms deadline. With 3–10 ms GPU round-trip stalls in about 7% of requests on this machine, the envelope is narrow.`}
+          description={`Highest tested offered rate at which at most ${env.miss_budget * 100}% of requests missed the ${env.deadline_us / 1000} ms deadline. Apple M4. With 3–10 ms GPU round-trip stalls in about 7% of requests on that machine, the envelope is narrow.`}
         >
           <Table
             head={["implementation / policy", "max sustainable rate"]}
