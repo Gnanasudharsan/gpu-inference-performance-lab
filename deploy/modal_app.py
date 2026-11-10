@@ -24,8 +24,16 @@ Deploy (from the repository root):
 """
 
 import os
+import subprocess
 
 import modal
+
+# the container has no .git: pass the exact deployed commit so live results stay traceable
+try:
+    COMMIT = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True,
+                            check=True).stdout.strip()
+except (OSError, subprocess.CalledProcessError):
+    COMMIT = ""
 
 GPU = os.environ.get("GPULAB_MODAL_GPU", "none")
 ON_GPU = GPU.lower() != "none"
@@ -47,6 +55,7 @@ image = image.env(
         "GPULAB_DAILY_RUN_CAP": "8" if ON_GPU else "40",
         "GPULAB_RATE_PER_MIN": "3",
         "GPULAB_HOST_LABEL": f"Modal cloud GPU ({GPU})" if ON_GPU else "Modal cloud CPU (2 vCPU)",
+        "GPULAB_GIT_COMMIT": COMMIT,
     }
 ).add_local_python_source("gpulab")  # resolved from src/ via PYTHONPATH=src at deploy time
 

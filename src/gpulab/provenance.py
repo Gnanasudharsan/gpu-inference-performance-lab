@@ -137,7 +137,8 @@ def git_state(root: Path = REPO_ROOT) -> tuple[str | None, bool | None, list[str
     """HEAD commit, whether tracked files differ from it, and which ones."""
     commit = _run(["git", "rev-parse", "HEAD"], cwd=root)
     if commit is None:
-        return None, None, []
+        # deployed containers have no .git: the deploy step passes the exact commit instead
+        return os.environ.get("GPULAB_GIT_COMMIT") or None, None, []
     status = _run(["git", "status", "--porcelain", "--untracked-files=no"], cwd=root) or ""
     # porcelain lines are "XY path" (or "XY old -> new"); _run strips the first line's
     # leading space, so split on whitespace instead of slicing fixed columns.

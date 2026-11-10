@@ -65,3 +65,10 @@ def test_git_state_lists_dirty_files_exactly(tmp_path):
     _, dirty, files = git_state(tmp_path)
     assert dirty is True
     assert files == ["pyproject.toml", "src.py"]
+
+
+def test_git_commit_from_env_without_a_repository(tmp_path, monkeypatch):
+    from gpulab.provenance import git_state
+
+    monkeypatch.setenv("GPULAB_GIT_COMMIT", "abc1234")
+    assert git_state(tmp_path) == ("abc1234", None, [])
