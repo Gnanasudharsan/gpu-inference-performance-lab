@@ -1,0 +1,26 @@
+{
+  "impl": "compile",
+  "device": "cuda",
+  "dtype": "float16",
+  "rows": 32,
+  "iters": 20,
+  "dispatches_per_forward": 8.0,
+  "custom_kernel_launches_per_forward": 0.0,
+  "custom_kernels": {},
+  "launches_per_forward": 8.0,
+  "launch_count_complete": false,
+  "top_ops": [
+    {
+      "name": "aten::addmm",
+      "calls_per_forward": 4.0,
+      "self_cpu_us_per_forward": 157.806250000002
+    },
+    {
+      "name": "aten::mm",
+      "calls_per_forward": 4.0,
+      "self_cpu_us_per_forward": 103.70754999999872
+    }
+  ],
+  "cuda_kernels_per_forward": 21.0,
+  "cuda_kernel_us_per_forward": 1534.2192500000015
+}

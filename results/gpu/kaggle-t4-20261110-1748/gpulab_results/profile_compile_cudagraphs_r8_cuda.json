@@ -1,0 +1,26 @@
+{
+  "impl": "compile_cudagraphs",
+  "device": "cuda",
+  "dtype": "float16",
+  "rows": 8,
+  "iters": 20,
+  "dispatches_per_forward": 2.0,
+  "custom_kernel_launches_per_forward": 0.0,
+  "custom_kernels": {},
+  "launches_per_forward": 2.0,
+  "launch_count_complete": false,
+  "top_ops": [
+    {
+      "name": "aten::_foreach_copy_",
+      "calls_per_forward": 1.0,
+      "self_cpu_us_per_forward": 25.102049999999668
+    },
+    {
+      "name": "aten::copy_",
+      "calls_per_forward": 1.0,
+      "self_cpu_us_per_forward": 10.529899999999714
+    }
+  ],
+  "cuda_kernels_per_forward": 24.0,
+  "cuda_kernel_us_per_forward": 1922.8932500000014
+}

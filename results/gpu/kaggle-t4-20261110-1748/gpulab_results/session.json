@@ -1,0 +1,103 @@
+{
+  "steps": [
+    {
+      "step": "provenance",
+      "status": "ok",
+      "detail": {
+        "cuda": true,
+        "torch": "2.11.0+cu130",
+        "triton": "3.6.0",
+        "gpu": "Tesla T4",
+        "capability": "7.5"
+      },
+      "seconds": 1.3
+    },
+    {
+      "step": "capability gate",
+      "status": "ok",
+      "detail": "capability (7, 5) ok",
+      "seconds": 0.0
+    },
+    {
+      "step": "correctness gate",
+      "status": "ok",
+      "detail": "279 passed, 175 skipped, 23 warnings in 2165.81s (0:36:05)",
+      "seconds": 2174.1
+    },
+    {
+      "step": "experiment",
+      "status": "ok",
+      "detail": {
+        "counts": {
+          "bench": 162,
+          "serving": 54
+        },
+        "skipped": [],
+        "elapsed_s": 1732.3
+      },
+      "seconds": 1732.4
+    },
+    {
+      "step": "kernel profiles",
+      "status": "ok",
+      "detail": {
+        "eager/r8": {
+          "cuda_kernels_per_forward": 61.0,
+          "cuda_kernel_us_per_forward": 2828.2265000000034
+        },
+        "eager/r32": {
+          "cuda_kernels_per_forward": 61.0,
+          "cuda_kernel_us_per_forward": 3001.0097499999983
+        },
+        "fused_weights/r8": {
+          "cuda_kernels_per_forward": 25.0,
+          "cuda_kernel_us_per_forward": 1729.3227000000002
+        },
+        "fused_weights/r32": {
+          "cuda_kernels_per_forward": 25.0,
+          "cuda_kernel_us_per_forward": 1937.3121500000002
+        },
+        "compile/r8": {
+          "cuda_kernels_per_forward": 21.0,
+          "cuda_kernel_us_per_forward": 1280.4203000000005
+        },
+        "compile/r32": {
+          "cuda_kernels_per_forward": 21.0,
+          "cuda_kernel_us_per_forward": 1534.2192500000015
+        },
+        "triton/r8": {
+          "cuda_kernels_per_forward": 9.0,
+          "cuda_kernel_us_per_forward": 11116.389450000004
+        },
+        "triton/r32": {
+          "cuda_kernels_per_forward": 9.0,
+          "cuda_kernel_us_per_forward": 10183.260549999999
+        },
+        "cuda_graph_triton/r8": {
+          "cuda_kernels_per_forward": 11.0,
+          "cuda_kernel_us_per_forward": 4961.189399999998
+        },
+        "cuda_graph_triton/r32": {
+          "cuda_kernels_per_forward": 11.0,
+          "cuda_kernel_us_per_forward": 7296.117499999998
+        },
+        "compile_cudagraphs/r8": {
+          "cuda_kernels_per_forward": 24.0,
+          "cuda_kernel_us_per_forward": 1922.8932500000014
+        },
+        "compile_cudagraphs/r32": {
+          "cuda_kernels_per_forward": 24.0,
+          "cuda_kernel_us_per_forward": 2075.2747000000013
+        }
+      },
+      "seconds": 6.9
+    },
+    {
+      "step": "nsight systems",
+      "status": "failed",
+      "reason": "RuntimeError: profile_nsys.sh eager exit 1",
+      "traceback": "Traceback (most recent call last):\n  File \"/tmp/gpulab/scripts/gpu_session.py\", line 54, in step\n    detail = fn()\n  File \"/tmp/gpulab/scripts/gpu_session.py\", line 211, in nsys\n    raise RuntimeError(f\"profile_nsys.sh {impl} exit {rc}\")\nRuntimeError: profile_nsys.sh eager exit 1\n",
+      "seconds": 0.6
+    }
+  ]
+}

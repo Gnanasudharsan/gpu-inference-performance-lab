@@ -1,0 +1,131 @@
+[{"stream_name":"stdout","time":0.653277762,"data":"+ git clone --filter=blob:none https://github.com/Gnanasudharsan/gpu-inference-performance-lab /tmp/gpulab\n"}
+,{"stream_name":"stderr","time":0.680050479,"data":"Cloning into '/tmp/gpulab'...\n"}
+,{"stream_name":"stdout","time":2.3376754650000002,"data":"+ git checkout --detach 83a0fc7220d685dcb3234e2e72af4e862e8488e0\n"}
+,{"stream_name":"stderr","time":2.3664345239999998,"data":"HEAD is now at 83a0fc7 fix(tests): expect the NVIDIA-unavailable note only on hosts without CUDA\n"}
+,{"stream_name":"stdout","time":2.36749139,"data":"+ nvidia-smi\n"}
+,{"stream_name":"stdout","time":2.398194783,"data":"Tue Nov 10 21:34:43 2026       \n"}
+,{"stream_name":"stdout","time":2.398215061,"data":"+-----------------------------------------------------------------------------------------+\n"}
+,{"stream_name":"stdout","time":2.398221133,"data":"| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |\n"}
+,{"stream_name":"stdout","time":2.398226336,"data":"+-----------------------------------------+------------------------+----------------------+\n"}
+,{"stream_name":"stdout","time":2.398230948,"data":"| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |\n"}
+,{"stream_name":"stdout","time":2.398249673,"data":"| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |\n"}
+,{"stream_name":"stdout","time":2.398389074,"data":"|                                         |                        |               MIG M. |\n"}
+,{"stream_name":"stdout","time":2.398393966,"data":"|=========================================+========================+======================|\n"}
+,{"stream_name":"stdout","time":2.429586829,"data":"|   0  Tesla T4                       Off |   00000000:00:04.0 Off |                    0 |\n"}
+,{"stream_name":"stdout","time":2.429659388,"data":"| N/A   52C    P8             10W /   70W |       0MiB /  15360MiB |      0%      Default |\n"}
+,{"stream_name":"stdout","time":2.42966775,"data":"|                                         |                        |                  N/A |\n"}
+,{"stream_name":"stdout","time":2.429682448,"data":"+-----------------------------------------+------------------------+----------------------+\n"}
+,{"stream_name":"stdout","time":2.429695153,"data":"|   1  Tesla T4                       Off |   00000000:00:05.0 Off |                    0 |\n"}
+,{"stream_name":"stdout","time":2.429737356,"data":"| N/A   55C    P8             10W /   70W |       0MiB /  15360MiB |      0%      Default |\n"}
+,{"stream_name":"stdout","time":2.429744765,"data":"|                                         |                        |                  N/A |\n"}
+,{"stream_name":"stdout","time":2.42975901,"data":"+-----------------------------------------+------------------------+----------------------+\n"}
+,{"stream_name":"stdout","time":2.430152485,"data":"\n"}
+,{"stream_name":"stdout","time":2.430162034,"data":"+-----------------------------------------------------------------------------------------+\n"}
+,{"stream_name":"stdout","time":2.430167195,"data":"| Processes:                                                                              |\n"}
+,{"stream_name":"stdout","time":2.430172294,"data":"|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |\n"}
+,{"stream_name":"stdout","time":2.430180401,"data":"|        ID   ID                                                               Usage      |\n"}
+,{"stream_name":"stdout","time":2.430194453,"data":"|=========================================================================================|\n"}
+,{"stream_name":"stdout","time":2.431925124,"data":"|  No running processes found                                                             |\n"}
+,{"stream_name":"stdout","time":2.431958429,"data":"+-----------------------------------------------------------------------------------------+\n"}
+,{"stream_name":"stdout","time":2.756169653,"data":"+ /usr/bin/python3 -m pip install -q -e .[dev]\n"}
+,{"stream_name":"stdout","time":23.645970071,"data":"[21:35:04] == provenance\n"}
+,{"stream_name":"stdout","time":24.957578957,"data":"[21:35:05] == capability gate\n"}
+,{"stream_name":"stdout","time":24.958038052,"data":"[21:35:05] == correctness gate\n"}
+,{"stream_name":"stdout","time":2199.052430843,"data":"[22:11:19] == experiment\n"}
+,{"stream_name":"stderr","time":2204.550531334,"data":"W1110 22:11:25.467000 99 torch/_inductor/utils.py:1731] [0/0] Not enough SMs to use max_autotune_gemm mode\n"}
+,{"stream_name":"stdout","time":2260.192951146,"data":"[22:12:21] bench[0] cuda/float16 1024 rows=1 latency: eager=998us, fused_weights=630us, compile=669us, compile_cudagraphs=1180us, triton=4225us, cuda_graph_eager=633us, cuda_graph_triton=3901us\n"}
+,{"stream_name":"stdout","time":2302.8896682,"data":"[22:13:03] bench[0] cuda/float16 1024 rows=1 throughput: eager=942us, fused_weights=566us, compile=620us, compile_cudagraphs=945us, triton=2206us, cuda_graph_eager=461us, cuda_graph_triton=2203us\n"}
+,{"stream_name":"stdout","time":2361.924206402,"data":"[22:14:02] bench[0] cuda/float16 1024 rows=2 latency: eager=1030us, fused_weights=649us, compile=672us, compile_cudagraphs=1186us, triton=4035us, cuda_graph_eager=663us, cuda_graph_triton=3920us\n"}
+,{"stream_name":"stdout","time":2407.607494505,"data":"[22:14:48] bench[0] cuda/float16 1024 rows=2 throughput: eager=958us, fused_weights=556us, compile=607us, compile_cudagraphs=953us, triton=2206us, cuda_graph_eager=472us, cuda_graph_triton=2207us\n"}
+,{"stream_name":"stdout","time":2468.513597155,"data":"[22:15:49] bench[0] cuda/float16 1024 rows=4 latency: eager=1075us, fused_weights=652us, compile=684us, compile_cudagraphs=1187us, triton=4025us, cuda_graph_eager=657us, cuda_graph_triton=3960us\n"}
+,{"stream_name":"stdout","time":2516.394507233,"data":"[22:16:37] bench[0] cuda/float16 1024 rows=4 throughput: eager=971us, fused_weights=570us, compile=627us, compile_cudagraphs=958us, triton=2217us, cuda_graph_eager=474us, cuda_graph_triton=2215us\n"}
+,{"stream_name":"stdout","time":2580.094982631,"data":"[22:17:41] bench[0] cuda/float16 1024 rows=8 latency: eager=1050us, fused_weights=648us, compile=678us, compile_cudagraphs=1209us, triton=4626us, cuda_graph_eager=668us, cuda_graph_triton=3979us\n"}
+,{"stream_name":"stdout","time":2628.544444663,"data":"[22:18:29] bench[0] cuda/float16 1024 rows=8 throughput: eager=951us, fused_weights=560us, compile=603us, compile_cudagraphs=961us, triton=2245us, cuda_graph_eager=480us, cuda_graph_triton=2246us\n"}
+,{"stream_name":"stdout","time":2691.819451811,"data":"[22:19:32] bench[0] cuda/float16 1024 rows=16 latency: eager=1036us, fused_weights=648us, compile=676us, compile_cudagraphs=1203us, triton=4107us, cuda_graph_eager=684us, cuda_graph_triton=3991us\n"}
+,{"stream_name":"stdout","time":2741.239505404,"data":"[22:20:22] bench[0] cuda/float16 1024 rows=16 throughput: eager=951us, fused_weights=564us, compile=622us, compile_cudagraphs=970us, triton=2266us, cuda_graph_eager=494us, cuda_graph_triton=2265us\n"}
+,{"stream_name":"stdout","time":2805.799947124,"data":"[22:21:26] bench[0] cuda/float16 1024 rows=32 latency: eager=1067us, fused_weights=673us, compile=707us, compile_cudagraphs=1246us, triton=4048us, cuda_graph_eager=646us, cuda_graph_triton=3970us\n"}
+,{"stream_name":"stdout","time":2859.253427608,"data":"[22:22:20] bench[0] cuda/float16 1024 rows=32 throughput: eager=965us, fused_weights=577us, compile=631us, compile_cudagraphs=1044us, triton=3679us, cuda_graph_eager=583us, cuda_graph_triton=3653us\n"}
+,{"stream_name":"stdout","time":2928.640902693,"data":"[22:23:29] bench[0] cuda/float16 1024 rows=64 latency: eager=1052us, fused_weights=669us, compile=714us, compile_cudagraphs=1297us, triton=6757us, cuda_graph_eager=705us, cuda_graph_triton=6747us\n"}
+,{"stream_name":"stdout","time":2990.10554891,"data":"[22:24:31] bench[0] cuda/float16 1024 rows=64 throughput: eager=959us, fused_weights=583us, compile=629us, compile_cudagraphs=1118us, triton=6686us, cuda_graph_eager=680us, cuda_graph_triton=6687us\n"}
+,{"stream_name":"stdout","time":3028.972777589,"data":"[22:25:09] bench[1] cuda/float32 1024 rows=1 latency: eager=883us, fused_weights=740us, triton=3932us, cuda_graph_triton=3245us\n"}
+,{"stream_name":"stdout","time":3059.564569997,"data":"[22:25:40] bench[1] cuda/float32 1024 rows=1 throughput: eager=726us, fused_weights=618us, triton=2079us, cuda_graph_triton=2076us\n"}
+,{"stream_name":"stdout","time":3099.37480057,"data":"[22:26:20] bench[1] cuda/float32 1024 rows=8 latency: eager=1383us, fused_weights=1239us, triton=3795us, cuda_graph_triton=3498us\n"}
+,{"stream_name":"stdout","time":3131.031303411,"data":"[22:26:51] bench[1] cuda/float32 1024 rows=8 throughput: eager=1120us, fused_weights=842us, triton=2086us, cuda_graph_triton=2083us\n"}
+,{"stream_name":"stdout","time":3171.546456639,"data":"[22:27:32] bench[1] cuda/float32 1024 rows=32 latency: eager=1285us, fused_weights=1175us, triton=3745us, cuda_graph_triton=3270us\n"}
+,{"stream_name":"stdout","time":3206.564486846,"data":"[22:28:07] bench[1] cuda/float32 1024 rows=32 throughput: eager=1211us, fused_weights=1141us, triton=3276us, cuda_graph_triton=3154us\n"}
+,{"stream_name":"stdout","time":3254.092822897,"data":"[22:28:55] bench[2] cuda/float16 512 rows=1 latency: eager=1000us, triton=2109us, cuda_graph_eager=459us, cuda_graph_triton=2044us, compile_cudagraphs=532us\n"}
+,{"stream_name":"stdout","time":3290.155394766,"data":"[22:29:31] bench[2] cuda/float16 512 rows=1 throughput: eager=931us, triton=1574us, cuda_graph_eager=373us, cuda_graph_triton=1577us, compile_cudagraphs=328us\n"}
+,{"stream_name":"stdout","time":3339.495362945,"data":"[22:30:20] bench[2] cuda/float16 512 rows=8 latency: eager=1039us, triton=2113us, cuda_graph_eager=502us, cuda_graph_triton=2046us, compile_cudagraphs=608us\n"}
+,{"stream_name":"stdout","time":3377.660968735,"data":"[22:30:58] bench[2] cuda/float16 512 rows=8 throughput: eager=969us, triton=1593us, cuda_graph_eager=409us, cuda_graph_triton=1563us, compile_cudagraphs=383us\n"}
+,{"stream_name":"stdout","time":3443.18199295,"data":"[22:32:04] bench[3] cuda/float16 2048 rows=1 latency: eager=1417us, triton=8316us, cuda_graph_eager=1250us, cuda_graph_triton=8205us, compile_cudagraphs=3772us\n"}
+,{"stream_name":"stdout","time":3506.93630346,"data":"[22:33:07] bench[3] cuda/float16 2048 rows=1 throughput: eager=1281us, triton=8479us, cuda_graph_eager=1256us, cuda_graph_triton=8485us, compile_cudagraphs=3540us\n"}
+,{"stream_name":"stdout","time":3571.979911346,"data":"[22:34:12] bench[3] cuda/float16 2048 rows=8 latency: eager=1582us, triton=8409us, cuda_graph_eager=1442us, cuda_graph_triton=8346us, compile_cudagraphs=3898us\n"}
+,{"stream_name":"stdout","time":3636.366165362,"data":"[22:35:17] bench[3] cuda/float16 2048 rows=8 throughput: eager=1447us, triton=8577us, cuda_graph_eager=1446us, cuda_graph_triton=8575us, compile_cudagraphs=3680us\n"}
+,{"stream_name":"stdout","time":3640.111186587,"data":"[22:35:21] serving[0] eager/direct 250 rps: miss 0.159 goodput 203 rows/s\n"}
+,{"stream_name":"stdout","time":3643.599537354,"data":"[22:35:24] serving[0] eager/direct 500 rps: miss 0.368 goodput 302 rows/s\n"}
+,{"stream_name":"stdout","time":3647.328819715,"data":"[22:35:28] serving[0] eager/direct 1000 rps: miss 0.743 goodput 264 rows/s\n"}
+,{"stream_name":"stdout","time":3651.20046622,"data":"[22:35:32] serving[0] eager/direct 2000 rps: miss 0.956 goodput 86 rows/s\n"}
+,{"stream_name":"stdout","time":3655.18962763,"data":"[22:35:36] serving[0] eager/direct 4000 rps: miss 0.998 goodput 10 rows/s\n"}
+,{"stream_name":"stdout","time":3659.498352053,"data":"[22:35:40] serving[0] eager/direct 8000 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3662.647882273,"data":"[22:35:43] serving[0] eager/static8 250 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3665.897493761,"data":"[22:35:46] serving[0] eager/static8 500 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3669.398236069,"data":"[22:35:50] serving[0] eager/static8 1000 rps: miss 0.992 goodput 8 rows/s\n"}
+,{"stream_name":"stdout","time":3673.504329951,"data":"[22:35:54] serving[0] eager/static8 2000 rps: miss 0.885 goodput 225 rows/s\n"}
+,{"stream_name":"stdout","time":3680.615649978,"data":"[22:36:01] serving[0] eager/static8 4000 rps: miss 0.593 goodput 1620 rows/s\n"}
+,{"stream_name":"stdout","time":3689.712365487,"data":"[22:36:10] serving[0] eager/static8 8000 rps: miss 0.942 goodput 468 rows/s\n"}
+,{"stream_name":"stdout","time":3693.004599352,"data":"[22:36:13] serving[0] eager/dynamic 250 rps: miss 0.157 goodput 203 rows/s\n"}
+,{"stream_name":"stdout","time":3696.638153726,"data":"[22:36:17] serving[0] eager/dynamic 500 rps: miss 0.219 goodput 373 rows/s\n"}
+,{"stream_name":"stdout","time":3700.93457322,"data":"[22:36:21] serving[0] eager/dynamic 1000 rps: miss 0.352 goodput 667 rows/s\n"}
+,{"stream_name":"stdout","time":3706.028952741,"data":"[22:36:26] serving[0] eager/dynamic 2000 rps: miss 0.424 goodput 1136 rows/s\n"}
+,{"stream_name":"stdout","time":3713.53319003,"data":"[22:36:34] serving[0] eager/dynamic 4000 rps: miss 0.450 goodput 2199 rows/s\n"}
+,{"stream_name":"stdout","time":3724.697863122,"data":"[22:36:45] serving[0] eager/dynamic 8000 rps: miss 0.463 goodput 4337 rows/s\n"}
+,{"stream_name":"stdout","time":3728.878708573,"data":"[22:36:49] serving[0] triton/direct 250 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3732.149893677,"data":"[22:36:53] serving[0] triton/direct 500 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3735.600408139,"data":"[22:36:56] serving[0] triton/direct 1000 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3739.129456858,"data":"[22:37:00] serving[0] triton/direct 2000 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3742.805263628,"data":"[22:37:03] serving[0] triton/direct 4000 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3747.046147936,"data":"[22:37:07] serving[0] triton/direct 8000 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3750.199022672,"data":"[22:37:11] serving[0] triton/static8 250 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3753.451985869,"data":"[22:37:14] serving[0] triton/static8 500 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3756.983622092,"data":"[22:37:17] serving[0] triton/static8 1000 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3761.014553613,"data":"[22:37:21] serving[0] triton/static8 2000 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3766.74775564,"data":"[22:37:27] serving[0] triton/static8 4000 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3773.426559332,"data":"[22:37:34] serving[0] triton/static8 8000 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3786.824546487,"data":"[22:37:47] serving[0] triton/dynamic 250 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3800.73562154,"data":"[22:38:01] serving[0] triton/dynamic 500 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3813.680693629,"data":"[22:38:14] serving[0] triton/dynamic 1000 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3826.664816633,"data":"[22:38:27] serving[0] triton/dynamic 2000 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3839.806939751,"data":"[22:38:40] serving[0] triton/dynamic 4000 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3853.445448707,"data":"[22:38:54] serving[0] triton/dynamic 8000 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3857.506523889,"data":"[22:38:58] serving[0] cuda_graph_triton/direct 250 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3860.782367067,"data":"[22:39:01] serving[0] cuda_graph_triton/direct 500 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3864.258136132,"data":"[22:39:05] serving[0] cuda_graph_triton/direct 1000 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3867.788397418,"data":"[22:39:08] serving[0] cuda_graph_triton/direct 2000 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3871.479603243,"data":"[22:39:12] serving[0] cuda_graph_triton/direct 4000 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3875.463290376,"data":"[22:39:16] serving[0] cuda_graph_triton/direct 8000 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3878.612008304,"data":"[22:39:19] serving[0] cuda_graph_triton/static8 250 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3881.870143968,"data":"[22:39:22] serving[0] cuda_graph_triton/static8 500 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3885.376617,"data":"[22:39:26] serving[0] cuda_graph_triton/static8 1000 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3889.369677042,"data":"[22:39:30] serving[0] cuda_graph_triton/static8 2000 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3895.147045301,"data":"[22:39:36] serving[0] cuda_graph_triton/static8 4000 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3901.793830829,"data":"[22:39:42] serving[0] cuda_graph_triton/static8 8000 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3905.01239128,"data":"[22:39:45] serving[0] cuda_graph_triton/dynamic 250 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3908.457916825,"data":"[22:39:49] serving[0] cuda_graph_triton/dynamic 500 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3912.359012168,"data":"[22:39:53] serving[0] cuda_graph_triton/dynamic 1000 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3917.099017327,"data":"[22:39:58] serving[0] cuda_graph_triton/dynamic 2000 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3923.103491525,"data":"[22:40:04] serving[0] cuda_graph_triton/dynamic 4000 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3931.462311861,"data":"[22:40:12] serving[0] cuda_graph_triton/dynamic 8000 rps: miss 1.000 goodput 0 rows/s\n"}
+,{"stream_name":"stdout","time":3931.465402572,"data":"[22:40:12] == kernel profiles\n"}
+,{"stream_name":"stderr","time":3931.734846964,"data":"/usr/local/lib/python3.13/dist-packages/torch/profiler/profiler.py:224: UserWarning: Warning: Profiler clears events at the end of each cycle.Only events from the current cycle will be reported.To keep events across cycles, set acc_events=True.\n"}
+,{"stream_name":"stderr","time":3931.734903422,"data":"  _warn_once(\n"}
+,{"stream_name":"stdout","time":3938.366195601,"data":"[22:40:19] == nsight systems\n"}
+,{"stream_name":"stdout","time":3938.933039081,"data":"[22:40:19]    FAILED: RuntimeError: profile_nsys.sh eager exit 1\n"}
+,{"stream_name":"stdout","time":3939.030075155,"data":"archive: /kaggle/working/gpulab_results.tar.gz\n"}
+,{"stream_name":"stdout","time":3941.434397541,"data":"gpu_session exit code: 0\n"}
+,{"stream_name":"stderr","time":3943.551798034,"data":"/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":3943.551838024,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":3943.782325275,"data":"/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":3943.782351774,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":3944.589072723,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":3945.532629017,"data":"[NbConvertApp] Writing 284710 bytes to __results__.html\n"}
+]

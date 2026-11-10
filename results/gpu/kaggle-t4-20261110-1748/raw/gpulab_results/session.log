@@ -1,0 +1,89 @@
+[21:35:04] == provenance
+[21:35:05] == capability gate
+[21:35:05] == correctness gate
+[22:11:19] == experiment
+[22:12:21] bench[0] cuda/float16 1024 rows=1 latency: eager=998us, fused_weights=630us, compile=669us, compile_cudagraphs=1180us, triton=4225us, cuda_graph_eager=633us, cuda_graph_triton=3901us
+[22:13:03] bench[0] cuda/float16 1024 rows=1 throughput: eager=942us, fused_weights=566us, compile=620us, compile_cudagraphs=945us, triton=2206us, cuda_graph_eager=461us, cuda_graph_triton=2203us
+[22:14:02] bench[0] cuda/float16 1024 rows=2 latency: eager=1030us, fused_weights=649us, compile=672us, compile_cudagraphs=1186us, triton=4035us, cuda_graph_eager=663us, cuda_graph_triton=3920us
+[22:14:48] bench[0] cuda/float16 1024 rows=2 throughput: eager=958us, fused_weights=556us, compile=607us, compile_cudagraphs=953us, triton=2206us, cuda_graph_eager=472us, cuda_graph_triton=2207us
+[22:15:49] bench[0] cuda/float16 1024 rows=4 latency: eager=1075us, fused_weights=652us, compile=684us, compile_cudagraphs=1187us, triton=4025us, cuda_graph_eager=657us, cuda_graph_triton=3960us
+[22:16:37] bench[0] cuda/float16 1024 rows=4 throughput: eager=971us, fused_weights=570us, compile=627us, compile_cudagraphs=958us, triton=2217us, cuda_graph_eager=474us, cuda_graph_triton=2215us
+[22:17:41] bench[0] cuda/float16 1024 rows=8 latency: eager=1050us, fused_weights=648us, compile=678us, compile_cudagraphs=1209us, triton=4626us, cuda_graph_eager=668us, cuda_graph_triton=3979us
+[22:18:29] bench[0] cuda/float16 1024 rows=8 throughput: eager=951us, fused_weights=560us, compile=603us, compile_cudagraphs=961us, triton=2245us, cuda_graph_eager=480us, cuda_graph_triton=2246us
+[22:19:32] bench[0] cuda/float16 1024 rows=16 latency: eager=1036us, fused_weights=648us, compile=676us, compile_cudagraphs=1203us, triton=4107us, cuda_graph_eager=684us, cuda_graph_triton=3991us
+[22:20:22] bench[0] cuda/float16 1024 rows=16 throughput: eager=951us, fused_weights=564us, compile=622us, compile_cudagraphs=970us, triton=2266us, cuda_graph_eager=494us, cuda_graph_triton=2265us
+[22:21:26] bench[0] cuda/float16 1024 rows=32 latency: eager=1067us, fused_weights=673us, compile=707us, compile_cudagraphs=1246us, triton=4048us, cuda_graph_eager=646us, cuda_graph_triton=3970us
+[22:22:20] bench[0] cuda/float16 1024 rows=32 throughput: eager=965us, fused_weights=577us, compile=631us, compile_cudagraphs=1044us, triton=3679us, cuda_graph_eager=583us, cuda_graph_triton=3653us
+[22:23:29] bench[0] cuda/float16 1024 rows=64 latency: eager=1052us, fused_weights=669us, compile=714us, compile_cudagraphs=1297us, triton=6757us, cuda_graph_eager=705us, cuda_graph_triton=6747us
+[22:24:31] bench[0] cuda/float16 1024 rows=64 throughput: eager=959us, fused_weights=583us, compile=629us, compile_cudagraphs=1118us, triton=6686us, cuda_graph_eager=680us, cuda_graph_triton=6687us
+[22:25:09] bench[1] cuda/float32 1024 rows=1 latency: eager=883us, fused_weights=740us, triton=3932us, cuda_graph_triton=3245us
+[22:25:40] bench[1] cuda/float32 1024 rows=1 throughput: eager=726us, fused_weights=618us, triton=2079us, cuda_graph_triton=2076us
+[22:26:20] bench[1] cuda/float32 1024 rows=8 latency: eager=1383us, fused_weights=1239us, triton=3795us, cuda_graph_triton=3498us
+[22:26:51] bench[1] cuda/float32 1024 rows=8 throughput: eager=1120us, fused_weights=842us, triton=2086us, cuda_graph_triton=2083us
+[22:27:32] bench[1] cuda/float32 1024 rows=32 latency: eager=1285us, fused_weights=1175us, triton=3745us, cuda_graph_triton=3270us
+[22:28:07] bench[1] cuda/float32 1024 rows=32 throughput: eager=1211us, fused_weights=1141us, triton=3276us, cuda_graph_triton=3154us
+[22:28:55] bench[2] cuda/float16 512 rows=1 latency: eager=1000us, triton=2109us, cuda_graph_eager=459us, cuda_graph_triton=2044us, compile_cudagraphs=532us
+[22:29:31] bench[2] cuda/float16 512 rows=1 throughput: eager=931us, triton=1574us, cuda_graph_eager=373us, cuda_graph_triton=1577us, compile_cudagraphs=328us
+[22:30:20] bench[2] cuda/float16 512 rows=8 latency: eager=1039us, triton=2113us, cuda_graph_eager=502us, cuda_graph_triton=2046us, compile_cudagraphs=608us
+[22:30:58] bench[2] cuda/float16 512 rows=8 throughput: eager=969us, triton=1593us, cuda_graph_eager=409us, cuda_graph_triton=1563us, compile_cudagraphs=383us
+[22:32:04] bench[3] cuda/float16 2048 rows=1 latency: eager=1417us, triton=8316us, cuda_graph_eager=1250us, cuda_graph_triton=8205us, compile_cudagraphs=3772us
+[22:33:07] bench[3] cuda/float16 2048 rows=1 throughput: eager=1281us, triton=8479us, cuda_graph_eager=1256us, cuda_graph_triton=8485us, compile_cudagraphs=3540us
+[22:34:12] bench[3] cuda/float16 2048 rows=8 latency: eager=1582us, triton=8409us, cuda_graph_eager=1442us, cuda_graph_triton=8346us, compile_cudagraphs=3898us
+[22:35:17] bench[3] cuda/float16 2048 rows=8 throughput: eager=1447us, triton=8577us, cuda_graph_eager=1446us, cuda_graph_triton=8575us, compile_cudagraphs=3680us
+[22:35:21] serving[0] eager/direct 250 rps: miss 0.159 goodput 203 rows/s
+[22:35:24] serving[0] eager/direct 500 rps: miss 0.368 goodput 302 rows/s
+[22:35:28] serving[0] eager/direct 1000 rps: miss 0.743 goodput 264 rows/s
+[22:35:32] serving[0] eager/direct 2000 rps: miss 0.956 goodput 86 rows/s
+[22:35:36] serving[0] eager/direct 4000 rps: miss 0.998 goodput 10 rows/s
+[22:35:40] serving[0] eager/direct 8000 rps: miss 1.000 goodput 0 rows/s
+[22:35:43] serving[0] eager/static8 250 rps: miss 1.000 goodput 0 rows/s
+[22:35:46] serving[0] eager/static8 500 rps: miss 1.000 goodput 0 rows/s
+[22:35:50] serving[0] eager/static8 1000 rps: miss 0.992 goodput 8 rows/s
+[22:35:54] serving[0] eager/static8 2000 rps: miss 0.885 goodput 225 rows/s
+[22:36:01] serving[0] eager/static8 4000 rps: miss 0.593 goodput 1620 rows/s
+[22:36:10] serving[0] eager/static8 8000 rps: miss 0.942 goodput 468 rows/s
+[22:36:13] serving[0] eager/dynamic 250 rps: miss 0.157 goodput 203 rows/s
+[22:36:17] serving[0] eager/dynamic 500 rps: miss 0.219 goodput 373 rows/s
+[22:36:21] serving[0] eager/dynamic 1000 rps: miss 0.352 goodput 667 rows/s
+[22:36:26] serving[0] eager/dynamic 2000 rps: miss 0.424 goodput 1136 rows/s
+[22:36:34] serving[0] eager/dynamic 4000 rps: miss 0.450 goodput 2199 rows/s
+[22:36:45] serving[0] eager/dynamic 8000 rps: miss 0.463 goodput 4337 rows/s
+[22:36:49] serving[0] triton/direct 250 rps: miss 1.000 goodput 0 rows/s
+[22:36:53] serving[0] triton/direct 500 rps: miss 1.000 goodput 0 rows/s
+[22:36:56] serving[0] triton/direct 1000 rps: miss 1.000 goodput 0 rows/s
+[22:37:00] serving[0] triton/direct 2000 rps: miss 1.000 goodput 0 rows/s
+[22:37:03] serving[0] triton/direct 4000 rps: miss 1.000 goodput 0 rows/s
+[22:37:07] serving[0] triton/direct 8000 rps: miss 1.000 goodput 0 rows/s
+[22:37:11] serving[0] triton/static8 250 rps: miss 1.000 goodput 0 rows/s
+[22:37:14] serving[0] triton/static8 500 rps: miss 1.000 goodput 0 rows/s
+[22:37:17] serving[0] triton/static8 1000 rps: miss 1.000 goodput 0 rows/s
+[22:37:21] serving[0] triton/static8 2000 rps: miss 1.000 goodput 0 rows/s
+[22:37:27] serving[0] triton/static8 4000 rps: miss 1.000 goodput 0 rows/s
+[22:37:34] serving[0] triton/static8 8000 rps: miss 1.000 goodput 0 rows/s
+[22:37:47] serving[0] triton/dynamic 250 rps: miss 1.000 goodput 0 rows/s
+[22:38:01] serving[0] triton/dynamic 500 rps: miss 1.000 goodput 0 rows/s
+[22:38:14] serving[0] triton/dynamic 1000 rps: miss 1.000 goodput 0 rows/s
+[22:38:27] serving[0] triton/dynamic 2000 rps: miss 1.000 goodput 0 rows/s
+[22:38:40] serving[0] triton/dynamic 4000 rps: miss 1.000 goodput 0 rows/s
+[22:38:54] serving[0] triton/dynamic 8000 rps: miss 1.000 goodput 0 rows/s
+[22:38:58] serving[0] cuda_graph_triton/direct 250 rps: miss 1.000 goodput 0 rows/s
+[22:39:01] serving[0] cuda_graph_triton/direct 500 rps: miss 1.000 goodput 0 rows/s
+[22:39:05] serving[0] cuda_graph_triton/direct 1000 rps: miss 1.000 goodput 0 rows/s
+[22:39:08] serving[0] cuda_graph_triton/direct 2000 rps: miss 1.000 goodput 0 rows/s
+[22:39:12] serving[0] cuda_graph_triton/direct 4000 rps: miss 1.000 goodput 0 rows/s
+[22:39:16] serving[0] cuda_graph_triton/direct 8000 rps: miss 1.000 goodput 0 rows/s
+[22:39:19] serving[0] cuda_graph_triton/static8 250 rps: miss 1.000 goodput 0 rows/s
+[22:39:22] serving[0] cuda_graph_triton/static8 500 rps: miss 1.000 goodput 0 rows/s
+[22:39:26] serving[0] cuda_graph_triton/static8 1000 rps: miss 1.000 goodput 0 rows/s
+[22:39:30] serving[0] cuda_graph_triton/static8 2000 rps: miss 1.000 goodput 0 rows/s
+[22:39:36] serving[0] cuda_graph_triton/static8 4000 rps: miss 1.000 goodput 0 rows/s
+[22:39:42] serving[0] cuda_graph_triton/static8 8000 rps: miss 1.000 goodput 0 rows/s
+[22:39:45] serving[0] cuda_graph_triton/dynamic 250 rps: miss 1.000 goodput 0 rows/s
+[22:39:49] serving[0] cuda_graph_triton/dynamic 500 rps: miss 1.000 goodput 0 rows/s
+[22:39:53] serving[0] cuda_graph_triton/dynamic 1000 rps: miss 1.000 goodput 0 rows/s
+[22:39:58] serving[0] cuda_graph_triton/dynamic 2000 rps: miss 1.000 goodput 0 rows/s
+[22:40:04] serving[0] cuda_graph_triton/dynamic 4000 rps: miss 1.000 goodput 0 rows/s
+[22:40:12] serving[0] cuda_graph_triton/dynamic 8000 rps: miss 1.000 goodput 0 rows/s
+[22:40:12] == kernel profiles
+[22:40:19] == nsight systems
+[22:40:19]    FAILED: RuntimeError: profile_nsys.sh eager exit 1
