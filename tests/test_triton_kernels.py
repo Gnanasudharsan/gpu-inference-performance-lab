@@ -33,9 +33,12 @@ DTYPES = [torch.float32, torch.float16, torch.bfloat16]
 )
 def test_triton_matches_reference(dtype, rows, d, h, depth):
     dev = _device()
+    impl = impls.get("triton")
+    if not impl.supports(dev, dtype):
+        pytest.skip(impl.unsupported_reason(dev, dtype))
     w = make_weights(ModelConfig(d_model=d, d_hidden=h, depth=depth), dev, dtype)
     x = make_inputs(rows, d, device=dev, dtype=dtype)
-    y = impls.get("triton").build(w)(x)
+    y = impl.build(w)(x)
     rep = compare(y, reference_forward(w, x), dtype)
     assert rep.passed, str(rep)
 

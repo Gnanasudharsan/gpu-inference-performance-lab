@@ -48,6 +48,11 @@ def test_bf16_load_cast_store():
     torch.testing.assert_close(out.float(), x.float() * 2)
 
 
+@pytest.mark.xfail(
+    INTERPRET and not torch.cuda.is_available(),
+    reason="Triton 3.9 CPU interpreter computes bf16 tl.dot incorrectly (measured in CI)",
+    strict=True,
+)
 def test_bf16_dot():
     dev = _device()
     g = torch.Generator().manual_seed(0)

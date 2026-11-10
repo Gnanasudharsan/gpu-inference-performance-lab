@@ -29,6 +29,10 @@ class TritonImpl(Implementation):
         if device.type == "cuda":
             return None
         if device.type == "cpu" and os.environ.get("TRITON_INTERPRET") == "1":
+            if dtype == torch.bfloat16:
+                # Measured: a bare bf16 tl.dot is wrong by ~1e10 in the Triton 3.9 CPU interpreter
+                # (tests/test_triton_bf16_diagnostic.py), so bf16 can only be validated on a GPU.
+                return "the Triton CPU interpreter computes bf16 tl.dot incorrectly"
             return None  # correctness only: the interpreter is not a performance target
         return "Triton needs an NVIDIA GPU (or TRITON_INTERPRET=1 on CPU for correctness)"
 
