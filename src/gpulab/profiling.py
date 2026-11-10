@@ -10,6 +10,8 @@ compute (or blit) command. For NVIDIA timelines use Nsight Systems
 from __future__ import annotations
 
 from collections import Counter, defaultdict
+from collections.abc import Iterator
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
 
@@ -54,6 +56,12 @@ VIEW_OPS = frozenset(
         "to",
         "contiguous",
         "type_as",
+        # allocations / metadata (no kernel)
+        "empty_like",
+        "resize_",
+        "set_",
+        "new_empty",
+        "new_empty_strided",
     )
 )
 
@@ -69,6 +77,44 @@ def _leaf_ops(prof: Any) -> list[Any]:
         if not has_aten_child:
             leaves.append(ev)
     return leaves
+
+
+_KERNEL_ENTRY_POINTS = {
+    "gpulab.kernels.metal": ("norm_gate_up_silu", "down_residual", "rmsnorm", "silu_mul"),
+    "gpulab.kernels.triton_kernels": ("norm_gate_up_silu", "down_residual"),
+}
+
+
+@contextmanager
+def _count_custom_kernels() -> Iterator[Counter[str]]:
+    """Count calls to gpulab's custom kernel launchers (not visible as ATen ops).
+
+    Each launcher issues exactly one device dispatch. Wrapping happens only while profiling,
+    so the hot path carries no instrumentation.
+    """
+    import importlib
+
+    counts: Counter[str] = Counter()
+    patched = []
+    for mod_name, fns in _KERNEL_ENTRY_POINTS.items():
+        try:
+            mod = importlib.import_module(mod_name)
+        except Exception:  # triton not installed
+            continue
+        for fn in fns:
+            orig = getattr(mod, fn)
+
+            def wrapper(*a: Any, _o: Any = orig, _k: str = f"{mod_name}.{fn}", **kw: Any) -> Any:
+                counts[_k] += 1
+                return _o(*a, **kw)
+
+            setattr(mod, fn, wrapper)
+            patched.append((mod, fn, orig))
+    try:
+        yield counts
+    finally:
+        for mod, fn, orig in patched:
+            setattr(mod, fn, orig)
 
 
 def profile_forward(
@@ -89,7 +135,7 @@ def profile_forward(
     acts = [ProfilerActivity.CPU]
     if device.type == "cuda":
         acts.append(ProfilerActivity.CUDA)
-    with profile(activities=acts) as prof:
+    with _count_custom_kernels() as custom, profile(activities=acts) as prof:
         for _ in range(iters):
             with record_function("gpulab.forward"):
                 runner(x)
@@ -103,14 +149,20 @@ def profile_forward(
     self_cpu: dict[str, float] = defaultdict(float)
     for ev in leaves:
         self_cpu[ev.name] += ev.self_cpu_time_total
-    top = sorted(counts, key=lambda n: -self_cpu[n])[:12]
+    top = sorted(counts, key=lambda n: -self_cpu[n])[:16]
     out: dict[str, Any] = {
         "impl": impl_name,
         "device": device.type,
         "dtype": str(dtype).removeprefix("torch."),
         "rows": rows,
         "iters": iters,
+        # ATen leaf dispatches (kept under the historical key for compatibility)
         "dispatches_per_forward": len(leaves) / iters,
+        "custom_kernel_launches_per_forward": sum(custom.values()) / iters,
+        "custom_kernels": {k: v / iters for k, v in custom.items()},
+        "launches_per_forward": (len(leaves) + sum(custom.values())) / iters,
+        # Inductor-generated kernels are neither ATen ops nor gpulab launchers
+        "launch_count_complete": not impl_name.startswith("compile"),
         "top_ops": [
             {
                 "name": n,

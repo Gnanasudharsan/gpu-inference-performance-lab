@@ -164,3 +164,52 @@ def test_cli_bench_and_report(tmp_path, capsys):
     assert main(["report", str(out), "--out", str(md), "--parquet", str(pq)]) == 0
     assert "| cpu | float32 | eager | 1 |" in md.read_text()
     assert pq.exists()
+
+
+def test_cli_interleave_produces_every_requested_mode(tmp_path):
+    out = tmp_path / "i.jsonl"
+    rc = main(
+        [
+            "bench",
+            "--device",
+            "cpu",
+            "--dtype",
+            "float32",
+            "--rows",
+            "2",
+            "--d-model",
+            "32",
+            "--d-hidden",
+            "64",
+            "--depth",
+            "1",
+            "--iters",
+            "6",
+            "--trials",
+            "3",
+            "--warmup-s",
+            "0",
+            "--burst",
+            "4",
+            "--interleave",
+            "--impls",
+            "eager",
+            "fused_weights",
+            "--modes",
+            "latency",
+            "throughput",
+            "--save",
+            str(out),
+        ]
+    )
+    assert rc == 0
+    recs = read_jsonl(out)
+    modes = sorted((r.impl, r.metrics["mode"]) for r in recs)
+    assert modes == [
+        ("eager", "latency"),
+        ("eager", "throughput"),
+        ("fused_weights", "latency"),
+        ("fused_weights", "throughput"),
+    ]
+    thr = [r for r in recs if r.metrics["mode"] == "throughput"]
+    assert all(r.params["bench"]["burst"] == 4 for r in thr)

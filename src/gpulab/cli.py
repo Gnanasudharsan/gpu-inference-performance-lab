@@ -122,13 +122,17 @@ def _cmd_bench(args: argparse.Namespace) -> int:
         deadline_us=args.deadline_us,
         device_iters=args.device_iters,
         keep_samples=not args.no_samples,
+        burst=args.burst,
     )
     records = []
     for rows in args.rows:
         if args.interleave:
-            records += run_interleaved(
-                list(args.impls), model, rows, device, dtype, cfg, args.input_seed
-            )
+            for mode in args.modes:
+                if mode == "e2e":
+                    raise SystemExit("--interleave supports latency and throughput modes only")
+                records += run_interleaved(
+                    list(args.impls), model, rows, device, dtype, cfg, args.input_seed, mode=mode
+                )
         else:
             for name in args.impls:
                 records += run_benchmark(
