@@ -1,0 +1,35 @@
+# Tiny, CPU-only experiment: exercises the full runner + analysis pipeline in seconds (CI).
+name = "smoke"
+description = "Pipeline smoke test on a tiny model (CPU). Not a performance result."
+
+[[bench]]
+device = "cpu"
+dtype = "float32"
+impls = ["eager", "fused_weights", "metal", "triton"]  # metal/triton are recorded as skipped
+rows = [1, 4]
+modes = ["latency", "throughput"]
+d_model = 64
+d_hidden = 160
+depth = 2
+iters = 12
+trials = 4
+burst = 5
+warmup_s = 0.0
+
+[[bench]]
+device = "cuda"  # recorded as skipped where no NVIDIA GPU exists
+dtype = "float16"
+impls = ["eager", "triton"]
+rows = [1]
+
+[[serving]]
+device = "cpu"
+dtype = "float32"
+impls = ["eager"]
+policies = ["direct", "dynamic"]
+rates = [100, 400]
+duration_s = 0.3
+deadline_us = 20000
+d_model = 64
+d_hidden = 160
+depth = 2

@@ -184,6 +184,35 @@ def _cmd_report(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_experiment(args: argparse.Namespace) -> int:
+    from gpulab.experiment import load_experiment, run_experiment
+
+    exp = load_experiment(args.config)
+    out = args.out or f"results/experiments/{exp.name}"
+    manifest = run_experiment(exp, out)
+    print(f"{exp.name}: {manifest['counts']} records in {manifest['elapsed_s']} s -> {out}")
+    for sk in manifest["skipped"]:
+        print(f"  skipped {sk.get('group')} {sk.get('impl', '')}: {sk['reason']}")
+    return 0
+
+
+def _cmd_analyze(args: argparse.Namespace) -> int:
+    from pathlib import Path
+
+    from gpulab.analysis_report import render
+    from gpulab.summary import write_summary
+
+    summary = write_summary(Path(args.results), Path(args.summary))
+    Path(args.report).write_text(render(summary))
+    print(f"summary -> {args.summary}; report -> {args.report}")
+    print(
+        f"{len(summary['benchmarks'])} benchmark records, {len(summary['comparisons'])} "
+        f"comparisons, {len(summary['regressions'])} regressions, "
+        f"{len(summary['serving'])} serving records"
+    )
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="gpulab", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -234,6 +263,17 @@ def build_parser() -> argparse.ArgumentParser:
     rep.add_argument("--out", help="write markdown here")
     rep.add_argument("--parquet", help="also write a flattened Parquet file")
     rep.set_defaults(func=_cmd_report)
+
+    exp = sub.add_parser("experiment", help="run a TOML experiment config")
+    exp.add_argument("config")
+    exp.add_argument("--out", help="output directory (default results/experiments/<name>)")
+    exp.set_defaults(func=_cmd_experiment)
+
+    ana = sub.add_parser("analyze", help="build summary.json and the analysis report")
+    ana.add_argument("--results", default="results")
+    ana.add_argument("--summary", default="results/summary.json")
+    ana.add_argument("--report", default="results/ANALYSIS.md")
+    ana.set_defaults(func=_cmd_analyze)
     return parser
 
 

@@ -29,6 +29,10 @@ jobs:
       - run: make lint
       - run: make typecheck
       - run: .venv/bin/python -m pytest --cov=gpulab --cov-report=term-missing
+      - name: experiment pipeline smoke test (runner + analysis)
+        run: |
+          .venv/bin/gpulab experiment experiments/smoke.toml --out /tmp/smoke
+          test -s /tmp/smoke/bench.jsonl && test -s /tmp/smoke/manifest.json
 
   triton-interpreter:
     name: Triton kernels via TRITON_INTERPRET=1

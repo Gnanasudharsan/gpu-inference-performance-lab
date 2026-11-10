@@ -13,7 +13,7 @@ import shutil
 import subprocess
 import sys
 from dataclasses import asdict, dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
@@ -180,7 +180,7 @@ def collect_provenance() -> Provenance:
         }
     }
     return Provenance(
-        timestamp_utc=datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        timestamp_utc=datetime.now(UTC).isoformat(timespec="seconds"),
         accelerators=accelerators(),
         git_commit=commit,
         git_dirty=dirty,

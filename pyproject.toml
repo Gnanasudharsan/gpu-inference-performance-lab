@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "GPU Inference Performance Lab: reproducible low-latency inference optimization and benchmarking"
 readme = "README.md"
 license = { file = "LICENSE" }
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 authors = [{ name = "Gnanasudharsan Ashokumar" }]
 dependencies = [
   "torch>=2.4",
@@ -51,7 +51,7 @@ markers = [
 
 [tool.ruff]
 line-length = 100
-target-version = "py310"
+target-version = "py311"
 src = ["src", "tests"]
 
 [tool.ruff.lint]
@@ -60,6 +60,7 @@ ignore = ["N803", "N806", "N812", "RUF001", "RUF002", "RUF003"]
 
 [tool.ruff.lint.per-file-ignores]
 "src/gpulab/kernels/triton_*.py" = ["N802", "E741", "SIM108"]
+"src/gpulab/analysis_report.py" = ["E501"]  # markdown table templates
 
 [tool.mypy]
 python_version = "3.12"

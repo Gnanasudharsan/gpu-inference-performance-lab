@@ -1,0 +1,12 @@
+# Reproduction check: re-measure a Phase 3 subset through the config-driven runner, in a new
+# process at a later time, and compare the paired speedups with the Phase 3 records.
+name = "repro_check"
+description = "eager vs metal, pipelined, fp16, rows 1 and 8 (compare with results/phase3)."
+
+[[bench]]
+device = "mps"
+dtype = "float16"
+impls = ["eager", "metal"]
+rows = [1, 8]
+modes = ["throughput"]
+trials = 30

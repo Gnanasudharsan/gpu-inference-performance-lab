@@ -6,7 +6,7 @@ import hashlib
 import json
 from collections.abc import Iterable
 from dataclasses import asdict, dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -34,7 +34,7 @@ class ExperimentRecord:
     evidence: str = "measured"
     provenance: dict[str, Any] = field(default_factory=lambda: collect_provenance().to_dict())
     created_utc: str = field(
-        default_factory=lambda: datetime.now(timezone.utc).isoformat(timespec="milliseconds")
+        default_factory=lambda: datetime.now(UTC).isoformat(timespec="milliseconds")
     )
     schema_version: int = SCHEMA_VERSION
     record_id: str = ""

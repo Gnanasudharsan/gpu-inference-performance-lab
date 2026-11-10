@@ -1,0 +1,33 @@
+# NVIDIA validation suite (see docs/GPU_VALIDATION_PLAN.md). NOT YET EXECUTED: no NVIDIA GPU
+# has been available or authorized. Running it on a CUDA host produces the CUDA-only results.
+name = "nvidia"
+description = "CUDA paths: Triton fused kernels, CUDA graphs, torch.compile reduce-overhead."
+
+[[bench]]
+device = "cuda"
+dtype = "float16"
+impls = ["eager", "fused_weights", "compile", "compile_cudagraphs", "triton",
+         "cuda_graph_eager", "cuda_graph_triton"]
+rows = [1, 2, 4, 8, 16, 32, 64]
+deadline_us = 1000
+
+[[bench]]
+device = "cuda"
+dtype = "bfloat16"
+impls = ["eager", "fused_weights", "triton", "cuda_graph_triton"]
+rows = [1, 8, 32]
+
+[[bench]]
+device = "cuda"
+dtype = "float32"
+impls = ["eager", "triton"]
+rows = [1, 8, 32]
+
+[[serving]]
+device = "cuda"
+dtype = "float16"
+impls = ["eager", "triton", "cuda_graph_triton"]
+policies = ["direct", "static8", "dynamic"]
+rates = [500, 1000, 2000, 4000, 8000, 16000]
+duration_s = 3.0
+deadline_us = 2000
