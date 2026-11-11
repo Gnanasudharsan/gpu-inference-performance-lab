@@ -1,0 +1,105 @@
+{
+  "steps": [
+    {
+      "step": "provenance",
+      "status": "ok",
+      "detail": {
+        "cuda": true,
+        "torch": "2.11.0+cu130",
+        "triton": "3.6.0",
+        "gpu": "Tesla T4",
+        "capability": "7.5"
+      },
+      "seconds": 1.5
+    },
+    {
+      "step": "capability gate",
+      "status": "ok",
+      "detail": "capability (7, 5) ok",
+      "seconds": 0.0
+    },
+    {
+      "step": "correctness gate",
+      "status": "ok",
+      "detail": "289 passed, 175 skipped, 23 warnings in 2853.18s (0:47:33)",
+      "seconds": 2861.8
+    },
+    {
+      "step": "experiment",
+      "status": "ok",
+      "detail": {
+        "counts": {
+          "bench": 162,
+          "serving": 54
+        },
+        "skipped": [],
+        "elapsed_s": 1672.4
+      },
+      "seconds": 1672.5
+    },
+    {
+      "step": "kernel profiles",
+      "status": "ok",
+      "detail": {
+        "eager/r8": {
+          "cuda_kernels_per_forward": 60.0,
+          "cuda_kernel_us_per_forward": 730.3492499999986
+        },
+        "eager/r32": {
+          "cuda_kernels_per_forward": 60.0,
+          "cuda_kernel_us_per_forward": 922.493300000004
+        },
+        "fused_weights/r8": {
+          "cuda_kernels_per_forward": 24.0,
+          "cuda_kernel_us_per_forward": 503.05944999999974
+        },
+        "fused_weights/r32": {
+          "cuda_kernels_per_forward": 24.0,
+          "cuda_kernel_us_per_forward": 702.4765499999987
+        },
+        "compile/r8": {
+          "cuda_kernels_per_forward": 20.0,
+          "cuda_kernel_us_per_forward": 456.36070000000035
+        },
+        "compile/r32": {
+          "cuda_kernels_per_forward": 20.0,
+          "cuda_kernel_us_per_forward": 654.2231500000003
+        },
+        "triton/r8": {
+          "cuda_kernels_per_forward": 8.0,
+          "cuda_kernel_us_per_forward": 4947.111449999999
+        },
+        "triton/r32": {
+          "cuda_kernels_per_forward": 8.0,
+          "cuda_kernel_us_per_forward": 7422.823849999996
+        },
+        "cuda_graph_triton/r8": {
+          "cuda_kernels_per_forward": 10.0,
+          "cuda_kernel_us_per_forward": 2306.0007000000014
+        },
+        "cuda_graph_triton/r32": {
+          "cuda_kernels_per_forward": 10.0,
+          "cuda_kernel_us_per_forward": 3823.12735
+        },
+        "compile_cudagraphs/r8": {
+          "cuda_kernels_per_forward": 23.0,
+          "cuda_kernel_us_per_forward": 956.2904999999977
+        },
+        "compile_cudagraphs/r32": {
+          "cuda_kernels_per_forward": 23.0,
+          "cuda_kernel_us_per_forward": 1034.7386
+        }
+      },
+      "seconds": 6.1
+    },
+    {
+      "step": "nsight systems",
+      "status": "ok",
+      "detail": [
+        "eager",
+        "cuda_graph_triton"
+      ],
+      "seconds": 214.2
+    }
+  ]
+}

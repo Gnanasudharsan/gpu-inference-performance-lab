@@ -1,0 +1,51 @@
+{
+  "impl": "fused_weights",
+  "device": "cuda",
+  "dtype": "float16",
+  "rows": 32,
+  "iters": 20,
+  "dispatches_per_forward": 20.0,
+  "custom_kernel_launches_per_forward": 0.0,
+  "custom_kernels": {},
+  "launches_per_forward": 20.0,
+  "launch_count_complete": true,
+  "top_ops": [
+    {
+      "name": "aten::addmm",
+      "calls_per_forward": 4.0,
+      "self_cpu_us_per_forward": 169.0270499999991
+    },
+    {
+      "name": "aten::mm",
+      "calls_per_forward": 4.0,
+      "self_cpu_us_per_forward": 116.11189999999961
+    },
+    {
+      "name": "aten::_fused_rms_norm",
+      "calls_per_forward": 4.0,
+      "self_cpu_us_per_forward": 71.46380000000157
+    },
+    {
+      "name": "aten::silu",
+      "calls_per_forward": 4.0,
+      "self_cpu_us_per_forward": 66.7167499999995
+    },
+    {
+      "name": "aten::mul",
+      "calls_per_forward": 4.0,
+      "self_cpu_us_per_forward": 55.61169999999896
+    }
+  ],
+  "cuda_kernels_per_forward": 24.0,
+  "cuda_kernel_us_per_forward": 702.4765499999987,
+  "gpu_forward_span_us": 1173.4457500000003,
+  "annotations_excluded": true,
+  "cuda_kernel_names": {
+    "void at::native::(anonymous namespace)::vectorized_layer_norm_kernel<c10::Half, float, true>(int, float, c10::Half const*, c10::Half const*, c10::Half const*, float*, float*, c10::Half*)": 80,
+    "turing_fp16_s1688gemm_fp16_256x64_ldg8_f2f_stages_32x1_tn": 80,
+    "void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl_nocast<at::native::(anonymous namespace)::silu_kernel(at::TensorIteratorBase&)::{lambda()#1}::operator()() const::{lambda()#5}::operator()() const::{lambda(c10::Half)#1}>(at::TensorIteratorBase&, at::native::(anonymous namespace)::silu_kernel(at::TensorIteratorBase&)::{lambda()#1}::operator()() const::{lambda()#5}::operator()() const::{lambda(c10::Half)#1} const&)::{lambda(int)#1}>(int, at::native::gpu_kernel_impl_nocast<at::native::(anonymous namespace)::silu_kernel(at::TensorIteratorBase&)::{lambda()#1}::operator()() const::{lambda()#5}::operator()() const::{lambda(c10::Half)#1}>(at::TensorIteratorBase&, at::native::(anonymous namespace)::silu_kernel(at::TensorIteratorBase&)::{lambda()#1}::operator()() const::{lambda()#5}::operator()() const::{lambda(c10::Half)#1} const&)::{lambda(int)#1})": 80,
+    "void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl_nocast<at::native::BinaryFunctor<c10::Half, c10::Half, c10::Half, at::native::binary_internal::MulFunctor<float> > >(at::TensorIteratorBase&, at::native::BinaryFunctor<c10::Half, c10::Half, c10::Half, at::native::binary_internal::MulFunctor<float> > const&)::{lambda(int)#1}>(int, at::native::gpu_kernel_impl_nocast<at::native::BinaryFunctor<c10::Half, c10::Half, c10::Half, at::native::binary_internal::MulFunctor<float> > >(at::TensorIteratorBase&, at::native::BinaryFunctor<c10::Half, c10::Half, c10::Half, at::native::binary_internal::MulFunctor<float> > const&)::{lambda(int)#1})": 80,
+    "Memcpy DtoD (Device -> Device)": 80,
+    "void cutlass::Kernel2<cutlass_75_wmma_tensorop_f16_s161616gemm_f16_32x32_128x2_tn_align8>(cutlass_75_wmma_tensorop_f16_s161616gemm_f16_32x32_128x2_tn_align8::Params)": 80
+  }
+}

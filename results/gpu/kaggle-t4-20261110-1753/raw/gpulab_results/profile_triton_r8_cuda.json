@@ -1,0 +1,24 @@
+{
+  "impl": "triton",
+  "device": "cuda",
+  "dtype": "float16",
+  "rows": 8,
+  "iters": 20,
+  "dispatches_per_forward": 0.0,
+  "custom_kernel_launches_per_forward": 8.0,
+  "custom_kernels": {
+    "gpulab.kernels.triton_kernels.norm_gate_up_silu": 4.0,
+    "gpulab.kernels.triton_kernels.down_residual": 4.0
+  },
+  "launches_per_forward": 8.0,
+  "launch_count_complete": true,
+  "top_ops": [],
+  "cuda_kernels_per_forward": 8.0,
+  "cuda_kernel_us_per_forward": 4947.111449999999,
+  "gpu_forward_span_us": 4959.92265,
+  "annotations_excluded": true,
+  "cuda_kernel_names": {
+    "_norm_gate_up_silu_kernel": 80,
+    "_down_residual_kernel": 80
+  }
+}

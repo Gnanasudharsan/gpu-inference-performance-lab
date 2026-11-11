@@ -1,0 +1,28 @@
+{
+  "impl": "cuda_graph_triton",
+  "device": "cuda",
+  "dtype": "float16",
+  "rows": 32,
+  "iters": 20,
+  "dispatches_per_forward": 2.0,
+  "custom_kernel_launches_per_forward": 0.0,
+  "custom_kernels": {},
+  "launches_per_forward": 2.0,
+  "launch_count_complete": true,
+  "top_ops": [
+    {
+      "name": "aten::copy_",
+      "calls_per_forward": 2.0,
+      "self_cpu_us_per_forward": 17.61515000000029
+    }
+  ],
+  "cuda_kernels_per_forward": 10.0,
+  "cuda_kernel_us_per_forward": 3823.12735,
+  "gpu_forward_span_us": 3860.8041999999987,
+  "annotations_excluded": true,
+  "cuda_kernel_names": {
+    "_norm_gate_up_silu_kernel": 80,
+    "_down_residual_kernel": 80,
+    "Memcpy DtoD (Device -> Device)": 40
+  }
+}

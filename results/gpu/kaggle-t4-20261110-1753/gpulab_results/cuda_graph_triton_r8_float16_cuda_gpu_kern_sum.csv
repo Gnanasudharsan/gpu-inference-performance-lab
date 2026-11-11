@@ -1,0 +1,7 @@
+Time (%),Total Time (ns),Instances,Avg (ns),Med (ns),Min (ns),Max (ns),StdDev (ns),Name
+41.7,5423421677,4720,1149030.0,1147486.0,1134750,1256959,7795.7,"void at::native::vectorized_elementwise_kernel<(int)4, at::native::FillFunctor<int>, std::array<char *, (unsigned long)1>>(int, T2, T3)"
+34.2,4449657394,2469,1802210.4,1058527.0,339999,10100467,1675066.9,_norm_gate_up_silu_kernel
+24.2,3147028384,3396,926686.8,583967.0,241536,9360151,1149048.5,_down_residual_kernel
+0.0,382367,4,95591.8,97599.5,88352,98816,4861.1,"void at::native::<unnamed>::CatArrayBatchedCopy_vectorized<at::native::<unnamed>::OpaqueType<(unsigned int)2>, unsigned int, (int)1, (int)128, (int)1, (int)16, (int)8>(char *, at::native::<unnamed>::CatArrInputTensorMetadata<T1, T2, T4, T5>, at::native::<unnamed>::TensorSizeStride<T2, (unsigned int)4>, int, T2)"
+0.0,3936,2,1968.0,1968.0,1792,2144,248.9,"void at::native::vectorized_elementwise_kernel<(int)2, at::native::FillFunctor<long>, std::array<char *, (unsigned long)1>>(int, T2, T3)"
+0.0,2816,1,2816.0,2816.0,2816,2816,0.0,"void at::native::vectorized_elementwise_kernel<(int)4, at::native::FillFunctor<c10::Half>, std::array<char *, (unsigned long)1>>(int, T2, T3)"

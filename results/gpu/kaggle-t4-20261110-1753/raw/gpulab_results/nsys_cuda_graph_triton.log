@@ -1,0 +1,18 @@
+| device | dtype | impl | rows | mode | host p50 µs | p95 | p99 | device p50 µs | rows/s (p50) | trial CV | speedup vs cuda_graph_triton |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| cuda | float16 | cuda_graph_triton | 8 | latency | 2,413 | 2,484 | 2,559 | 2,402 | 3,316 | 0.000 | n/a |
+Collecting data...
+Generating '/tmp/nsys-report-8c64.qdstrm'
+[1/1] [0%                          ] cuda_graph_triton_r8_float16.nsys-rep[1/1] [0%                          ] cuda_graph_triton_r8_float16.nsys-rep[1/1] [0%                          ] cuda_graph_triton_r8_float16.nsys-rep[1/1] [6%                          ] cuda_graph_triton_r8_float16.nsys-rep[1/1] [12%                         ] cuda_graph_triton_r8_float16.nsys-rep[1/1] [=17%                        ] cuda_graph_triton_r8_float16.nsys-rep[1/1] [====26%                     ] cuda_graph_triton_r8_float16.nsys-rep[1/1] [=======36%                  ] cuda_graph_triton_r8_float16.nsys-rep[1/1] [=========45%                ] cuda_graph_triton_r8_float16.nsys-rep[1/1] [============55%             ] cuda_graph_triton_r8_float16.nsys-rep[1/1] [===============65%          ] cuda_graph_triton_r8_float16.nsys-rep[1/1] [================71%         ] cuda_graph_triton_r8_float16.nsys-rep[1/1] [========================100%] cuda_graph_triton_r8_float16.nsys-rep[1/1] [========================100%] cuda_graph_triton_r8_float16.nsys-rep
+Generated:
+	/tmp/gpulab/results/gpu/nsys/cuda_graph_triton_r8_float16.nsys-rep
+Generating SQLite file results/gpu/nsys/cuda_graph_triton_r8_float16.sqlite from results/gpu/nsys/cuda_graph_triton_r8_float16.nsys-rep
+Processing [results/gpu/nsys/cuda_graph_triton_r8_float16.sqlite] with [/opt/nvidia/nsight-compute/2025.3.1/host/target-linux-x64/reports/cuda_gpu_kern_sum.py] to [results/gpu/nsys/cuda_graph_triton_r8_float16_cuda_gpu_kern_sum.csv]... PROCESSED
+
+Processing [results/gpu/nsys/cuda_graph_triton_r8_float16.sqlite] with [/opt/nvidia/nsight-compute/2025.3.1/host/target-linux-x64/reports/cuda_api_sum.py] to [results/gpu/nsys/cuda_graph_triton_r8_float16_cuda_api_sum.csv]... PROCESSED
+
+Processing [results/gpu/nsys/cuda_graph_triton_r8_float16.sqlite] with [/opt/nvidia/nsight-compute/2025.3.1/host/target-linux-x64/reports/nvtx_sum.py] to [results/gpu/nsys/cuda_graph_triton_r8_float16_nvtx_sum.csv]... PROCESSED (EMPTY RESULTS)
+
+SKIPPED: results/gpu/nsys/cuda_graph_triton_r8_float16.sqlite does not contain NV Tools Extension (NVTX) data.
+
+summaries: results/gpu/nsys/cuda_graph_triton_r8_float16_*.csv (commit these, not the .nsys-rep)

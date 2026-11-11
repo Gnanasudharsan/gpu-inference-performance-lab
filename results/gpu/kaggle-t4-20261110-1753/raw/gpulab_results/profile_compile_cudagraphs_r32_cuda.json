@@ -1,0 +1,36 @@
+{
+  "impl": "compile_cudagraphs",
+  "device": "cuda",
+  "dtype": "float16",
+  "rows": 32,
+  "iters": 20,
+  "dispatches_per_forward": 2.0,
+  "custom_kernel_launches_per_forward": 0.0,
+  "custom_kernels": {},
+  "launches_per_forward": 2.0,
+  "launch_count_complete": false,
+  "top_ops": [
+    {
+      "name": "aten::_foreach_copy_",
+      "calls_per_forward": 1.0,
+      "self_cpu_us_per_forward": 37.19635000000005
+    },
+    {
+      "name": "aten::copy_",
+      "calls_per_forward": 1.0,
+      "self_cpu_us_per_forward": 15.649149999999281
+    }
+  ],
+  "cuda_kernels_per_forward": 23.0,
+  "cuda_kernel_us_per_forward": 1034.7386,
+  "gpu_forward_span_us": 1045.2922000000003,
+  "annotations_excluded": true,
+  "cuda_kernel_names": {
+    "Memcpy DtoD (Device -> Device)": 100,
+    "triton_per_fused__fused_rms_norm_0": 80,
+    "turing_fp16_s1688gemm_fp16_256x64_ldg8_f2f_stages_32x1_tn": 80,
+    "triton_poi_fused_mul_silu_slice_1": 80,
+    "void cutlass::Kernel2<cutlass_75_wmma_tensorop_f16_s161616gemm_f16_32x32_128x2_tn_align8>(cutlass_75_wmma_tensorop_f16_s161616gemm_f16_32x32_128x2_tn_align8::Params)": 80,
+    "void at::native::(anonymous namespace)::multi_tensor_apply_kernel<at::native::(anonymous namespace)::TensorListMetadata<2>, at::native::(anonymous namespace)::UnaryOpFunctor<c10::Half, 2, 1, 1>, at::native::Copy<c10::Half, c10::Half> >(at::native::(anonymous namespace)::TensorListMetadata<2>, at::native::(anonymous namespace)::UnaryOpFunctor<c10::Half, 2, 1, 1>, at::native::Copy<c10::Half, c10::Half>)": 40
+  }
+}

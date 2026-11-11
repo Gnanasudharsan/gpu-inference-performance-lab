@@ -4,15 +4,13 @@
 > labeled by evidence type: **measured** (read from records), **derived** (computed from
 > measured values), or **theoretical** (from specifications). Do not edit by hand.
 
-- Generated: 2026-11-10T20:14:29+00:00
+- Generated: 2026-11-11T00:14:50+00:00
 - Hardware: Apple M4, 16.0 GiB; accelerators: mps: Apple M4 GPU (Metal/MPS), cpu: Apple M4
 - Software: Darwin 27.2, Python 3.12.16, PyTorch 2.15.0
 - Records from commit: `758dbd6`
 
 ## Unavailable (not measured, not estimated)
 
-- NVIDIA GPU results (no NVIDIA hardware available or authorized)
-- Nsight Systems / Nsight Compute traces
 
 ## Paired comparisons against eager (derived; 95% bootstrap CI over interleaved trials)
 
@@ -30,6 +28,140 @@
 | cpu | float32 | 1024×2816×4 | throughput | fused_weights | 1 | 2,860 | 2,898 | 1.02× [0.82, 1.24] | no significant difference |
 | cpu | float32 | 1024×2816×4 | throughput | fused_weights | 8 | 4,257 | 5,715 | 0.89× [0.69, 1.18] | no significant difference |
 | cpu | float32 | 1024×2816×4 | throughput | fused_weights | 32 | 15,296 | 14,404 | 1.01× [0.71, 1.46] | no significant difference |
+| cuda | float16 | 512×1408×4 | latency | compile_cudagraphs | 1 | 1,063 | 532 | 1.98× [1.93, 2.03] | faster |
+| cuda | float16 | 512×1408×4 | latency | compile_cudagraphs | 8 | 1,089 | 606 | 1.87× [1.78, 2.00] | faster |
+| cuda | float16 | 512×1408×4 | latency | cuda_graph_eager | 1 | 1,063 | 460 | 2.41× [2.26, 2.63] | faster |
+| cuda | float16 | 512×1408×4 | latency | cuda_graph_eager | 8 | 1,089 | 503 | 2.35× [2.17, 2.57] | faster |
+| cuda | float16 | 512×1408×4 | latency | cuda_graph_triton | 1 | 1,063 | 2,045 | 0.54× [0.51, 0.59] | slower |
+| cuda | float16 | 512×1408×4 | latency | cuda_graph_triton | 8 | 1,089 | 2,048 | 0.57× [0.52, 0.64] | slower |
+| cuda | float16 | 512×1408×4 | latency | triton | 1 | 1,063 | 2,111 | 0.54× [0.49, 0.62] | slower |
+| cuda | float16 | 512×1408×4 | latency | triton | 8 | 1,089 | 2,115 | 0.58× [0.52, 0.66] | slower |
+| cuda | float16 | 512×1408×4 | throughput | compile_cudagraphs | 1 | 949 | 329 | 2.99× [2.88, 3.11] | faster |
+| cuda | float16 | 512×1408×4 | throughput | compile_cudagraphs | 8 | 974 | 382 | 2.54× [2.48, 2.61] | faster |
+| cuda | float16 | 512×1408×4 | throughput | cuda_graph_eager | 1 | 949 | 377 | 2.59× [2.44, 2.78] | faster |
+| cuda | float16 | 512×1408×4 | throughput | cuda_graph_eager | 8 | 974 | 413 | 2.36× [2.25, 2.52] | faster |
+| cuda | float16 | 512×1408×4 | throughput | cuda_graph_triton | 1 | 949 | 1,578 | 0.60× [0.56, 0.67] | slower |
+| cuda | float16 | 512×1408×4 | throughput | cuda_graph_triton | 8 | 974 | 1,577 | 0.61× [0.56, 0.67] | slower |
+| cuda | float16 | 512×1408×4 | throughput | triton | 1 | 949 | 1,574 | 0.62× [0.55, 0.71] | slower |
+| cuda | float16 | 512×1408×4 | throughput | triton | 8 | 974 | 1,579 | 0.61× [0.54, 0.69] | slower |
+| cuda | float16 | 1024×2816×4 | latency | compile | 1 | 1,069 | 706 | 1.51× [1.43, 1.58] | faster |
+| cuda | float16 | 1024×2816×4 | latency | compile | 2 | 1,114 | 698 | 1.63× [1.55, 1.75] | faster |
+| cuda | float16 | 1024×2816×4 | latency | compile | 4 | 1,095 | 683 | 1.61× [1.57, 1.65] | faster |
+| cuda | float16 | 1024×2816×4 | latency | compile | 8 | 1,092 | 681 | 1.59× [1.51, 1.65] | faster |
+| cuda | float16 | 1024×2816×4 | latency | compile | 16 | 1,093 | 693 | 1.57× [1.54, 1.62] | faster |
+| cuda | float16 | 1024×2816×4 | latency | compile | 32 | 1,132 | 726 | 1.57× [1.52, 1.61] | faster |
+| cuda | float16 | 1024×2816×4 | latency | compile | 64 | 1,109 | 725 | 1.57× [1.51, 1.65] | faster |
+| cuda | float16 | 1024×2816×4 | latency | compile_cudagraphs | 1 | 1,069 | 1,193 | 0.90× [0.87, 0.94] | slower |
+| cuda | float16 | 1024×2816×4 | latency | compile_cudagraphs | 2 | 1,114 | 1,187 | 0.96× [0.91, 1.03] | no significant difference |
+| cuda | float16 | 1024×2816×4 | latency | compile_cudagraphs | 4 | 1,095 | 1,195 | 0.92× [0.90, 0.94] | slower |
+| cuda | float16 | 1024×2816×4 | latency | compile_cudagraphs | 8 | 1,092 | 1,225 | 0.90× [0.88, 0.92] | slower |
+| cuda | float16 | 1024×2816×4 | latency | compile_cudagraphs | 16 | 1,093 | 1,208 | 0.90× [0.88, 0.92] | slower |
+| cuda | float16 | 1024×2816×4 | latency | compile_cudagraphs | 32 | 1,132 | 1,256 | 0.89× [0.87, 0.91] | slower |
+| cuda | float16 | 1024×2816×4 | latency | compile_cudagraphs | 64 | 1,109 | 1,304 | 0.87× [0.83, 0.91] | slower |
+| cuda | float16 | 1024×2816×4 | latency | cuda_graph_eager | 1 | 1,069 | 638 | 1.70× [1.63, 1.78] | faster |
+| cuda | float16 | 1024×2816×4 | latency | cuda_graph_eager | 2 | 1,114 | 661 | 1.72× [1.61, 1.87] | faster |
+| cuda | float16 | 1024×2816×4 | latency | cuda_graph_eager | 4 | 1,095 | 662 | 1.63× [1.56, 1.71] | faster |
+| cuda | float16 | 1024×2816×4 | latency | cuda_graph_eager | 8 | 1,092 | 722 | 1.55× [1.47, 1.62] | faster |
+| cuda | float16 | 1024×2816×4 | latency | cuda_graph_eager | 16 | 1,093 | 681 | 1.57× [1.51, 1.64] | faster |
+| cuda | float16 | 1024×2816×4 | latency | cuda_graph_eager | 32 | 1,132 | 647 | 1.66× [1.58, 1.74] | faster |
+| cuda | float16 | 1024×2816×4 | latency | cuda_graph_eager | 64 | 1,109 | 710 | 1.60× [1.54, 1.68] | faster |
+| cuda | float16 | 1024×2816×4 | latency | cuda_graph_triton | 1 | 1,069 | 3,947 | 0.28× [0.26, 0.30] | slower |
+| cuda | float16 | 1024×2816×4 | latency | cuda_graph_triton | 2 | 1,114 | 3,906 | 0.29× [0.26, 0.32] | slower |
+| cuda | float16 | 1024×2816×4 | latency | cuda_graph_triton | 4 | 1,095 | 3,994 | 0.27× [0.24, 0.29] | slower |
+| cuda | float16 | 1024×2816×4 | latency | cuda_graph_triton | 8 | 1,092 | 4,779 | 0.25× [0.23, 0.28] | slower |
+| cuda | float16 | 1024×2816×4 | latency | cuda_graph_triton | 16 | 1,093 | 3,903 | 0.27× [0.25, 0.29] | slower |
+| cuda | float16 | 1024×2816×4 | latency | cuda_graph_triton | 32 | 1,132 | 4,163 | 0.24× [0.21, 0.26] | slower |
+| cuda | float16 | 1024×2816×4 | latency | cuda_graph_triton | 64 | 1,109 | 7,140 | 0.16× [0.15, 0.16] | slower |
+| cuda | float16 | 1024×2816×4 | latency | fused_weights | 1 | 1,069 | 651 | 1.66× [1.61, 1.72] | faster |
+| cuda | float16 | 1024×2816×4 | latency | fused_weights | 2 | 1,114 | 671 | 1.70× [1.62, 1.83] | faster |
+| cuda | float16 | 1024×2816×4 | latency | fused_weights | 4 | 1,095 | 676 | 1.60× [1.52, 1.67] | faster |
+| cuda | float16 | 1024×2816×4 | latency | fused_weights | 8 | 1,092 | 669 | 1.64× [1.61, 1.68] | faster |
+| cuda | float16 | 1024×2816×4 | latency | fused_weights | 16 | 1,093 | 672 | 1.62× [1.59, 1.65] | faster |
+| cuda | float16 | 1024×2816×4 | latency | fused_weights | 32 | 1,132 | 685 | 1.65× [1.61, 1.68] | faster |
+| cuda | float16 | 1024×2816×4 | latency | fused_weights | 64 | 1,109 | 703 | 1.61× [1.56, 1.68] | faster |
+| cuda | float16 | 1024×2816×4 | latency | triton | 1 | 1,069 | 4,034 | 0.25× [0.22, 0.28] | slower |
+| cuda | float16 | 1024×2816×4 | latency | triton | 2 | 1,114 | 4,035 | 0.26× [0.24, 0.30] | slower |
+| cuda | float16 | 1024×2816×4 | latency | triton | 4 | 1,095 | 4,035 | 0.26× [0.23, 0.28] | slower |
+| cuda | float16 | 1024×2816×4 | latency | triton | 8 | 1,092 | 5,161 | 0.23× [0.21, 0.26] | slower |
+| cuda | float16 | 1024×2816×4 | latency | triton | 16 | 1,093 | 4,007 | 0.25× [0.23, 0.28] | slower |
+| cuda | float16 | 1024×2816×4 | latency | triton | 32 | 1,132 | 5,273 | 0.21× [0.19, 0.24] | slower |
+| cuda | float16 | 1024×2816×4 | latency | triton | 64 | 1,109 | 7,176 | 0.16× [0.15, 0.17] | slower |
+| cuda | float16 | 1024×2816×4 | throughput | compile | 1 | 937 | 606 | 1.54× [1.51, 1.56] | faster |
+| cuda | float16 | 1024×2816×4 | throughput | compile | 2 | 962 | 605 | 1.59× [1.56, 1.65] | faster |
+| cuda | float16 | 1024×2816×4 | throughput | compile | 4 | 967 | 607 | 1.60× [1.58, 1.63] | faster |
+| cuda | float16 | 1024×2816×4 | throughput | compile | 8 | 948 | 594 | 1.55× [1.46, 1.60] | faster |
+| cuda | float16 | 1024×2816×4 | throughput | compile | 16 | 965 | 611 | 1.59× [1.57, 1.60] | faster |
+| cuda | float16 | 1024×2816×4 | throughput | compile | 32 | 987 | 620 | 1.60× [1.59, 1.62] | faster |
+| cuda | float16 | 1024×2816×4 | throughput | compile | 64 | 968 | 628 | 1.55× [1.53, 1.56] | faster |
+| cuda | float16 | 1024×2816×4 | throughput | compile_cudagraphs | 1 | 937 | 946 | 1.00× [0.99, 1.00] | no significant difference |
+| cuda | float16 | 1024×2816×4 | throughput | compile_cudagraphs | 2 | 962 | 954 | 1.02× [1.00, 1.05] | no significant difference |
+| cuda | float16 | 1024×2816×4 | throughput | compile_cudagraphs | 4 | 967 | 957 | 1.01× [1.01, 1.02] | faster |
+| cuda | float16 | 1024×2816×4 | throughput | compile_cudagraphs | 8 | 948 | 962 | 0.99× [0.98, 1.00] | slower |
+| cuda | float16 | 1024×2816×4 | throughput | compile_cudagraphs | 16 | 965 | 971 | 1.00× [0.99, 1.01] | no significant difference |
+| cuda | float16 | 1024×2816×4 | throughput | compile_cudagraphs | 32 | 987 | 1,047 | 0.95× [0.94, 0.96] | slower |
+| cuda | float16 | 1024×2816×4 | throughput | compile_cudagraphs | 64 | 968 | 1,124 | 0.87× [0.86, 0.88] | slower |
+| cuda | float16 | 1024×2816×4 | throughput | cuda_graph_eager | 1 | 937 | 462 | 2.04× [2.02, 2.06] | faster |
+| cuda | float16 | 1024×2816×4 | throughput | cuda_graph_eager | 2 | 962 | 474 | 2.05× [2.01, 2.11] | faster |
+| cuda | float16 | 1024×2816×4 | throughput | cuda_graph_eager | 4 | 967 | 476 | 2.04× [2.03, 2.06] | faster |
+| cuda | float16 | 1024×2816×4 | throughput | cuda_graph_eager | 8 | 948 | 481 | 1.98× [1.96, 1.99] | faster |
+| cuda | float16 | 1024×2816×4 | throughput | cuda_graph_eager | 16 | 965 | 496 | 1.95× [1.94, 1.97] | faster |
+| cuda | float16 | 1024×2816×4 | throughput | cuda_graph_eager | 32 | 987 | 586 | 1.70× [1.68, 1.72] | faster |
+| cuda | float16 | 1024×2816×4 | throughput | cuda_graph_eager | 64 | 968 | 683 | 1.43× [1.42, 1.45] | faster |
+| cuda | float16 | 1024×2816×4 | throughput | cuda_graph_triton | 1 | 937 | 2,294 | 0.41× [0.41, 0.41] | slower |
+| cuda | float16 | 1024×2816×4 | throughput | cuda_graph_triton | 2 | 962 | 2,302 | 0.42× [0.40, 0.43] | slower |
+| cuda | float16 | 1024×2816×4 | throughput | cuda_graph_triton | 4 | 967 | 2,312 | 0.42× [0.41, 0.42] | slower |
+| cuda | float16 | 1024×2816×4 | throughput | cuda_graph_triton | 8 | 948 | 2,335 | 0.40× [0.38, 0.41] | slower |
+| cuda | float16 | 1024×2816×4 | throughput | cuda_graph_triton | 16 | 965 | 2,365 | 0.41× [0.40, 0.41] | slower |
+| cuda | float16 | 1024×2816×4 | throughput | cuda_graph_triton | 32 | 987 | 3,832 | 0.26× [0.26, 0.26] | slower |
+| cuda | float16 | 1024×2816×4 | throughput | cuda_graph_triton | 64 | 968 | 7,026 | 0.14× [0.14, 0.14] | slower |
+| cuda | float16 | 1024×2816×4 | throughput | fused_weights | 1 | 937 | 560 | 1.68× [1.66, 1.70] | faster |
+| cuda | float16 | 1024×2816×4 | throughput | fused_weights | 2 | 962 | 557 | 1.70× [1.61, 1.79] | faster |
+| cuda | float16 | 1024×2816×4 | throughput | fused_weights | 4 | 967 | 559 | 1.72× [1.70, 1.75] | faster |
+| cuda | float16 | 1024×2816×4 | throughput | fused_weights | 8 | 948 | 551 | 1.70× [1.67, 1.73] | faster |
+| cuda | float16 | 1024×2816×4 | throughput | fused_weights | 16 | 965 | 565 | 1.68× [1.61, 1.73] | faster |
+| cuda | float16 | 1024×2816×4 | throughput | fused_weights | 32 | 987 | 584 | 1.68× [1.61, 1.72] | faster |
+| cuda | float16 | 1024×2816×4 | throughput | fused_weights | 64 | 968 | 592 | 1.64× [1.62, 1.67] | faster |
+| cuda | float16 | 1024×2816×4 | throughput | triton | 1 | 937 | 2,298 | 0.40× [0.39, 0.41] | slower |
+| cuda | float16 | 1024×2816×4 | throughput | triton | 2 | 962 | 2,303 | 0.41× [0.39, 0.43] | slower |
+| cuda | float16 | 1024×2816×4 | throughput | triton | 4 | 967 | 2,316 | 0.41× [0.39, 0.42] | slower |
+| cuda | float16 | 1024×2816×4 | throughput | triton | 8 | 948 | 2,340 | 0.38× [0.36, 0.41] | slower |
+| cuda | float16 | 1024×2816×4 | throughput | triton | 16 | 965 | 2,373 | 0.40× [0.39, 0.41] | slower |
+| cuda | float16 | 1024×2816×4 | throughput | triton | 32 | 987 | 3,833 | 0.26× [0.26, 0.26] | slower |
+| cuda | float16 | 1024×2816×4 | throughput | triton | 64 | 968 | 7,030 | 0.14× [0.14, 0.14] | slower |
+| cuda | float16 | 2048×5632×4 | latency | compile_cudagraphs | 1 | 1,416 | 3,772 | 0.38× [0.37, 0.38] | slower |
+| cuda | float16 | 2048×5632×4 | latency | compile_cudagraphs | 8 | 1,582 | 3,897 | 0.41× [0.40, 0.41] | slower |
+| cuda | float16 | 2048×5632×4 | latency | cuda_graph_eager | 1 | 1,416 | 1,252 | 1.13× [1.12, 1.14] | faster |
+| cuda | float16 | 2048×5632×4 | latency | cuda_graph_eager | 8 | 1,582 | 1,442 | 1.09× [1.09, 1.10] | faster |
+| cuda | float16 | 2048×5632×4 | latency | cuda_graph_triton | 1 | 1,416 | 8,757 | 0.16× [0.16, 0.16] | slower |
+| cuda | float16 | 2048×5632×4 | latency | cuda_graph_triton | 8 | 1,582 | 8,820 | 0.18× [0.17, 0.18] | slower |
+| cuda | float16 | 2048×5632×4 | latency | triton | 1 | 1,416 | 8,951 | 0.15× [0.15, 0.16] | slower |
+| cuda | float16 | 2048×5632×4 | latency | triton | 8 | 1,582 | 8,694 | 0.18× [0.18, 0.18] | slower |
+| cuda | float16 | 2048×5632×4 | throughput | compile_cudagraphs | 1 | 1,321 | 3,676 | 0.36× [0.36, 0.36] | slower |
+| cuda | float16 | 2048×5632×4 | throughput | compile_cudagraphs | 8 | 1,470 | 3,706 | 0.40× [0.40, 0.40] | slower |
+| cuda | float16 | 2048×5632×4 | throughput | cuda_graph_eager | 1 | 1,321 | 1,289 | 1.03× [1.02, 1.04] | faster |
+| cuda | float16 | 2048×5632×4 | throughput | cuda_graph_eager | 8 | 1,470 | 1,473 | 1.00× [1.00, 1.00] | no significant difference |
+| cuda | float16 | 2048×5632×4 | throughput | cuda_graph_triton | 1 | 1,321 | 9,078 | 0.15× [0.14, 0.15] | slower |
+| cuda | float16 | 2048×5632×4 | throughput | cuda_graph_triton | 8 | 1,470 | 8,980 | 0.16× [0.16, 0.16] | slower |
+| cuda | float16 | 2048×5632×4 | throughput | triton | 1 | 1,321 | 9,077 | 0.14× [0.14, 0.14] | slower |
+| cuda | float16 | 2048×5632×4 | throughput | triton | 8 | 1,470 | 9,002 | 0.16× [0.16, 0.16] | slower |
+| cuda | float32 | 1024×2816×4 | latency | cuda_graph_triton | 1 | 901 | 3,226 | 0.27× [0.25, 0.29] | slower |
+| cuda | float32 | 1024×2816×4 | latency | cuda_graph_triton | 8 | 1,387 | 3,240 | 0.41× [0.39, 0.43] | slower |
+| cuda | float32 | 1024×2816×4 | latency | cuda_graph_triton | 32 | 1,302 | 3,287 | 0.37× [0.35, 0.39] | slower |
+| cuda | float32 | 1024×2816×4 | latency | fused_weights | 1 | 901 | 746 | 1.21× [1.20, 1.23] | faster |
+| cuda | float32 | 1024×2816×4 | latency | fused_weights | 8 | 1,387 | 1,238 | 1.17× [1.13, 1.22] | faster |
+| cuda | float32 | 1024×2816×4 | latency | fused_weights | 32 | 1,302 | 1,190 | 1.10× [1.09, 1.11] | faster |
+| cuda | float32 | 1024×2816×4 | latency | triton | 1 | 901 | 3,755 | 0.24× [0.22, 0.27] | slower |
+| cuda | float32 | 1024×2816×4 | latency | triton | 8 | 1,387 | 3,803 | 0.38× [0.36, 0.42] | slower |
+| cuda | float32 | 1024×2816×4 | latency | triton | 32 | 1,302 | 3,818 | 0.34× [0.32, 0.36] | slower |
+| cuda | float32 | 1024×2816×4 | throughput | cuda_graph_triton | 1 | 746 | 2,141 | 0.35× [0.35, 0.35] | slower |
+| cuda | float32 | 1024×2816×4 | throughput | cuda_graph_triton | 8 | 1,147 | 2,148 | 0.53× [0.53, 0.53] | slower |
+| cuda | float32 | 1024×2816×4 | throughput | cuda_graph_triton | 32 | 1,266 | 3,280 | 0.38× [0.38, 0.39] | slower |
+| cuda | float32 | 1024×2816×4 | throughput | fused_weights | 1 | 746 | 619 | 1.21× [1.20, 1.22] | faster |
+| cuda | float32 | 1024×2816×4 | throughput | fused_weights | 8 | 1,147 | 863 | 1.33× [1.32, 1.34] | faster |
+| cuda | float32 | 1024×2816×4 | throughput | fused_weights | 32 | 1,266 | 1,196 | 1.06× [1.04, 1.07] | faster |
+| cuda | float32 | 1024×2816×4 | throughput | triton | 1 | 746 | 2,138 | 0.35× [0.35, 0.35] | slower |
+| cuda | float32 | 1024×2816×4 | throughput | triton | 8 | 1,147 | 2,146 | 0.53× [0.53, 0.53] | slower |
+| cuda | float32 | 1024×2816×4 | throughput | triton | 32 | 1,266 | 3,312 | 0.38× [0.37, 0.38] | slower |
 | mps | bfloat16 | 1024×2816×4 | latency | compile | 1 | 1,784 | 1,553 | 1.15× [0.97, 1.36] | no significant difference |
 | mps | bfloat16 | 1024×2816×4 | latency | compile | 8 | 1,882 | 2,611 | 0.86× [0.70, 1.06] | no significant difference |
 | mps | bfloat16 | 1024×2816×4 | latency | compile | 32 | 2,902 | 2,787 | 1.02× [0.86, 1.22] | no significant difference |
@@ -139,6 +271,75 @@
 - cpu/float32 1024×2816 latency **compile** at 8 rows: 0.63× [0.48, 0.83]
 - cpu/float32 1024×2816 latency **fused_weights** at 8 rows: 0.79× [0.69, 0.86]
 - cpu/float32 1024×2816 throughput **compile** at 8 rows: 0.70× [0.54, 0.83]
+- cuda/float16 512×1408 latency **cuda_graph_triton** at 1 rows: 0.54× [0.51, 0.59]
+- cuda/float16 512×1408 latency **cuda_graph_triton** at 8 rows: 0.57× [0.52, 0.64]
+- cuda/float16 512×1408 latency **triton** at 1 rows: 0.54× [0.49, 0.62]
+- cuda/float16 512×1408 latency **triton** at 8 rows: 0.58× [0.52, 0.66]
+- cuda/float16 512×1408 throughput **cuda_graph_triton** at 1 rows: 0.60× [0.56, 0.67]
+- cuda/float16 512×1408 throughput **cuda_graph_triton** at 8 rows: 0.61× [0.56, 0.67]
+- cuda/float16 512×1408 throughput **triton** at 1 rows: 0.62× [0.55, 0.71]
+- cuda/float16 512×1408 throughput **triton** at 8 rows: 0.61× [0.54, 0.69]
+- cuda/float16 1024×2816 latency **compile_cudagraphs** at 1 rows: 0.90× [0.87, 0.94]
+- cuda/float16 1024×2816 latency **compile_cudagraphs** at 4 rows: 0.92× [0.90, 0.94]
+- cuda/float16 1024×2816 latency **compile_cudagraphs** at 8 rows: 0.90× [0.88, 0.92]
+- cuda/float16 1024×2816 latency **compile_cudagraphs** at 16 rows: 0.90× [0.88, 0.92]
+- cuda/float16 1024×2816 latency **compile_cudagraphs** at 32 rows: 0.89× [0.87, 0.91]
+- cuda/float16 1024×2816 latency **compile_cudagraphs** at 64 rows: 0.87× [0.83, 0.91]
+- cuda/float16 1024×2816 latency **cuda_graph_triton** at 1 rows: 0.28× [0.26, 0.30]
+- cuda/float16 1024×2816 latency **cuda_graph_triton** at 2 rows: 0.29× [0.26, 0.32]
+- cuda/float16 1024×2816 latency **cuda_graph_triton** at 4 rows: 0.27× [0.24, 0.29]
+- cuda/float16 1024×2816 latency **cuda_graph_triton** at 8 rows: 0.25× [0.23, 0.28]
+- cuda/float16 1024×2816 latency **cuda_graph_triton** at 16 rows: 0.27× [0.25, 0.29]
+- cuda/float16 1024×2816 latency **cuda_graph_triton** at 32 rows: 0.24× [0.21, 0.26]
+- cuda/float16 1024×2816 latency **cuda_graph_triton** at 64 rows: 0.16× [0.15, 0.16]
+- cuda/float16 1024×2816 latency **triton** at 1 rows: 0.25× [0.22, 0.28]
+- cuda/float16 1024×2816 latency **triton** at 2 rows: 0.26× [0.24, 0.30]
+- cuda/float16 1024×2816 latency **triton** at 4 rows: 0.26× [0.23, 0.28]
+- cuda/float16 1024×2816 latency **triton** at 8 rows: 0.23× [0.21, 0.26]
+- cuda/float16 1024×2816 latency **triton** at 16 rows: 0.25× [0.23, 0.28]
+- cuda/float16 1024×2816 latency **triton** at 32 rows: 0.21× [0.19, 0.24]
+- cuda/float16 1024×2816 latency **triton** at 64 rows: 0.16× [0.15, 0.17]
+- cuda/float16 1024×2816 throughput **compile_cudagraphs** at 8 rows: 0.99× [0.98, 1.00]
+- cuda/float16 1024×2816 throughput **compile_cudagraphs** at 32 rows: 0.95× [0.94, 0.96]
+- cuda/float16 1024×2816 throughput **compile_cudagraphs** at 64 rows: 0.87× [0.86, 0.88]
+- cuda/float16 1024×2816 throughput **cuda_graph_triton** at 1 rows: 0.41× [0.41, 0.41]
+- cuda/float16 1024×2816 throughput **cuda_graph_triton** at 2 rows: 0.42× [0.40, 0.43]
+- cuda/float16 1024×2816 throughput **cuda_graph_triton** at 4 rows: 0.42× [0.41, 0.42]
+- cuda/float16 1024×2816 throughput **cuda_graph_triton** at 8 rows: 0.40× [0.38, 0.41]
+- cuda/float16 1024×2816 throughput **cuda_graph_triton** at 16 rows: 0.41× [0.40, 0.41]
+- cuda/float16 1024×2816 throughput **cuda_graph_triton** at 32 rows: 0.26× [0.26, 0.26]
+- cuda/float16 1024×2816 throughput **cuda_graph_triton** at 64 rows: 0.14× [0.14, 0.14]
+- cuda/float16 1024×2816 throughput **triton** at 1 rows: 0.40× [0.39, 0.41]
+- cuda/float16 1024×2816 throughput **triton** at 2 rows: 0.41× [0.39, 0.43]
+- cuda/float16 1024×2816 throughput **triton** at 4 rows: 0.41× [0.39, 0.42]
+- cuda/float16 1024×2816 throughput **triton** at 8 rows: 0.38× [0.36, 0.41]
+- cuda/float16 1024×2816 throughput **triton** at 16 rows: 0.40× [0.39, 0.41]
+- cuda/float16 1024×2816 throughput **triton** at 32 rows: 0.26× [0.26, 0.26]
+- cuda/float16 1024×2816 throughput **triton** at 64 rows: 0.14× [0.14, 0.14]
+- cuda/float16 2048×5632 latency **compile_cudagraphs** at 1 rows: 0.38× [0.37, 0.38]
+- cuda/float16 2048×5632 latency **compile_cudagraphs** at 8 rows: 0.41× [0.40, 0.41]
+- cuda/float16 2048×5632 latency **cuda_graph_triton** at 1 rows: 0.16× [0.16, 0.16]
+- cuda/float16 2048×5632 latency **cuda_graph_triton** at 8 rows: 0.18× [0.17, 0.18]
+- cuda/float16 2048×5632 latency **triton** at 1 rows: 0.15× [0.15, 0.16]
+- cuda/float16 2048×5632 latency **triton** at 8 rows: 0.18× [0.18, 0.18]
+- cuda/float16 2048×5632 throughput **compile_cudagraphs** at 1 rows: 0.36× [0.36, 0.36]
+- cuda/float16 2048×5632 throughput **compile_cudagraphs** at 8 rows: 0.40× [0.40, 0.40]
+- cuda/float16 2048×5632 throughput **cuda_graph_triton** at 1 rows: 0.15× [0.14, 0.15]
+- cuda/float16 2048×5632 throughput **cuda_graph_triton** at 8 rows: 0.16× [0.16, 0.16]
+- cuda/float16 2048×5632 throughput **triton** at 1 rows: 0.14× [0.14, 0.14]
+- cuda/float16 2048×5632 throughput **triton** at 8 rows: 0.16× [0.16, 0.16]
+- cuda/float32 1024×2816 latency **cuda_graph_triton** at 1 rows: 0.27× [0.25, 0.29]
+- cuda/float32 1024×2816 latency **cuda_graph_triton** at 8 rows: 0.41× [0.39, 0.43]
+- cuda/float32 1024×2816 latency **cuda_graph_triton** at 32 rows: 0.37× [0.35, 0.39]
+- cuda/float32 1024×2816 latency **triton** at 1 rows: 0.24× [0.22, 0.27]
+- cuda/float32 1024×2816 latency **triton** at 8 rows: 0.38× [0.36, 0.42]
+- cuda/float32 1024×2816 latency **triton** at 32 rows: 0.34× [0.32, 0.36]
+- cuda/float32 1024×2816 throughput **cuda_graph_triton** at 1 rows: 0.35× [0.35, 0.35]
+- cuda/float32 1024×2816 throughput **cuda_graph_triton** at 8 rows: 0.53× [0.53, 0.53]
+- cuda/float32 1024×2816 throughput **cuda_graph_triton** at 32 rows: 0.38× [0.38, 0.39]
+- cuda/float32 1024×2816 throughput **triton** at 1 rows: 0.35× [0.35, 0.35]
+- cuda/float32 1024×2816 throughput **triton** at 8 rows: 0.53× [0.53, 0.53]
+- cuda/float32 1024×2816 throughput **triton** at 32 rows: 0.38× [0.37, 0.38]
 - mps/float32 1024×2816 latency **metal** at 32 rows: 0.81× [0.70, 0.93]
 
 ## Bandwidth roofline (pipelined mode)
@@ -225,6 +426,87 @@ Achieved GB/s is **derived** (weight bytes ÷ measured p50). The nominal bandwid
 | mps | float16 | 512×1408 | fused_weights | 8 | 409 | 42.3 | 35% | 144 |
 | mps | float16 | 512×1408 | compile | 8 | 511 | 33.9 | 28% | 144 |
 | mps | float16 | 512×1408 | metal | 8 | 317 | 54.6 | 45% | 144 |
+| cuda | float16 | 1024×2816 | eager | 1 | 937 | 73.9 | 23% | 216 |
+| cuda | float16 | 1024×2816 | fused_weights | 1 | 560 | 123.5 | 39% | 216 |
+| cuda | float16 | 1024×2816 | compile | 1 | 606 | 114.1 | 36% | 216 |
+| cuda | float16 | 1024×2816 | compile_cudagraphs | 1 | 946 | 73.1 | 23% | 216 |
+| cuda | float16 | 1024×2816 | triton | 1 | 2,298 | 30.1 | 9% | 216 |
+| cuda | float16 | 1024×2816 | cuda_graph_eager | 1 | 462 | 149.9 | 47% | 216 |
+| cuda | float16 | 1024×2816 | cuda_graph_triton | 1 | 2,294 | 30.2 | 9% | 216 |
+| cuda | float16 | 1024×2816 | eager | 2 | 962 | 72.0 | 22% | 216 |
+| cuda | float16 | 1024×2816 | fused_weights | 2 | 557 | 124.3 | 39% | 216 |
+| cuda | float16 | 1024×2816 | compile | 2 | 605 | 114.3 | 36% | 216 |
+| cuda | float16 | 1024×2816 | compile_cudagraphs | 2 | 954 | 72.6 | 23% | 216 |
+| cuda | float16 | 1024×2816 | triton | 2 | 2,303 | 30.0 | 9% | 216 |
+| cuda | float16 | 1024×2816 | cuda_graph_eager | 2 | 474 | 146.1 | 46% | 216 |
+| cuda | float16 | 1024×2816 | cuda_graph_triton | 2 | 2,302 | 30.1 | 9% | 216 |
+| cuda | float16 | 1024×2816 | eager | 4 | 967 | 71.6 | 22% | 216 |
+| cuda | float16 | 1024×2816 | fused_weights | 4 | 559 | 123.9 | 39% | 216 |
+| cuda | float16 | 1024×2816 | compile | 4 | 607 | 114.1 | 36% | 216 |
+| cuda | float16 | 1024×2816 | compile_cudagraphs | 4 | 957 | 72.3 | 23% | 216 |
+| cuda | float16 | 1024×2816 | triton | 4 | 2,316 | 29.9 | 9% | 216 |
+| cuda | float16 | 1024×2816 | cuda_graph_eager | 4 | 476 | 145.5 | 45% | 216 |
+| cuda | float16 | 1024×2816 | cuda_graph_triton | 4 | 2,312 | 29.9 | 9% | 216 |
+| cuda | float16 | 1024×2816 | eager | 8 | 948 | 73.0 | 23% | 216 |
+| cuda | float16 | 1024×2816 | fused_weights | 8 | 551 | 125.7 | 39% | 216 |
+| cuda | float16 | 1024×2816 | compile | 8 | 594 | 116.5 | 36% | 216 |
+| cuda | float16 | 1024×2816 | compile_cudagraphs | 8 | 962 | 71.9 | 22% | 216 |
+| cuda | float16 | 1024×2816 | triton | 8 | 2,340 | 29.6 | 9% | 216 |
+| cuda | float16 | 1024×2816 | cuda_graph_eager | 8 | 481 | 144.0 | 45% | 216 |
+| cuda | float16 | 1024×2816 | cuda_graph_triton | 8 | 2,335 | 29.6 | 9% | 216 |
+| cuda | float16 | 1024×2816 | eager | 16 | 965 | 71.8 | 22% | 216 |
+| cuda | float16 | 1024×2816 | fused_weights | 16 | 565 | 122.5 | 38% | 216 |
+| cuda | float16 | 1024×2816 | compile | 16 | 611 | 113.4 | 35% | 216 |
+| cuda | float16 | 1024×2816 | compile_cudagraphs | 16 | 971 | 71.2 | 22% | 216 |
+| cuda | float16 | 1024×2816 | triton | 16 | 2,373 | 29.2 | 9% | 216 |
+| cuda | float16 | 1024×2816 | cuda_graph_eager | 16 | 496 | 139.6 | 44% | 216 |
+| cuda | float16 | 1024×2816 | cuda_graph_triton | 16 | 2,365 | 29.3 | 9% | 216 |
+| cuda | float16 | 1024×2816 | eager | 32 | 987 | 70.1 | 22% | 216 |
+| cuda | float16 | 1024×2816 | fused_weights | 32 | 584 | 118.5 | 37% | 216 |
+| cuda | float16 | 1024×2816 | compile | 32 | 620 | 111.7 | 35% | 216 |
+| cuda | float16 | 1024×2816 | compile_cudagraphs | 32 | 1,047 | 66.1 | 21% | 216 |
+| cuda | float16 | 1024×2816 | triton | 32 | 3,833 | 18.1 | 6% | 216 |
+| cuda | float16 | 1024×2816 | cuda_graph_eager | 32 | 586 | 118.0 | 37% | 216 |
+| cuda | float16 | 1024×2816 | cuda_graph_triton | 32 | 3,832 | 18.1 | 6% | 216 |
+| cuda | float16 | 1024×2816 | eager | 64 | 968 | 71.5 | 22% | 216 |
+| cuda | float16 | 1024×2816 | fused_weights | 64 | 592 | 116.8 | 37% | 216 |
+| cuda | float16 | 1024×2816 | compile | 64 | 628 | 110.2 | 34% | 216 |
+| cuda | float16 | 1024×2816 | compile_cudagraphs | 64 | 1,124 | 61.6 | 19% | 216 |
+| cuda | float16 | 1024×2816 | triton | 64 | 7,030 | 9.8 | 3% | 216 |
+| cuda | float16 | 1024×2816 | cuda_graph_eager | 64 | 683 | 101.3 | 32% | 216 |
+| cuda | float16 | 1024×2816 | cuda_graph_triton | 64 | 7,026 | 9.9 | 3% | 216 |
+| cuda | float32 | 1024×2816 | eager | 1 | 746 | 185.6 | 58% | 433 |
+| cuda | float32 | 1024×2816 | fused_weights | 1 | 619 | 223.5 | 70% | 433 |
+| cuda | float32 | 1024×2816 | triton | 1 | 2,138 | 64.8 | 20% | 433 |
+| cuda | float32 | 1024×2816 | cuda_graph_triton | 1 | 2,141 | 64.7 | 20% | 433 |
+| cuda | float32 | 1024×2816 | eager | 8 | 1,147 | 120.7 | 38% | 433 |
+| cuda | float32 | 1024×2816 | fused_weights | 8 | 863 | 160.4 | 50% | 433 |
+| cuda | float32 | 1024×2816 | triton | 8 | 2,146 | 64.5 | 20% | 433 |
+| cuda | float32 | 1024×2816 | cuda_graph_triton | 8 | 2,148 | 64.4 | 20% | 433 |
+| cuda | float32 | 1024×2816 | eager | 32 | 1,266 | 109.4 | 34% | 433 |
+| cuda | float32 | 1024×2816 | fused_weights | 32 | 1,196 | 115.7 | 36% | 433 |
+| cuda | float32 | 1024×2816 | triton | 32 | 3,312 | 41.8 | 13% | 433 |
+| cuda | float32 | 1024×2816 | cuda_graph_triton | 32 | 3,280 | 42.2 | 13% | 433 |
+| cuda | float16 | 512×1408 | eager | 1 | 949 | 18.2 | 6% | 54 |
+| cuda | float16 | 512×1408 | triton | 1 | 1,574 | 11.0 | 3% | 54 |
+| cuda | float16 | 512×1408 | cuda_graph_eager | 1 | 377 | 45.9 | 14% | 54 |
+| cuda | float16 | 512×1408 | cuda_graph_triton | 1 | 1,578 | 11.0 | 3% | 54 |
+| cuda | float16 | 512×1408 | compile_cudagraphs | 1 | 329 | 52.7 | 16% | 54 |
+| cuda | float16 | 512×1408 | eager | 8 | 974 | 17.8 | 6% | 54 |
+| cuda | float16 | 512×1408 | triton | 8 | 1,579 | 11.0 | 3% | 54 |
+| cuda | float16 | 512×1408 | cuda_graph_eager | 8 | 413 | 42.0 | 13% | 54 |
+| cuda | float16 | 512×1408 | cuda_graph_triton | 8 | 1,577 | 11.0 | 3% | 54 |
+| cuda | float16 | 512×1408 | compile_cudagraphs | 8 | 382 | 45.3 | 14% | 54 |
+| cuda | float16 | 2048×5632 | eager | 1 | 1,321 | 209.6 | 65% | 865 |
+| cuda | float16 | 2048×5632 | triton | 1 | 9,077 | 30.5 | 10% | 865 |
+| cuda | float16 | 2048×5632 | cuda_graph_eager | 1 | 1,289 | 214.8 | 67% | 865 |
+| cuda | float16 | 2048×5632 | cuda_graph_triton | 1 | 9,078 | 30.5 | 10% | 865 |
+| cuda | float16 | 2048×5632 | compile_cudagraphs | 1 | 3,676 | 75.3 | 24% | 865 |
+| cuda | float16 | 2048×5632 | eager | 8 | 1,470 | 188.3 | 59% | 865 |
+| cuda | float16 | 2048×5632 | triton | 8 | 9,002 | 30.8 | 10% | 865 |
+| cuda | float16 | 2048×5632 | cuda_graph_eager | 8 | 1,473 | 188.0 | 59% | 865 |
+| cuda | float16 | 2048×5632 | cuda_graph_triton | 8 | 8,980 | 30.8 | 10% | 865 |
+| cuda | float16 | 2048×5632 | compile_cudagraphs | 8 | 3,706 | 74.7 | 23% | 865 |
 
 ## Serving (measured, open-loop replay)
 
@@ -260,36 +542,72 @@ Achieved GB/s is **derived** (weight bytes ÷ measured p50). The nominal bandwid
 | compile | static8 | poisson | 800 | 7,989 | 23,456 | 0.466 | 430 | 8.0 | 0.41 |
 | compile | static8 | poisson | 1,200 | 6,785 | 22,949 | 0.257 | 890 | 8.0 | 0.62 |
 | compile | static8 | poisson | 1,600 | 6,576 | 22,558 | 0.343 | 1,058 | 8.0 | 0.81 |
+| cuda_graph_triton | direct | poisson | 250 | 2,307 | 4,246 | 1.000 | 0 | 1.0 | 0.46 |
+| cuda_graph_triton | direct | poisson | 500 | 2,896 | 4,341 | 1.000 | 0 | 1.0 | 0.72 |
+| cuda_graph_triton | direct | poisson | 1,000 | 3,753 | 4,425 | 1.000 | 0 | 1.0 | 0.89 |
+| cuda_graph_triton | direct | poisson | 2,000 | 4,075 | 4,455 | 1.000 | 0 | 1.0 | 0.84 |
+| cuda_graph_triton | direct | poisson | 4,000 | 4,263 | 4,460 | 1.000 | 0 | 1.0 | 0.93 |
+| cuda_graph_triton | direct | poisson | 8,000 | 4,352 | 4,490 | 1.000 | 0 | 1.0 | 0.93 |
+| cuda_graph_triton | dynamic | poisson | 250 | 2,503 | 6,394 | 1.000 | 0 | 1.2 | 0.48 |
+| cuda_graph_triton | dynamic | poisson | 500 | 2,930 | 4,336 | 1.000 | 0 | 1.6 | 0.72 |
+| cuda_graph_triton | dynamic | poisson | 1,000 | 3,402 | 4,419 | 1.000 | 0 | 2.9 | 0.89 |
+| cuda_graph_triton | dynamic | poisson | 2,000 | 3,488 | 4,469 | 1.000 | 0 | 4.9 | 0.93 |
+| cuda_graph_triton | dynamic | poisson | 4,000 | 3,630 | 7,145 | 1.000 | 0 | 9.0 | 0.93 |
+| cuda_graph_triton | dynamic | poisson | 8,000 | 4,481 | 9,797 | 1.000 | 0 | 17.2 | 0.94 |
+| cuda_graph_triton | static8 | poisson | 250 | n/a | n/a | 1.000 | 0 | n/a | 0.00 |
+| cuda_graph_triton | static8 | poisson | 500 | n/a | n/a | 1.000 | 0 | n/a | 0.00 |
+| cuda_graph_triton | static8 | poisson | 1,000 | 6,904 | 7,925 | 1.000 | 0 | 8.0 | 0.02 |
+| cuda_graph_triton | static8 | poisson | 2,000 | 6,586 | 7,765 | 1.000 | 0 | 8.0 | 0.30 |
+| cuda_graph_triton | static8 | poisson | 4,000 | 3,496 | 7,277 | 1.000 | 0 | 8.0 | 0.67 |
+| cuda_graph_triton | static8 | poisson | 8,000 | 3,983 | 7,527 | 1.000 | 0 | 8.0 | 0.93 |
 | eager | direct | bursty | 300 | 9,283 | 19,335 | 0.690 | 97 | 1.0 | 0.48 |
 | eager | direct | poisson | 50 | 3,207 | 8,589 | 0.006 | 59 | 1.0 | 0.21 |
 | eager | direct | poisson | 100 | 2,262 | 6,705 | 0.000 | 99 | 1.0 | 0.23 |
 | eager | direct | poisson | 200 | 2,381 | 19,036 | 0.074 | 181 | 1.0 | 0.47 |
+| eager | direct | poisson | 250 | 1,228 | 2,846 | 0.170 | 200 | 1.0 | 0.28 |
 | eager | direct | poisson | 300 | 4,500 | 24,321 | 0.279 | 218 | 1.0 | 0.78 |
 | eager | direct | poisson | 400 | 5,380 | 25,188 | 0.366 | 251 | 1.0 | 0.85 |
+| eager | direct | poisson | 500 | 1,391 | 3,152 | 0.381 | 296 | 1.0 | 0.52 |
 | eager | direct | poisson | 600 | 8,724 | 22,962 | 0.614 | 232 | 1.0 | 0.97 |
 | eager | direct | poisson | 800 | 10,961 | 27,618 | 0.871 | 104 | 1.0 | 0.99 |
+| eager | direct | poisson | 1,000 | 2,346 | 3,358 | 0.785 | 222 | 1.0 | 0.79 |
 | eager | direct | poisson | 1,200 | 11,534 | 29,953 | 0.972 | 34 | 1.0 | 0.99 |
 | eager | direct | poisson | 1,600 | 11,521 | 25,807 | 0.986 | 22 | 1.0 | 0.99 |
+| eager | direct | poisson | 2,000 | 2,805 | 3,264 | 0.961 | 76 | 1.0 | 0.86 |
+| eager | direct | poisson | 4,000 | 2,995 | 3,387 | 0.998 | 6 | 1.0 | 0.86 |
+| eager | direct | poisson | 8,000 | 3,056 | 3,816 | 1.000 | 0 | 1.0 | 0.86 |
 | eager | dynamic | bursty | 300 | 4,107 | 26,637 | 0.195 | 251 | 4.3 | 0.40 |
 | eager | dynamic | poisson | 50 | 4,074 | 42,292 | 0.141 | 51 | 1.1 | 0.27 |
 | eager | dynamic | poisson | 100 | 3,448 | 26,083 | 0.164 | 83 | 1.2 | 0.37 |
 | eager | dynamic | poisson | 200 | 4,569 | 48,105 | 0.370 | 122 | 1.7 | 0.66 |
+| eager | dynamic | poisson | 250 | 1,595 | 2,586 | 0.146 | 206 | 1.2 | 0.26 |
 | eager | dynamic | poisson | 300 | 3,477 | 392,408 | 0.379 | 190 | 2.1 | 0.69 |
 | eager | dynamic | poisson | 400 | 3,507 | 273,956 | 0.334 | 264 | 2.4 | 0.76 |
+| eager | dynamic | poisson | 500 | 1,636 | 3,304 | 0.270 | 349 | 1.5 | 0.47 |
 | eager | dynamic | poisson | 600 | 3,717 | 67,412 | 0.317 | 409 | 3.3 | 0.85 |
 | eager | dynamic | poisson | 800 | 3,329 | 30,824 | 0.160 | 678 | 3.4 | 0.88 |
+| eager | dynamic | poisson | 1,000 | 1,763 | 2,901 | 0.370 | 649 | 2.3 | 0.70 |
 | eager | dynamic | poisson | 1,200 | 4,949 | 87,758 | 0.397 | 727 | 6.7 | 0.98 |
 | eager | dynamic | poisson | 1,600 | 4,551 | 33,418 | 0.284 | 1,158 | 8.1 | 0.98 |
+| eager | dynamic | poisson | 2,000 | 1,899 | 2,979 | 0.432 | 1,121 | 3.7 | 0.82 |
+| eager | dynamic | poisson | 4,000 | 1,949 | 2,994 | 0.463 | 2,150 | 6.7 | 0.86 |
+| eager | dynamic | poisson | 8,000 | 1,974 | 3,334 | 0.485 | 4,158 | 12.7 | 0.86 |
 | eager | static8 | bursty | 300 | 7,466 | 16,094 | 0.467 | 166 | 8.0 | 0.12 |
 | eager | static8 | poisson | 50 | n/a | n/a | 1.000 | 0 | n/a | 0.00 |
 | eager | static8 | poisson | 100 | n/a | n/a | 1.000 | 0 | n/a | 0.00 |
 | eager | static8 | poisson | 200 | n/a | n/a | 1.000 | 0 | n/a | 0.00 |
+| eager | static8 | poisson | 250 | n/a | n/a | 1.000 | 0 | n/a | 0.00 |
 | eager | static8 | poisson | 300 | 10,168 | 35,865 | 0.942 | 18 | 8.0 | 0.03 |
 | eager | static8 | poisson | 400 | 8,359 | 18,556 | 0.808 | 76 | 8.0 | 0.07 |
+| eager | static8 | poisson | 500 | n/a | n/a | 1.000 | 0 | n/a | 0.00 |
 | eager | static8 | poisson | 600 | 9,332 | 30,589 | 0.674 | 197 | 8.0 | 0.27 |
 | eager | static8 | poisson | 800 | 9,375 | 30,679 | 0.567 | 348 | 8.0 | 0.47 |
+| eager | static8 | poisson | 1,000 | 2,459 | 3,554 | 0.992 | 8 | 8.0 | 0.01 |
 | eager | static8 | poisson | 1,200 | 7,577 | 37,978 | 0.417 | 700 | 8.0 | 0.70 |
 | eager | static8 | poisson | 1,600 | 7,078 | 27,913 | 0.395 | 975 | 8.0 | 0.81 |
+| eager | static8 | poisson | 2,000 | 2,039 | 3,374 | 0.872 | 251 | 8.0 | 0.08 |
+| eager | static8 | poisson | 4,000 | 2,083 | 3,352 | 0.622 | 1,504 | 8.0 | 0.52 |
+| eager | static8 | poisson | 8,000 | 2,682 | 3,311 | 0.944 | 453 | 8.0 | 0.86 |
 | metal | direct | bursty | 300 | 7,874 | 16,227 | 0.570 | 134 | 1.0 | 0.43 |
 | metal | direct | poisson | 50 | 2,860 | 29,951 | 0.192 | 48 | 1.0 | 0.27 |
 | metal | direct | poisson | 100 | 2,288 | 22,802 | 0.117 | 88 | 1.0 | 0.31 |
@@ -320,6 +638,24 @@ Achieved GB/s is **derived** (weight bytes ÷ measured p50). The nominal bandwid
 | metal | static8 | poisson | 800 | 7,111 | 19,260 | 0.387 | 495 | 8.0 | 0.32 |
 | metal | static8 | poisson | 1,200 | 6,160 | 25,371 | 0.188 | 975 | 8.0 | 0.55 |
 | metal | static8 | poisson | 1,600 | 5,919 | 25,144 | 0.241 | 1,223 | 8.0 | 0.72 |
+| triton | direct | poisson | 250 | 2,395 | 4,312 | 1.000 | 0 | 1.0 | 0.47 |
+| triton | direct | poisson | 500 | 3,055 | 4,450 | 1.000 | 0 | 1.0 | 0.73 |
+| triton | direct | poisson | 1,000 | 3,858 | 4,539 | 1.000 | 0 | 1.0 | 0.90 |
+| triton | direct | poisson | 2,000 | 4,231 | 4,585 | 1.000 | 0 | 1.0 | 0.93 |
+| triton | direct | poisson | 4,000 | 4,372 | 4,598 | 1.000 | 0 | 1.0 | 0.93 |
+| triton | direct | poisson | 8,000 | 4,452 | 4,714 | 1.000 | 0 | 1.0 | 0.93 |
+| triton | dynamic | poisson | 250 | 2,599 | 6,641 | 1.000 | 0 | 1.2 | 0.50 |
+| triton | dynamic | poisson | 500 | 2,957 | 4,387 | 1.000 | 0 | 1.6 | 0.72 |
+| triton | dynamic | poisson | 1,000 | 3,467 | 4,458 | 1.000 | 0 | 2.9 | 0.89 |
+| triton | dynamic | poisson | 2,000 | 3,517 | 4,529 | 1.000 | 0 | 4.9 | 0.93 |
+| triton | dynamic | poisson | 4,000 | 3,629 | 7,396 | 1.000 | 0 | 9.0 | 0.93 |
+| triton | dynamic | poisson | 8,000 | 4,441 | 10,001 | 1.000 | 0 | 17.1 | 0.94 |
+| triton | static8 | poisson | 250 | n/a | n/a | 1.000 | 0 | n/a | 0.00 |
+| triton | static8 | poisson | 500 | n/a | n/a | 1.000 | 0 | n/a | 0.00 |
+| triton | static8 | poisson | 1,000 | 7,099 | 8,105 | 1.000 | 0 | 8.0 | 0.02 |
+| triton | static8 | poisson | 2,000 | 6,676 | 7,841 | 1.000 | 0 | 8.0 | 0.31 |
+| triton | static8 | poisson | 4,000 | 3,565 | 7,331 | 1.000 | 0 | 8.0 | 0.74 |
+| triton | static8 | poisson | 8,000 | 4,073 | 7,678 | 1.000 | 0 | 8.0 | 0.94 |
 
 Operating envelope (≤1% misses, 10 ms deadline): compile/direct: none, compile/dynamic: 100, compile/static8: none, eager/direct: 100, eager/dynamic: none, eager/static8: none, metal/direct: none, metal/dynamic: none, metal/static8: none
 

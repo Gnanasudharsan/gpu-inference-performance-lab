@@ -1,0 +1,35 @@
+{
+  "impl": "compile",
+  "device": "cuda",
+  "dtype": "float16",
+  "rows": 32,
+  "iters": 20,
+  "dispatches_per_forward": 8.0,
+  "custom_kernel_launches_per_forward": 0.0,
+  "custom_kernels": {},
+  "launches_per_forward": 8.0,
+  "launch_count_complete": false,
+  "top_ops": [
+    {
+      "name": "aten::addmm",
+      "calls_per_forward": 4.0,
+      "self_cpu_us_per_forward": 161.0503
+    },
+    {
+      "name": "aten::mm",
+      "calls_per_forward": 4.0,
+      "self_cpu_us_per_forward": 109.14589999999862
+    }
+  ],
+  "cuda_kernels_per_forward": 20.0,
+  "cuda_kernel_us_per_forward": 654.2231500000003,
+  "gpu_forward_span_us": 896.4276500000002,
+  "annotations_excluded": true,
+  "cuda_kernel_names": {
+    "triton_per_fused__fused_rms_norm_0": 80,
+    "turing_fp16_s1688gemm_fp16_256x64_ldg8_f2f_stages_32x1_tn": 80,
+    "triton_poi_fused_mul_silu_slice_1": 80,
+    "Memcpy DtoD (Device -> Device)": 80,
+    "void cutlass::Kernel2<cutlass_75_wmma_tensorop_f16_s161616gemm_f16_32x32_128x2_tn_align8>(cutlass_75_wmma_tensorop_f16_s161616gemm_f16_32x32_128x2_tn_align8::Params)": 80
+  }
+}
