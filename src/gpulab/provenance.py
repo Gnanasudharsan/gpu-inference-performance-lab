@@ -121,8 +121,14 @@ def accelerators() -> list[AcceleratorInfo]:
                     name=p.name,
                     memory_bytes=int(p.total_memory),
                     compute_capability=f"{p.major}.{p.minor}",
+                    # --id: without it nvidia-smi prints one line per GPU (seen on a 2×T4 host)
                     driver=_run(
-                        ["nvidia-smi", "--query-gpu=driver_version", "--format=csv,noheader"]
+                        [
+                            "nvidia-smi",
+                            f"--id={i}",
+                            "--query-gpu=driver_version",
+                            "--format=csv,noheader",
+                        ]
                     ),
                 )
             )
