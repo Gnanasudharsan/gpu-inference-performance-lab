@@ -37,19 +37,27 @@ verified from what is not.
   - *Bursty arrivals:* the dynamic miss rate was 13.5–19.5%, against 57–69% for direct.
 - **Idle-gap penalty:** a 2 ms idle gap made requests 1.19× [1.01, 1.39] and 1.35× [1.18, 1.53]
   slower in two paired runs.
+- **NVIDIA T4 (Kaggle, one session, correctness gate passed with 289 tests on the GPU).** fp16,
+  1024×2816×4, 8 rows, pipelined:
+  - *eager + CUDA graph:* 1.98× [1.96, 1.99]
+  - *fused weights:* 1.70× [1.67, 1.73]
+  - *torch.compile:* 1.55× [1.46, 1.60]
+  - *Triton fused kernels:* 0.38× [0.36, 0.41], a measured loss
+  - *Replication:* a second passing session agreed within about ±0.03×.
+  - *Details:* [NVIDIA_T4.md](NVIDIA_T4.md).
 - **Live API from the browser:** 1.25× [1.19, 1.35] in a live run, and 1.28× [1.18, 1.41] in a
   cross-origin run from the production origin.
 
 ## Known limitations and incomplete work
 
-1. **No NVIDIA measurements.**
-   - *Missing:* Triton performance, CUDA-graph launch savings, `reduce-overhead`, Nsight
-     Systems/Compute traces, PTX/SASS inspection.
-   - *Cause:* no NVIDIA GPU and no authorized spend.
-   - *What would fill it:* `experiments/nvidia.toml` and [GPU_VALIDATION_PLAN.md](GPU_VALIDATION_PLAN.md).
+1. **NVIDIA coverage is one free-tier T4.**
+   - *Measured:* Triton, CUDA graphs, `reduce-overhead` and Nsight Systems.
+   - *Missing:* Nsight Compute, PTX/SASS, bf16, data-center GPUs, and between-session CIs.
+   - *Open questions:* the cause of the Triton slowdown (occupancy is a hypothesis), and the
+     `reduce-overhead` fix (diagnosed, not measured).
 2. **The GPU execution API is not deployed**; the dashboard's Live page needs a user-run backend.
    `deploy/Dockerfile` has not been built (no Docker daemon locally).
-3. **Triton bf16** is unverified, because of the CPU-interpreter bug.
+3. **Triton bf16** is unverified: the CPU interpreter has a bf16 bug, and the T4 has no bf16.
 4. **Development machine noise.**
    - Synchronous latency on the laptop GPU has clustered 3–10 ms stalls (~7% of round trips), and
      rare single-batch stalls of 114–392 ms.
@@ -71,14 +79,26 @@ the Git history:
 - wake-up jitter in the replay
 - a float-ulp test flake
 - a mis-attributed p99 claim in the docs
+- seven bugs that only real NVIDIA hardware exposed:
+  - the CUDA-graph runner did not own what its graph reads
+  - Triton re-autotuned in the middle of serving (p99 12.7 s)
+  - profiler annotation spans were counted as kernels
+  - the summary pooled failed sessions
+  - the Nsight script used the wrong CLI path
+  - the dashboard served a stale cached dataset
+  - the driver was duplicated in provenance
+
+  Details are in [NVIDIA_T4.md](NVIDIA_T4.md#bugs-that-only-real-nvidia-hardware-exposed).
 
 ## Follow-up opportunities (by expected value)
 
-1. A budgeted NVIDIA run: L4 or H100, with Nsight evidence, and a CUDA-graphs vs Triton comparison.
-2. Pipelining the serving round trip (double-buffered H2D/compute/D2H, or device-resident inputs).
-3. int8/fp8 weights with an accuracy study.
-4. Split-K for the narrow down projection; computing the norm statistic once per forward.
-5. Repeated serving runs with CIs, a deadline-derived queue bound, and a stall watchdog with hedging.
+1. Make the Triton kernel competitive: Nsight Compute on the T4 to test the occupancy hypothesis,
+   then split-K or stream-K. Then a data-center GPU (L4 or H100) run.
+2. Apply and measure the static-weights fix for `reduce-overhead`.
+3. Pipelining the serving round trip (double-buffered H2D/compute/D2H, or device-resident inputs).
+4. int8/fp8 weights with an accuracy study.
+5. Computing the norm statistic once per forward.
+6. Repeated serving runs with CIs, a deadline-derived queue bound, and a stall watchdog with hedging.
 
 ## Resume bullets (measured, verifiable from this repository)
 
@@ -95,7 +115,15 @@ the Git history:
 - Implemented a latency-aware serving layer with open-loop replay, bounded queues and deadline-aware
   dynamic batching. It reached 4–5× the peak goodput of direct execution under a 10 ms deadline, and
   showed that host↔GPU round trips, not kernels, bounded end-to-end latency.
+- Measured the same workload on an NVIDIA T4. The host was launch-bound (Nsight: 606 µs of kernels
+  in a 948 µs forward), so CUDA-graph replay gave 1.98× [1.96, 1.99] over eager PyTorch. That beat
+  operator fusion (1.70×) and torch.compile (1.55×).
+- Found and fixed seven bugs that only real NVIDIA hardware exposed. One was a CUDA-graph
+  memory-lifetime bug, isolated with an on-GPU diagnostic and pinned by a deterministic test.
+  Another was Triton re-autotuning per batch size in the middle of serving, which cut p99 from
+  12.7 s to 10 ms once fixed.
 - Shipped a static observability dashboard and a bounded, authenticated, rate-limited live-benchmark
   API with load, fuzz, dependency and accessibility checks in CI.
 
-*Not claimed:* any NVIDIA, Triton-performance or CUDA-graph number.
+*Not claimed:* a Triton speedup (it is a measured 0.38× slowdown on the T4), any data-center GPU
+number, or a verified cause for the Triton slowdown.

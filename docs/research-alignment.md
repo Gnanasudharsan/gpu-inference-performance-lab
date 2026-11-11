@@ -70,11 +70,11 @@ appeared only in search snippets for those pages, such as specific GPU SKUs, are
 | Skill named or implied by the sources | Where this project demonstrates it | Evidence type |
 |---|---|---|
 | Low-latency inference (S1) | Small-batch gated MLP workload; latency-SLO serving layer (Phase 4) | Measured (CPU and M4 GPU) |
-| CUDA graph launch latency (S1, S2) | CUDA-graph execution mode (Phase 3) | Implemented; measurement needs NVIDIA GPU |
-| Triton (S1, S3) | Fused RMSNorm and fused GEMM+SwiGLU / GEMM+residual Triton kernels | Correctness via `TRITON_INTERPRET=1` in CI; perf needs NVIDIA GPU |
+| CUDA graph launch latency (S1, S2) | CUDA-graph execution mode (Phase 3) | Measured on a T4: 1.98× over eager at 8 rows ([NVIDIA_T4.md](NVIDIA_T4.md)) |
+| Triton (S1, S3) | Fused RMSNorm and fused GEMM+SwiGLU / GEMM+residual Triton kernels | Correctness in CI (interpreter) and on a T4; performance measured on the T4: 0.38×, a loss |
 | Custom GPU kernels on available hardware | Fused Metal kernels via `torch.mps.compile_shader` on Apple M4 | Measured |
 | Fusion and `torch.compile` (S2, S3) | `fused_weights` and `compile` modes compared with eager | Measured |
-| Nsight Systems / Compute (S1, S3) | Profiling scripts and methodology; PyTorch-profiler traces collected locally | Nsight not available on macOS; PyTorch profiler measured |
+| Nsight Systems / Compute (S1, S3) | Profiling scripts and methodology; PyTorch-profiler traces | Nsight Systems run on the T4; Nsight Compute not yet run |
 | Goodput vs. throughput (S1) | Deadline-aware goodput metric in the benchmark and serving layer | Measured |
 | Whole-system view (S1) | Host-to-device transfer, queueing and service time measured separately | Measured |
 | Hidden synchronizations (S3) | Harness design; sync-count tests; documented contamination sources | Measured |
@@ -85,5 +85,5 @@ appeared only in search snippets for those pages, such as specific GPU SKUs, are
 ## Uncertainties
 
 - The exact GPU models and inference stack in production are not publicly verified.
-- No NVIDIA GPU is available on the development machine (Apple M4). CUDA-specific claims stay labeled
-  *pending* until they are measured on real hardware. See [GPU_VALIDATION_PLAN.md](GPU_VALIDATION_PLAN.md).
+- The development machine is an Apple M4. CUDA-specific claims come from one free-tier T4 session
+  ([NVIDIA_T4.md](NVIDIA_T4.md)), and they do not generalize to data-center GPUs.

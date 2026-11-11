@@ -3,9 +3,10 @@
 **Question.** How far can a correct PyTorch baseline for small-batch, latency-sensitive inference be
 pushed on the GPU that is actually available? And which parts of the system decide the answer?
 
-**Scope of evidence.** Everything *measured* here comes from one Apple M4 laptop (CPU and 10-core GPU
-via Metal/MPS, PyTorch 2.15.0). NVIDIA-specific work (Triton kernels, CUDA graphs, Nsight) is
-implemented and correctness-tested, but **unmeasured**. The generated, exhaustive tables are in
+**Scope of evidence.** The narrative below is measured on one Apple M4 laptop (CPU and 10-core GPU
+via Metal/MPS, PyTorch 2.15.0). The NVIDIA paths were measured later on a free Kaggle Tesla T4. That
+host is launch-bound: CUDA graphs gave 1.98×, and the Triton kernel was a measured 0.38× slowdown.
+Those results and their caveats are in [NVIDIA_T4.md](NVIDIA_T4.md). The generated, exhaustive tables are in
 [`results/ANALYSIS.md`](../results/ANALYSIS.md). This page is the narrative.
 
 ## 1. Bottlenecks, as measured before optimizing

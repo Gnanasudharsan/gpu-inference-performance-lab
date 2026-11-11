@@ -81,15 +81,30 @@ beats eager at large batch is measured below, not assumed.
 - Autotuning covers BLOCK_M ∈ {16, 32, 64} (16 is `tl.dot`'s minimum), BLOCK_N ∈ {32, 64, 128},
   BLOCK_K ∈ {64, 128}, and warps/stages. The interpreter uses one small config.
 
-**Verified:** fp32 and fp16 correctness on all test shapes under `TRITON_INTERPRET=1` in CI.
+**Verified:**
+- fp32 and fp16 correctness on all test shapes, under `TRITON_INTERPRET=1` in CI and on a real T4
+  (the session's 289-test correctness gate).
+
+**Measured on the T4** ([NVIDIA_T4.md](NVIDIA_T4.md)):
+- **Slower than eager everywhere:** 0.38× at 8 rows on the default model, 0.14–0.62× across the
+  sweep.
+- **Launches are not the cause.** It issues 8 kernels per forward against eager's 60, and CUDA-graph
+  replay leaves it unchanged.
+- **Nsight Systems puts the time inside the kernels.** The fastest instance per layer is 340 µs for
+  gate/up and 241 µs for down, about 24–34 GB/s effective. cuBLAS GEMMs reach about 168 GB/s.
+- **The autotune key is now bucketed to powers of two** (`gpulab.kernels.tuning.autotune_m_key`),
+  so serving warm-up covers every key. Keying on exact M re-tuned during serving and caused a 12.7 s
+  p99.
+
 **Not verified:**
 - *bf16:* a bare bf16 `tl.dot` is wrong under the Triton 3.9 CPU interpreter
-  (`tests/test_triton_bf16_diagnostic.py`, strict xfail).
-- *performance, register and shared-memory limits:* these need an NVIDIA GPU.
+  (`tests/test_triton_bf16_diagnostic.py`, strict xfail), and the T4 (sm_75) has no bf16.
+- *register and shared-memory limits:* Nsight Compute was not run.
 
 **Known design limit.** At M ≤ 16 the grid is only `ceil(N / BLOCK_N)` programs: 22–88 for the down
 projection here, fewer than the SM count of large GPUs. Split-K would raise occupancy. It needs a
-two-phase reduction because the SiLU and residual epilogues are applied after the full sum.
+two-phase reduction because the SiLU and residual epilogues are applied after the full sum. On the
+40-SM T4 this is the leading hypothesis for the measured slowdown; it is not yet confirmed.
 
 ## CUDA Graphs
 
@@ -97,8 +112,17 @@ two-phase reduction because the SiLU and residual epilogues are applied after th
 it with one launch. The runner copies the request into a static input buffer and clones the static
 output; both copies are included in measurements. A request with a different row count is rejected.
 The serving layer buckets and pads instead, so this never happens there. `compile_cudagraphs` uses
-Inductor's `reduce-overhead` mode. All three are implemented and tested for failure modes. Their
-performance is pending NVIDIA hardware.
+Inductor's `reduce-overhead` mode. All three are implemented and tested for failure modes.
+
+**Measured on the T4** (fp16, 1024×2816×4, 8 rows, pipelined):
+- `cuda_graph_eager` is **1.98× [1.96, 1.99]** over eager, the largest gain on that host. It
+  shrinks with model size: 2.35–2.59× at d=512, 1.00–1.13× at d=2048.
+- `cuda_graph_triton` is 0.40×; graphs cannot rescue a GPU-bound kernel.
+- `compile_cudagraphs` is 0.99× here, 2.99× at d=512 and 0.36–0.41× at d=2048. The likely cause is
+  per-replay weight copies (see [NVIDIA_T4.md](NVIDIA_T4.md)).
+- **A bug the T4 found:** the graph runner did not own the memory its graph reads, so a replay after
+  garbage collection read freed memory. `GraphRunner` now owns the inner runner, the weights and
+  the buffers, and `test_graph_runner_owns_what_it_replays` pins it.
 
 ## Measured results (Apple M4 GPU via MPS, PyTorch 2.15.0, commit `758dbd6`)
 

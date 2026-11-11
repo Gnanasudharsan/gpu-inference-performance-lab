@@ -100,7 +100,9 @@ with `git show`, so the comparison stays reproducible without keeping dead code 
 For this workload, Triton expresses the needed fusion (norm folded into the K-loop, two accumulators,
 nonlinear epilogues) at the tile level. No NVIDIA hardware was available to justify or validate
 hand-written CUDA or PTX. **Revisit** if Nsight Compute on a real GPU shows Triton failing to reach
-DRAM bandwidth at small M (for example, if split-K is needed).
+DRAM bandwidth at small M (for example, if split-K is needed). *Update:* on a T4 the Triton kernels
+reach about 24–34 GB/s against cuBLAS's ~168 GB/s ([NVIDIA_T4.md](NVIDIA_T4.md)). The next step is
+Nsight Compute and split-K within Triton; that comes before any move to CUDA C++.
 
 ## D14. Launch-config tuning and comparisons use pipelined mode
 

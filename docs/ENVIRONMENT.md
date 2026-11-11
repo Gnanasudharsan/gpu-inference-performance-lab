@@ -33,7 +33,8 @@ this information, so this page only summarizes the development machine.
 
 1. All measured numbers in this repository come from the Apple M4 CPU or the Apple M4 GPU through MPS,
    unless a record says otherwise.
-2. CUDA, Triton-on-GPU and CUDA-graph code paths are implemented and tested for **correctness** only
-   (Triton interpreter), until an NVIDIA GPU run is authorized.
+2. CUDA, Triton-on-GPU and CUDA-graph paths were measured on a Kaggle T4 (free tier), and are
+   recorded with that host's provenance ([NVIDIA_T4.md](NVIDIA_T4.md)). Locally they are covered by
+   correctness tests only (the Triton interpreter).
 3. Apple-GPU timings use `torch.mps.Event` plus host wall-clock time after `torch.mps.synchronize()`.
    They are not comparable to NVIDIA numbers and are never presented as such.

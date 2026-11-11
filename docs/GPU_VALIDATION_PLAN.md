@@ -1,7 +1,7 @@
 # GPU validation plan (NVIDIA)
 
-**Status: ready to run; not executed yet.** It needs the repository owner's Kaggle API token. Nothing
-in this file is a result.
+**Status: executed on a Kaggle T4 (2026-11-10).** See [Outcome](#outcome-2026-11-10) and
+[NVIDIA_T4.md](NVIDIA_T4.md). Apart from that section, this file is the plan, not a result.
 
 ## Chosen platform: Kaggle Notebooks, free tier (T4)
 
@@ -47,8 +47,9 @@ in this file is a result.
 ## How to run
 
 ```bash
-# one-time (account owner): phone-verify the Kaggle account; create an API token
-# (kaggle.com → Settings → API → Create New Token) and save it as ~/.kaggle/kaggle.json (chmod 600)
+# one-time (account owner): phone-verify the Kaggle account, then sign in from the browser:
+#   uvx --with six --from kaggle==2.2.5 kaggle auth login      (the session expires after ~3 h;
+#   `--force` re-authenticates; scripts/kaggle_run.sh --fetch resumes)
 scripts/kaggle_run.sh          # pushes the current pushed commit, runs (≤ 3 h cap), downloads,
                                # unpacks into results/gpu/kaggle-t4-<date>/, runs gpulab analyze
 scripts/kaggle_run.sh --fetch  # re-download the latest run's outputs only
@@ -68,3 +69,13 @@ make install && .venv/bin/python scripts/gpu_session.py --config experiments/nvi
 
 Explorer's `gpu` partition allows 4–8 h jobs, and `gpu-short` (1–2 h) schedules faster. The full
 `nvidia.toml` includes bf16 for Ampere or newer.
+
+## Outcome (2026-11-10)
+
+This plan was executed on the Kaggle T4 path. Two sessions failed their correctness gate and
+stopped before benchmarking, as designed. Two passed. The reported one is
+`results/gpu/kaggle-t4-20261110-1753/` (commit `36e9026`; 289 tests; every step ok, Nsight Systems
+included).
+
+Results, caveats and the bugs found are in [NVIDIA_T4.md](NVIDIA_T4.md). Nsight Compute and the
+full `nvidia.toml` (bf16 on Ampere or newer) remain unexecuted.

@@ -63,7 +63,8 @@
   difference. At d=512 it is 1.66×.
 - Regressions documented: CPU `torch.compile` (0.63–0.78×), CPU `fused_weights` at 8 rows (0.79×),
   and one MPS fp32 latency-mode case that the pipelined mode contradicts.
-- Not measured: anything CUDA-specific (no NVIDIA GPU).
+- Not measured at the time: anything CUDA-specific. That was measured later on a Kaggle T4 (see the
+  post-release section).
 - Gate: correctness passes; speedups and regressions are backed by paired CIs; profiler launch counts
   explain the gains. Process bugs found and fixed on the way: the interleaved CLI silently skipped
   throughput mode, the profiler missed custom kernels, and lint failures were masked by pipes.
@@ -146,4 +147,10 @@ including resume bullets limited to measured outcomes, are in `docs/`.
 - The Triton bf16 path is reported unsupported below compute capability 8.0.
 - Ingestion: `gpulab analyze` merges `results/gpu/*`. The dashboard gains CUDA views only when real
   CUDA records exist; the layout was checked once with a scratch-only fixture, which was deleted.
-- **Pending:** the run itself, which needs the owner's Kaggle API token.
+- **Done (2026-11-10).** Five T4 sessions plus two diagnostics.
+  - *Two gates failed and blocked the benchmarks,* as designed. One exposed the CUDA-graph lifetime
+    bug.
+  - *Two passed:* `83a0fc7`, and then `36e9026`, which verified the fixes for the four bugs the
+    first passing session exposed.
+  - *Reported session:* `results/gpu/kaggle-t4-20261110-1753/`.
+  - *Results:* [NVIDIA_T4.md](NVIDIA_T4.md).

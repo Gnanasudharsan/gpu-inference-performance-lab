@@ -1,8 +1,12 @@
 # Known limitations
 
-- **No NVIDIA GPU.** No NVIDIA hardware was available during development. CUDA, Triton-on-GPU,
-  CUDA-graph and Nsight results are not measured until the [GPU validation plan](GPU_VALIDATION_PLAN.md)
-  runs.
+- **NVIDIA evidence is one T4 session on a shared free-tier host.** See
+  [NVIDIA_T4.md](NVIDIA_T4.md).
+  - *What it measures:* a launch-bound Turing GPU (sm_75, no bf16) behind a slow 4-vCPU virtualized
+    host, in one session.
+  - *What it cannot tell you:* behavior on data-center GPUs (L4, A100, H100), where launch overhead
+    and occupancy limits differ.
+  - *No between-session CIs:* two passing sessions agreed within about ±0.03×, but that is not a CI.
 - **Research input.** The Deep Research report mentioned in the project brief was not supplied. The
   alignment uses public primary sources instead (see [research-alignment.md](research-alignment.md)).
 - **Single device.** Distributed training and collectives (NCCL, InfiniBand), which the role posting
@@ -15,9 +19,18 @@
   from this machine are indicative. Paired, interleaved speedups are the robust quantity.
 - **No device-side MPS timeline.** The PyTorch profiler has no MPS device activity, and Instruments
   is not installed. Device time comes from MPS events, and launch counts from leaf dispatches.
-- **Triton and CUDA graphs are unmeasured.** These paths are correctness-tested only (fp32/fp16 under
-  the interpreter). bf16 under the interpreter is blocked by a Triton interpreter bug
-  (`tests/test_triton_bf16_diagnostic.py`).
+- **The Triton kernel is slower than eager on the T4 (0.14–0.62×).**
+  - *What is measured:* the time is inside its two kernels (Nsight Systems).
+  - *What is not established:* the cause. Under-occupancy at small M is a hypothesis; Nsight Compute
+    was not run.
+  - *Also unexplained:* why Triton is much slower in latency mode than pipelined.
+- **`reduce-overhead` regresses at d ≥ 1024 on the T4.** The diagnosis is that its CUDA-graph trees
+  copy the weights on every replay, which the profiles are consistent with. The static-weights fix
+  is not applied or measured.
+- **The Triton Nsight capture includes autotuning.** Per-kernel averages in that capture are
+  contaminated, so only minimums are used. A capture range that starts after warm-up would fix it.
+- **bf16 Triton is unverified.** The CPU interpreter has a bf16 bug
+  (`tests/test_triton_bf16_diagnostic.py`), and the T4 has no bf16.
 - **Launch counts for `torch.compile` are incomplete.** Inductor-generated Metal kernels are invisible
   to the ATen-level profiler proxy.
 - **Serving sweep points are single 3-second runs.** Point-to-point noise is visible. Repeated runs

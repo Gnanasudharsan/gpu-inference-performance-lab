@@ -6,8 +6,9 @@
 |---|---|---|
 | PyTorch profiler (`gpulab profile`) | all | **Used.** Operator dispatches per forward, CPU-side dispatch cost, Chrome traces (`--trace`) |
 | `torch.mps.Event` / `torch.cuda.Event` | MPS / CUDA | **Used** for device time (separate instrumented pass) |
-| Nsight Systems (`scripts/profile_nsys.sh`) | NVIDIA | Written, **not executed** (no NVIDIA GPU; Nsight is unsupported on macOS hosts) |
-| Nsight Compute (`scripts/profile_ncu.sh`) | NVIDIA | Written, **not executed** |
+| Nsight Systems (`scripts/profile_nsys.sh`) | NVIDIA | **Executed on a Kaggle T4** (eager and `cuda_graph_triton`, 8 rows); kernel summaries in `results/gpu/kaggle-t4-20261110-1753/gpulab_results/*_cuda_gpu_kern_sum.csv`. The Triton capture includes autotuning ([NVIDIA_T4.md](NVIDIA_T4.md)) |
+| Nsight Compute (`scripts/profile_ncu.sh`) | NVIDIA | Written, **not executed** (`ncu` is on the Kaggle image; a candidate next step) |
+| PyTorch profiler, CUDA activity | NVIDIA | **Used on the T4.** Device kernels per forward. `record_function` spans are excluded and reported separately as `gpu_forward_span_us`; before that fix they were miscounted as kernels |
 | Triton interpreter (`TRITON_INTERPRET=1`) | any | **Used** in CI for kernel correctness. It says nothing about performance |
 | Xcode Instruments (Metal System Trace) | macOS | Not available: `xctrace` is missing because only the Command Line Tools are installed |
 

@@ -13,11 +13,11 @@ free Modal CPU container, labeled as such; point the page at your own GPU backen
 
 ![Dashboard overview](docs/screenshots/overview.png)
 
-> **Hardware honesty.** All measurements come from an **Apple M4** (10-core GPU via Metal/MPS, plus
-> CPU). No NVIDIA GPU was available or authorized. The Triton kernels, CUDA graphs and
-> `torch.compile(mode="reduce-overhead")` paths are implemented and correctness-tested in CI, but
-> **their performance is unmeasured**. See [GPU_VALIDATION_PLAN.md](docs/GPU_VALIDATION_PLAN.md) and
-> [`experiments/nvidia.toml`](experiments/nvidia.toml).
+> **Hardware honesty.** The kernel work was developed and measured on an **Apple M4** (10-core GPU
+> via Metal/MPS, plus CPU). The NVIDIA paths (Triton kernels, CUDA graphs, `reduce-overhead`) were
+> then measured on a **free Kaggle Tesla T4**: one session whose correctness gate passed with 289 tests
+> on the GPU ([NVIDIA_T4.md](docs/NVIDIA_T4.md)). It is a shared, virtualized, launch-bound host with
+> no bf16. Its numbers describe that setup, not data-center GPUs in general.
 
 ## Why this problem
 
@@ -60,12 +60,39 @@ ratios, bootstrap 95% CI. Records are in `results/phase3/` (commit `758dbd6`).
 - The first Metal kernel was 0.77× at 8 rows.
 - `torch.compile` on MPS is mostly indistinguishable from eager.
 
-All 114 comparisons are in [results/ANALYSIS.md](results/ANALYSIS.md).
+All 248 comparisons (Apple M4 and T4) are in [results/ANALYSIS.md](results/ANALYSIS.md).
 
 **The whole-system finding:** the 1.2× kernel speedup barely moves end-to-end serving. A served
 request costs ~2 ms (H2D copy, forward, synchronizing D2H), against ~0.8 ms of compute, and ~7% of
 synchronous GPU round trips stall for 3–10 ms on this machine. On this platform the next lever is
 the host↔GPU round trip, not the kernel ([ENGINEERING_REPORT.md](docs/ENGINEERING_REPORT.md)).
+
+## Results (NVIDIA Tesla T4 on Kaggle, torch 2.11 + CUDA 13.0)
+
+Same method and workload: fp16, 1024×2816×4, 8 rows, pipelined; commit `36e9026`
+([NVIDIA_T4.md](docs/NVIDIA_T4.md), `results/gpu/kaggle-t4-20261110-1753/`).
+
+| Implementation | µs per forward | speedup vs eager [95% CI] |
+|---|---|---|
+| eager (baseline) | 948 | 1.00× |
+| **eager + CUDA graph** | 481 | **1.98× [1.96, 1.99]** |
+| fused weights | 551 | 1.70× [1.67, 1.73] |
+| torch.compile | 594 | 1.55× [1.46, 1.60] |
+| **my Triton fused kernels** | 2,340 | **0.38× [0.36, 0.41]: slower** |
+
+- **The T4 host is launch-bound.** Nsight shows eager's 60 kernels per forward take 606 µs inside a
+  948 µs forward. CUDA-graph replay removes the CPU launch cost and doubles speed. The gain shrinks
+  with model size: 2.35–2.59× at d=512, 1.00–1.13× at d=2048.
+- **The Triton kernel is GPU-bound and slow.** CUDA graphs don't help it, and Nsight puts the time
+  inside its two kernels: about 24–34 GB/s, against about 168 GB/s for cuBLAS. The likely cause is
+  under-occupancy at small M (8–88 programs on 40 SMs, no split-K); that is a hypothesis, not yet
+  confirmed with Nsight Compute.
+- **`reduce-overhead` regresses as the model grows** (2.99× → 0.36–0.41×). Profiles show two extra
+  copy kernels per forward, consistent with Inductor copying the weights into its CUDA-graph buffers
+  on every replay. This is a diagnosis; the fix is not yet measured.
+- **Real hardware found seven bugs**, including a CUDA-graph lifetime bug and Triton re-autotuning
+  in the middle of serving (p99 12.7 s → 10 ms after the fix). All are listed in
+  [NVIDIA_T4.md](docs/NVIDIA_T4.md#bugs-that-only-real-nvidia-hardware-exposed).
 
 ## Architecture
 
@@ -112,8 +139,8 @@ flowchart LR
    measured.
 5. **Triton** (`kernels/triton_kernels.py`) applies the same fusion to tiled `tl.dot` GEMMs. Σx²
    accumulates inside the K-loop, there are two accumulators, fp32 uses `input_precision="ieee"`, and
-   configs are autotuned. **CUDA graphs** wrap either path for stable shapes. Both are
-   correctness-only so far.
+   configs are autotuned. **CUDA graphs** wrap either path for stable shapes. On the T4, CUDA graphs
+   are the biggest win (1.98×) and the Triton kernel is a measured loss (0.38×); see above.
 
 Rejected alternatives and their reasons are in [DECISIONS.md](docs/DECISIONS.md). Examples:
 - a full transformer workload
@@ -134,7 +161,9 @@ Rejected alternatives and their reasons are in [DECISIONS.md](docs/DECISIONS.md)
   strided inputs and leading dims. Repeated execution must be bitwise stable.
 - The benchmark harness **refuses to time** an implementation that fails correctness.
 - Triton runs under `TRITON_INTERPRET=1` in CI and passes in fp32/fp16. bf16 is blocked by a
-  reproducible Triton-interpreter bug (`tests/test_triton_bf16_diagnostic.py`, strict xfail).
+  reproducible Triton-interpreter bug (`tests/test_triton_bf16_diagnostic.py`, strict xfail). On the
+  real T4 the full suite is a gate: benchmarks run only if it passes (289 passed; bf16 is unsupported
+  below sm_80).
 
 ## Measurement methodology
 
@@ -158,6 +187,7 @@ make install && make check                      # lint (incl. security rules), m
 .venv/bin/gpulab bench --interleave --impls eager metal --rows 1 8 --modes throughput --trials 20
 .venv/bin/gpulab experiment experiments/apple_m4.toml     # full matrix (~25 min on an M-series Mac)
 .venv/bin/gpulab experiment experiments/nvidia.toml       # on a CUDA host
+scripts/kaggle_run.sh                                     # or: the T4 session on Kaggle's free tier
 .venv/bin/gpulab analyze                                  # results/summary.json + ANALYSIS.md
 .venv/bin/python scripts/perf_regression_check.py         # GPU perf regression gate
 cd web && npm ci && npm run build                         # dashboard from your data
@@ -193,8 +223,10 @@ See [REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md) for per-phase commands.
 - Throughput vs goodput: static batching's low-load failure, and why dynamic batching needs slack
   margins.
 - The whole-system lesson: kernel wins that do not survive the host↔GPU round trip.
-- What I would do on an H100 first: Nsight Systems on eager vs CUDA-graph replay, Nsight Compute DRAM
-  throughput for the Triton kernels at M ≤ 16, then split-K.
+- What the T4 changed: on a slow host, CUDA graphs beat every kernel change, and my Triton kernel
+  lost to cuBLAS. Real hardware also exposed seven bugs that CPU-only CI could not see.
+- What I would do next on a GPU: Nsight Compute on the Triton kernels at M ≤ 16 to test the
+  occupancy hypothesis, then split-K; and the static-weights fix for `reduce-overhead`.
 
 A 5- and 20-minute walkthrough is in [docs/interview-walkthrough.md](docs/interview-walkthrough.md).
 The audit is in [docs/final-audit.md](docs/final-audit.md).
@@ -205,7 +237,7 @@ The audit is in [docs/final-audit.md](docs/final-audit.md).
 [Workload](docs/WORKLOAD.md) · [Correctness](docs/CORRECTNESS.md) ·
 [Benchmark methodology](docs/BENCHMARK_METHODOLOGY.md) · [Profiling](docs/PROFILING.md) ·
 [Kernels](docs/KERNELS.md) · [Serving](docs/SERVING.md) ·
-[Engineering report](docs/ENGINEERING_REPORT.md) · [Dashboard](docs/DASHBOARD.md) ·
+[NVIDIA T4 results](docs/NVIDIA_T4.md) · [Engineering report](docs/ENGINEERING_REPORT.md) · [Dashboard](docs/DASHBOARD.md) ·
 [Deployment](docs/DEPLOYMENT.md) · [Decisions](docs/DECISIONS.md) ·
 [Known limitations](docs/KNOWN_LIMITATIONS.md) · [Phase status](docs/PHASE_STATUS.md) ·
 [Final audit](docs/final-audit.md)

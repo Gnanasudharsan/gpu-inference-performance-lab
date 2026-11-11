@@ -34,9 +34,12 @@ extrapolate them to NVIDIA hardware.
 
 - **What latency-sensitive means here.** Deadlines in the milliseconds, batch sizes near 1, and
   goodput (on-time work) rather than throughput.
-- **What I could and could not measure.** The available hardware is an M4. NVIDIA paths (Triton,
-  CUDA graphs) are implemented and correctness-tested, but unmeasured. I won't quote numbers I don't
-  have.
+- **What I could and could not measure.** The kernels were developed on an M4. The NVIDIA paths
+  were then measured on a free Kaggle T4 behind a correctness gate.
+  - *What it showed:* the host was launch-bound, so CUDA graphs won (1.98×), and my Triton kernel
+    lost to cuBLAS (0.38×). I report both.
+  - *What the hardware found:* seven bugs that CPU-only CI could not see. The best story is the
+    CUDA-graph memory-lifetime bug ([NVIDIA_T4.md](NVIDIA_T4.md)).
 
 ### 2. Correctness first (3 min)
 

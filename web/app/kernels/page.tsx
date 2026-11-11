@@ -102,7 +102,7 @@ function Kernels({ s }: { s: Summary }) {
         title={isCuda ? "Paired speedup of the fused Triton path (with and without CUDA graphs)" : "Paired speedup of the fused Metal path"}
         description={
           isCuda
-            ? "Pipelined time, interleaved trials, 95% bootstrap CI. The Triton kernel is slower than eager everywhere on the T4, and CUDA-graph replay barely changes it, so its time is on the GPU, not in launches. Likely cause (a hypothesis, not yet profiled): too little parallelism at small M. The grid is one program per output tile, at most 32 for the down projection on a 40-SM GPU, and each streams the full K dimension serially (no split-K)."
+            ? "Pipelined time, interleaved trials, 95% bootstrap CI. The Triton kernel is slower than eager everywhere on the T4, and CUDA-graph replay barely changes it, so its time is on the GPU, not in launches. Nsight Systems confirms the time is inside its two kernels (about 24–34 GB/s effective, against about 168 GB/s for cuBLAS). Likely cause (a hypothesis, not yet confirmed with Nsight Compute): too little parallelism at small M. The grid is one program per output tile, at most 32 for the down projection on a 40-SM GPU, and each streams the full K dimension serially (no split-K)."
             : "Pipelined time, interleaved trials, 95% bootstrap CI. It helps most where launches dominate (the small model, 2–8 rows), and not at all at 16 rows, where the path falls back to vendor GEMM."
         }
       >
@@ -173,6 +173,13 @@ function Kernels({ s }: { s: Summary }) {
                 </li>
               ))}
             </ul>
+            {isCuda && regressions.some((c) => c.candidate === "compile_cudagraphs") && (
+              <p className="mt-3 text-xs leading-relaxed text-ink-2">
+                <span className="font-medium text-ink">compile (reduce-overhead)</span> regresses more as the model grows. Its profile shows two
+                extra copy kernels per forward and about 500 µs more kernel time than plain compile. That is consistent with Inductor&apos;s
+                CUDA-graph trees copying the weights (passed as graph inputs) on every replay. This is a diagnosis; the fix is not yet measured.
+              </p>
+            )}
           </Card>
           <Card>
             <div className="mb-2 flex items-center justify-between">

@@ -55,7 +55,8 @@ cd web && npm ci && npm run build   # this dashboard, from your data`}</CodeBloc
             ["experiments/smoke.toml", "tiny CPU pipeline check (CI)", "runs in CI on every push"],
             ["experiments/apple_m4.toml", "full MPS + CPU matrix, serving sweep", "executed (results/phase3, phase4)"],
             ["experiments/repro_check.toml", "eager vs metal re-measurement", "executed: replicated within CIs"],
-            ["experiments/nvidia.toml", "Triton, CUDA graphs, reduce-overhead", "prepared, not executed"],
+            ["experiments/nvidia_t4.toml", "T4 session: Triton, CUDA graphs, reduce-overhead, serving", "executed on Kaggle (results/gpu/kaggle-t4-*)"],
+            ["experiments/nvidia.toml", "full NVIDIA matrix incl. bf16 (Ampere or newer)", "prepared, not executed"],
           ]}
         />
       </Section>
